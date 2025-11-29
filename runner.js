@@ -14,8 +14,6 @@ let FINISH = new Date().getTime()+21000000
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
-console.log(process.argv.slice(2))
-
 startServer()
 
 setInterval(() => {
