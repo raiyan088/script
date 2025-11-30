@@ -86,7 +86,7 @@ async function startServer() {
                     mPendingServer[key] = value.t
                     if (value.s == 0 || value.t < Date.now()-400000) {
                         await delay(delayPerLoop)
-                        runGithubAction(key, false)
+                        runGithubAction(key, 0)
                         active++
                     }
                 }
@@ -149,7 +149,7 @@ async function callEveryMinute() {
                     if(mLiveServer[key]) {
                         if (value < Date.now()-400000) {
                             await delay(delayPerLoop)
-                            runGithubAction(key, true)
+                            runGithubAction(key, 0)
                             active++
                         }
                     }
@@ -242,7 +242,7 @@ async function runClientWebSocket(url) {
                     mPendingServer[json.i] = json.t
                     if (json.s === 0) {
                         console.log(json)
-                        runGithubAction(json.i, true)
+                        runGithubAction(json.i, 3000)
                     }
                 }
             }
@@ -284,10 +284,7 @@ async function checkStatus(firstTime) {
             await closeProcess()
         }
     } else {
-        if(!firstTime) {
-            sendWSMessage(mServerConnection, JSON.stringify({ t: 3, s: 'server', d: { s:1, t: Date.now(), i:USER } }))
-            await delay(150000)
-        }
+        if(!firstTime) sendWSMessage(mServerConnection, JSON.stringify({ t: 3, s: 'server', d: { s:1, t: Date.now(), i:USER } }))
 
         if (FINISH > 0 && FINISH < new Date().getTime()) {
             if (isActionChecking) {
@@ -421,57 +418,46 @@ async function getStorageData(liveServer, auth) {
 
 async function runGithubAction(repo, update) {
     isActionChecking = true
-    try {
-        if (update) {
-            try {
-                let response = await axios.get(STORAGE+encodeURIComponent('realtime/'+key+'.json'))
-                let data = response.data
-                if (data) {
-                    let split = data.contentType.split('/')
-                    if (parseInt(split[0]) === 1) {
-                        if(parseInt(split[1]) > Date.now()-400000) {
-                            return
-                        }
-                    }
-                }
-            } catch (error) {}
-        }
-
-        if (mRepoData[repo]) {
-            let data = mRepoData[repo]
-            await activeAction(data.user, repo, data.action, data.access)
-        } else {
-            let response = await axios.get(BASE_URL+'running/'+repo+'.json')
-                
-            let data = response.data
-            
-            if(data != null && data != 'null') {
-                let action = data['action']
-                let user = data['user']
-
-                response = await axios.get(BASE_URL+'github/account/'+user+'.json')
-            
-                data = response.data
-
-                if(data != null && data != 'null') {
-                    let access = data['access']
-
-                    mRepoData[repo] = {
-                        user: user,
-                        action: action,
-                        access: access
-                    }
-
-                    await activeAction(user, repo, action, access)
-                } else {
-                    console.log('User Not Found: '+user)
-                }
+    
+    setTimeout(async () => {
+        try {
+            if (mRepoData[repo]) {
+                let data = mRepoData[repo]
+                await activeAction(data.user, repo, data.action, data.access)
             } else {
-                console.log('Repo Not Found: '+repo)
+                let response = await axios.get(BASE_URL+'running/'+repo+'.json')
+                    
+                let data = response.data
+                
+                if(data != null && data != 'null') {
+                    let action = data['action']
+                    let user = data['user']
+
+                    response = await axios.get(BASE_URL+'github/account/'+user+'.json')
+                
+                    data = response.data
+
+                    if(data != null && data != 'null') {
+                        let access = data['access']
+
+                        mRepoData[repo] = {
+                            user: user,
+                            action: action,
+                            access: access
+                        }
+
+                        await activeAction(user, repo, action, access)
+                    } else {
+                        console.log('User Not Found: '+user)
+                    }
+                } else {
+                    console.log('Repo Not Found: '+repo)
+                }
             }
-        }
-    } catch (error) {}
-    isActionChecking = false
+        } catch (error) {}
+
+        isActionChecking = false
+    }, timeout)
 }
 
 async function activeAction(user, repo, action, token) {
