@@ -228,7 +228,6 @@ async function runClientWebSocket(url) {
     })
 
     ws.on('open', () => {
-        console.log('Node: ---CLIENT-SOCKET-OPEN---', new Date().toString())
         mClientConnection = ws
         clientReconnecting = false
         ws.send(JSON.stringify({ t: 1, s: 'controller' }))
@@ -241,7 +240,6 @@ async function runClientWebSocket(url) {
                 if (json.i && json.t) {
                     mPendingServer[json.i] = json.t
                     if (json.s === 0) {
-                        console.log(json)
                         runGithubAction(json.i, 3000)
                     }
                 }
@@ -250,7 +248,6 @@ async function runClientWebSocket(url) {
     })
 
     ws.on('close', () => {
-        console.log('Node: ---CLIENT-SOCKET-CLOSE---', new Date().toString())
         mClientConnection = null
         if (!clientReconnecting) {
             clientReconnecting = true
@@ -259,7 +256,6 @@ async function runClientWebSocket(url) {
     })
 
     ws.on('error', err => {
-        console.log('Node: ---CLIENT-SOCKET-ERROR---', new Date().toString())
         mClientConnection = null
         if (!clientReconnecting) {
             clientReconnecting = true
@@ -418,7 +414,7 @@ async function getStorageData(liveServer, auth) {
 
 async function runGithubAction(repo, update) {
     isActionChecking = true
-    
+
     setTimeout(async () => {
         try {
             if (mRepoData[repo]) {
