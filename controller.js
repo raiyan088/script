@@ -404,7 +404,7 @@ async function getStorageData(liveServer, auth) {
     return null
 }
 
-async function runGithubAction(repo, update) {
+async function runGithubAction(repo, timeout) {
     isActionChecking = true
 
     setTimeout(async () => {
