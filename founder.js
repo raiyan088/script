@@ -146,9 +146,7 @@ async function foundLoginNumber() {
 
                     await delay(Math.min(mConfig.d, 2000))
                 }
-
-                console.log({ t:1, u:mConfig.u, s:USER, f:found, r:recaptcha, c:captcha, o:other })
-
+                
                 process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:found, r:recaptcha, c:captcha, o:other } })
             } catch (error) {}
 
