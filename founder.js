@@ -119,7 +119,6 @@ async function foundLoginNumber() {
 
                     try {
                         let status = await getLoginStatus('+'+number)
-                        console.log(status, number)
                         
                         if (status == 0) {
                             status = await getLoginStatus('+'+number)
