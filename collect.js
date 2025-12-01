@@ -11,6 +11,7 @@ const DATABASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJl
 
 let mMailData = null
 let mMailRequest = false
+let mFinishWork = false
 let mMailCookies = {}
 let mSameNumber = 0
 
@@ -130,6 +131,16 @@ let mCookie = [
     }
 ]
 
+
+process.on('message', async (data) => {
+    try {
+        let json = (typeof data === 'string') ? JSON.parse(data) : data
+        if (json.t == 9) {
+            mFinishWork = true
+        }
+    } catch (error) {}
+})
+
 puppeteer.use(StealthPlugin())
 
 
@@ -149,7 +160,10 @@ async function startServer() {
     while (true) {
         mWorkerActive = false
         let data = await getGmailData()
-        if (data) {
+        if (data && !mFinishWork) {
+            try {
+                process.send({ t:9, s:true })
+            } catch (error) {}
             mWorkerActive = true
             if (prevNumber == data.number) {
                 mSameNumber++
@@ -159,6 +173,9 @@ async function startServer() {
             console.log('Node: [ Receive New Data --- Time: '+getTime()+' ]')
             await loginWithCompleted(data.number, data.password, data.cookies, data.key)
             prevNumber = data.number
+            try {
+                process.send({ t:9, s:false })
+            } catch (error) {}
         } else {
             await delay(10000)
         }
