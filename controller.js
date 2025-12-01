@@ -282,21 +282,13 @@ async function checkStatus(firstTime) {
     } else {
         if(!firstTime) sendWSMessage(mServerConnection, JSON.stringify({ t: 3, s: 'server', d: { s:1, t: Date.now(), i:USER } }))
 
-        if (FINISH > 0 && FINISH < new Date().getTime()) {
-            if (isActionChecking) {
-                finishPending = true
-            } else {
-                await closeProcess()
-            }
-        } else {
-            try {
-                await axios.patch(BASE_URL+'live/'+USER+'.json', JSON.stringify({ s:1, t: Date.now() }), {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
-            } catch (error) {}
-        }
+        try {
+            await axios.patch(BASE_URL+'live/'+USER+'.json', JSON.stringify({ s:1, t: Date.now() }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+        } catch (error) {}
     }
 }
 
