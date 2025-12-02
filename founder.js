@@ -11,6 +11,7 @@ let mUrl = null
 let mPostData = null
 let mHeaders = null
 let page = null
+let mStart = Date.now()
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -22,9 +23,13 @@ process.on('message', async (data) => {
         let json = (typeof data === 'string') ? JSON.parse(data) : data
         if (json.t == 1) {
             mConfig = json
+        } else if (json.t == 2) {
+            let running = mConfig != null
+            process.send({ t: 3, s: 'controller_status', d: { t:2, s:running, u:USER, a:parseInt((Date.now()-mStart)/1000) } })
         }
     } catch (error) {}
 })
+
 
 startBrowser()
 
@@ -98,6 +103,7 @@ async function startBrowser() {
 async function foundLoginNumber() {
     while (true) {
         if (mConfig) {
+            mStart = Date.now()
             try {
                 let prev = mConfig.n
                 let target = mConfig.s
@@ -119,7 +125,7 @@ async function foundLoginNumber() {
 
                     try {
                         let status = await getLoginStatus('+'+number)
-                        
+
                         if (status == 0) {
                             status = await getLoginStatus('+'+number)
                         }
@@ -145,7 +151,7 @@ async function foundLoginNumber() {
 
                     await delay(Math.min(mConfig.d, 2000))
                 }
-                
+
                 process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:found, r:recaptcha, c:captcha, o:other } })
             } catch (error) {}
 
