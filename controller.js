@@ -52,29 +52,29 @@ setInterval(async () => {
 
 
 async function startServer() {
-    console.log('Node: ---START-SERVER---')
+    consoleLog('Node: ---START-SERVER---')
     
     let data = await onServerDetails()
     
     if (!data) {
-        console.log('---PROCESS-CLOSE---')
+        consoleLog('---PROCESS-CLOSE---')
         process.exit(0)
     }
 
     await runServerWebSocket(data.database)
 
-    console.log('Node: ---RUN-SERVER-SOCKET---')
+    consoleLog('Node: ---RUN-SERVER-SOCKET---')
 
     await checkStatus(true)
 
     let mData = await readServerData(data.server, data.auth)
 
     if (mData) {
-        console.log('Node: ---DATA-LOAD-SUCCESS---')
+        consoleLog('Node: ---DATA-LOAD-SUCCESS---')
         
         await runClientWebSocket(mWebUrl)
 
-        console.log('Node: ---RUN-CLIENT-SOCKET---')
+        consoleLog('Node: ---RUN-CLIENT-SOCKET---')
 
         let active = 0
         let entries = Object.entries(mData)
@@ -94,12 +94,12 @@ async function startServer() {
         }
 
         if (active > 0) {
-            console.log('Active Server: '+active)
+            consoleLog('Active Server: '+active)
         } else {
-            console.log('Node: ---ACTION-SERVER-START---')
+            consoleLog('Node: ---ACTION-SERVER-START---')
         }
     } else {
-        console.log('Node: ---DATA-LOAD-FAILED---')
+        consoleLog('Node: ---DATA-LOAD-FAILED---')
         process.exit(0)
     }
 }
@@ -161,7 +161,7 @@ async function callEveryMinute() {
     }
 
     if (active > 0) {
-        console.log('Active Server: '+active)
+        consoleLog('Active Server: '+active)
     }
 }
 
@@ -174,7 +174,6 @@ async function runServerWebSocket(url) {
     })
 
     ws.on('open', () => {
-        console.log('Node: ---SERVER-SOCKET-OPEN---', new Date().toString())
         mServerConnection = ws
         serverReconnecting = false
         ws.send(JSON.stringify({ t: 2, s: 'server', d: { s:0, i:USER } }))
@@ -193,7 +192,6 @@ async function runServerWebSocket(url) {
     })
 
     ws.on('close', () => {
-        console.log('Node: ---SERVER-SOCKET-CLOSE---', new Date().toString())
         mServerConnection = null
         if (!serverReconnecting) {
             serverReconnecting = true
@@ -202,7 +200,6 @@ async function runServerWebSocket(url) {
     })
 
     ws.on('error', err => {
-        console.log('Node: ---SERVER-SOCKET-ERROR---', new Date().toString())
         mServerConnection = null
         if (!serverReconnecting) {
             serverReconnecting = true
@@ -240,7 +237,7 @@ async function runClientWebSocket(url) {
                 if (json.i && json.t) {
                     mPendingServer[json.i] = json.t
                     if (json.s === 0) {
-                        runGithubAction(json.i, 3000)
+                        runGithubAction(json.i, 5000)
                     }
                 }
             }
@@ -309,7 +306,7 @@ async function closeProcess() {
         }
     } catch (error) {}
 
-    console.log('---COMPLETED---')
+    consoleLog('---COMPLETED---')
     process.exit(0)
 }
 
@@ -436,10 +433,10 @@ async function runGithubAction(repo, timeout) {
 
                         await activeAction(user, repo, action, access)
                     } else {
-                        console.log('User Not Found: '+user)
+                        consoleLog('User Not Found: '+user)
                     }
                 } else {
-                    console.log('Repo Not Found: '+repo)
+                    consoleLog('Repo Not Found: '+repo)
                 }
             }
         } catch (error) {}
@@ -472,9 +469,9 @@ async function activeAction(user, repo, action, token) {
 
                 try {
                     if (!body || Object.keys(body).length == 0) {
-                        console.log('Success: '+user+'/'+repo)
+                        consoleLog('Success: '+user+'/'+repo)
                     } else {
-                        console.log('Block: '+user+'/'+repo)
+                        consoleLog('Block: '+user+'/'+repo)
                     }
 
                     mPendingServer[repo] = Date.now()
@@ -497,27 +494,27 @@ async function activeAction(user, repo, action, token) {
                                     mRepoData[repo].action = newId
                                 }
                                 await saveAction(repo, newId)
-                                console.log('New Action Success: '+user+'/'+repo)
+                                consoleLog('New Action Success: '+user+'/'+repo)
                             } else {
-                                console.log('New Action Failed: '+user+'/'+repo)
+                                consoleLog('New Action Failed: '+user+'/'+repo)
                             }
                         } else {
                             console.log(error)
-                            console.log('Error: '+user+'/'+repo)
+                            consoleLog('Error: '+user+'/'+repo)
                         }
                     } else {
                         console.log(error)
-                        console.log('Error: '+user+'/'+repo)
+                        consoleLog('Error: '+user+'/'+repo)
                     }
                 } catch (error) {
-                    console.log('Error: '+user+'/'+repo)
+                    consoleLog('Error: '+user+'/'+repo)
                 }
             }
         } else if (body.status == 'queued' || body.status == 'in_progress') {
             if (body.status == 'queued') {
-                console.log('Panding: '+user+'/'+repo)
+                consoleLog('Panding: '+user+'/'+repo)
             } else {
-                console.log('Runing: '+user+'/'+repo)
+                consoleLog('Runing: '+user+'/'+repo)
             }
 
             mPendingServer[repo] = Date.now()
@@ -533,7 +530,7 @@ async function activeAction(user, repo, action, token) {
     } catch (error) {}
 
     if (token == null) {
-        console.log('Token Null: '+user+'/'+repo)
+        consoleLog('Token Null: '+user+'/'+repo)
     }
 }
 
@@ -639,6 +636,23 @@ function getServerName(id) {
         return 'server0'+id
     }
     return 'server'+id
+}
+
+function consoleLog(parm1, parm2, parm3, parm4, parm5) {
+    try {
+        let time = new Date().toLocaleTimeString('en-us', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '')+' :\t'
+        if(parm5) {
+            console.log(time, parm1, parm2, parm3, parm4, parm5)
+        } else if(parm4) {
+            console.log(time, parm1, parm2, parm3, parm4)
+        } else if(parm3) {
+            console.log(time, parm1, parm2, parm3)
+        } else if(parm2) {
+            console.log(time, parm1, parm2)
+        } else if (parm1) {
+            console.log(time, parm1)
+        }
+    } catch (error) {}
 }
 
 function decrypt(text) {
