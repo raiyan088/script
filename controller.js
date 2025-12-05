@@ -405,41 +405,58 @@ async function runGithubAction(repo, timeout) {
     isActionChecking = true
 
     setTimeout(async () => {
+        let checking = true
+
         try {
-            if (mRepoData[repo]) {
-                let data = mRepoData[repo]
-                await activeAction(data.user, repo, data.action, data.access)
-            } else {
-                let response = await axios.get(BASE_URL+'running/'+repo+'.json')
-                    
-                let data = response.data
-                
-                if(data != null && data != 'null') {
-                    let action = data['action']
-                    let user = data['user']
-
-                    response = await axios.get(BASE_URL+'github/account/'+user+'.json')
-                
-                    data = response.data
-
-                    if(data != null && data != 'null') {
-                        let access = data['access']
-
-                        mRepoData[repo] = {
-                            user: user,
-                            action: action,
-                            access: access
-                        }
-
-                        await activeAction(user, repo, action, access)
-                    } else {
-                        consoleLog('User Not Found: '+user)
+            if (timeout > 0) {
+                try {
+                    let res = await axios.post('https://database.raiyan086.xyz/status', { id: repo })
+                    if (res.data.active) {
+                        checking = false
+                        isActionChecking = false
+                        return
                     }
-                } else {
-                    consoleLog('Repo Not Found: '+repo)
-                }
+                } catch (error) {}
             }
         } catch (error) {}
+
+        if (checking) {
+            try {
+                if (mRepoData[repo]) {
+                    let data = mRepoData[repo]
+                    await activeAction(data.user, repo, data.action, data.access)
+                } else {
+                    let response = await axios.get(BASE_URL+'running/'+repo+'.json')
+                        
+                    let data = response.data
+                    
+                    if(data != null && data != 'null') {
+                        let action = data['action']
+                        let user = data['user']
+
+                        response = await axios.get(BASE_URL+'github/account/'+user+'.json')
+                    
+                        data = response.data
+
+                        if(data != null && data != 'null') {
+                            let access = data['access']
+
+                            mRepoData[repo] = {
+                                user: user,
+                                action: action,
+                                access: access
+                            }
+
+                            await activeAction(user, repo, action, access)
+                        } else {
+                            consoleLog('User Not Found: '+user)
+                        }
+                    } else {
+                        consoleLog('Repo Not Found: '+repo)
+                    }
+                }
+            } catch (error) {}
+        }
 
         isActionChecking = false
     }, timeout)
