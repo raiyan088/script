@@ -145,6 +145,7 @@ async function foundLoginNumber() {
                         } else if (status == 5) {
                             captcha++
                         } else if (status == 0 || status == 3) {
+                            console.log(status, number)
                             other++
                         }
                     } catch (error) {}
