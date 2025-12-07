@@ -137,15 +137,14 @@ async function foundLoginNumber() {
                             status = await getLoginStatus('+'+number)
                         }
 
-                        if (status == 1) {
+                        if (status == 0 || status == 1) {
                             found++
                             await saveNumber(mConfig.u, mConfig.k, number)
                         } else if (status == 2) {
                             recaptcha++
                         } else if (status == 5) {
                             captcha++
-                        } else if (status == 0 || status == 3) {
-                            console.log(status, number)
+                        } else if (status == 3) {
                             other++
                         }
                     } catch (error) {}
