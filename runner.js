@@ -189,8 +189,8 @@ async function closeProcess() {
 
 async function sendFinishData() {
     finishStatus = false
-    if (sendWSMessage(CONNECTION, JSON.stringify({ t: 6, s: 'controller', d: { s:0, t: Date.now(), i:USER } }))) {
-        for (let i = 0; i < 10; i++) {
+    if (sendWSMessage(CONNECTION, JSON.stringify({ t: 6, s: 'controller', d: { s:2, t: Date.now(), i:USER } }))) {
+        for (let i = 0; i < 30; i++) {
             await delay(100)
             if (finishStatus) {
                 break
