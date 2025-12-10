@@ -25,7 +25,7 @@ process.on('message', async (data) => {
             mConfig = json
         } else if (json.t == 2) {
             let running = mConfig != null
-            process.send({ t: 3, s: 'controller_status', d: { t:2, s:running, u:USER, a:parseInt((Date.now()-mStart)/1000) } })
+            process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
         }
     } catch (error) {}
 })
@@ -137,14 +137,15 @@ async function foundLoginNumber() {
                             status = await getLoginStatus('+'+number)
                         }
 
-                        if (status == 0 || status == 1) {
+                        if (status == 1) {
                             found++
                             await saveNumber(mConfig.u, mConfig.k, number)
                         } else if (status == 2) {
                             recaptcha++
                         } else if (status == 5) {
                             captcha++
-                        } else if (status == 3) {
+                        } else if (status == 0 || status == 3) {
+                            console.log(status, number)
                             other++
                         }
                     } catch (error) {}
