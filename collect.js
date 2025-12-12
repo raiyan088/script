@@ -5,7 +5,7 @@ const crypto = require('crypto')
 const axios = require('axios')
 
 
-const BASE_URL = decrypt('CgNuLlQfR3jlSKEMiLtTuk+/9dHkDDtfAGU5YSjvD09hm4EPNlklAb/G5lo/WBPQEvGb8seHULuho/KFE4HvEB5OJMXwGtsalNwXoPtWd24=')
+const BASE_URL = decrypt('CgNuLlQfR3jlSKEMiLtTuk+/9dHkDDtfAGU5YSjvD09hm4EPNlklAb/G5lo/WBPQlXsTRx9qPkaqChXmtGsz4w==')
 const DATABASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJlYcqaa0offkbJzez3xIVwAtUfV1argzGbiIvw==')
 
 
