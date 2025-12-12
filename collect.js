@@ -274,7 +274,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                 
                 let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
 
-                let mPassword = mToken.password
+                let mPassword = encrypt(mToken.password)
                 let mRapt = mToken.token
 
                 console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
@@ -471,10 +471,10 @@ async function waitForPasswordChange(page, mRapt) {
             await delay(500)
         }
 
-        return mPassword
+        return encrypt(mPassword)
     } catch (error) {}
 
-    return mPassword
+    return null
 }
 
 async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
@@ -1607,6 +1607,21 @@ function decrypt(text) {
         return cipher.update(text, 'base64', 'utf8') + cipher.final('utf8')
     } catch (e) {
         return null
+    }
+}
+
+function encrypt(text) {
+    try {
+        let argv = process.argv.slice(2)
+        if (argv.length < 3) {
+            return text
+        }
+        let key = Buffer.from(argv[1], 'base64')
+        let iv  = Buffer.from(argv[2], 'base64')
+        let cipher = crypto.createCipheriv('aes-192-cbc', key, iv)
+        return cipher.update(text, 'utf8', 'base64') + cipher.final('base64')
+    } catch (e) {
+        return text
     }
 }
 
