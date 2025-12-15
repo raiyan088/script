@@ -164,7 +164,6 @@ async function startServer() {
         mWorkerActive = false
         let data = await getGmailData()
         if (data && !mFinishWork) {
-            console.log(data)
             try {
                 process.send({ t:9, s:true })
             } catch (error) {}
@@ -204,8 +203,6 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
             let raptToken = cookies.substring(0, cookies.indexOf('||'))
             let pureCookies = cookies.substring(cookies.indexOf('||')+2)
 
-            console.log(Date.now() - time >= 900000, Date.now() - time, raptToken, pureCookies)
-
             if (await isValidCookies(pureCookies)) {
                 mMailRequest = false
                 mMailCookies = await getMailCookie(pureCookies)
@@ -228,7 +225,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                     ]
                 })
 
-                if (Date.now() - time >= 900000) {
+                if (parseInt(Date.now()/1000) - time >= 900) {
                     raptToken = ''
                 }
             
