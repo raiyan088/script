@@ -164,6 +164,7 @@ async function startServer() {
         mWorkerActive = false
         let data = await getGmailData()
         if (data && !mFinishWork) {
+            console.log(data)
             try {
                 process.send({ t:9, s:true })
             } catch (error) {}
