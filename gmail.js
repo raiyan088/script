@@ -203,6 +203,9 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
         try {
             let raptToken = cookies.substring(0, cookies.indexOf('||'))
             let pureCookies = cookies.substring(cookies.indexOf('||')+2)
+
+            console.log(Date.now() - time >= 900000, Date.now() - time, raptToken, pureCookies)
+
             if (await isValidCookies(pureCookies)) {
                 mMailRequest = false
                 mMailCookies = await getMailCookie(pureCookies)
@@ -883,7 +886,7 @@ async function waitForRemoveRecovery(page, mRapt) {
             await delay(500)
         }
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             if (await exists(page, 'div[data-phone]')) {
                 try {
                     if (await exists(page, 'button[aria-label="Remove phone number"]')) {
@@ -1101,8 +1104,7 @@ async function waitForLoginChallenge(page, number, password, target) {
 
         }
     } catch (error) {
-        console.log(error);
-        
+        console.log(error)
     }
 
     return null
