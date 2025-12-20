@@ -237,7 +237,6 @@ async function runClientWebSocket(url) {
                 if (json.i && json.t) {
                     mPendingServer[json.i] = json.t
                     if (json.s === 0 || json.s === 2) {
-                        consoleLog('Status: '+json.s)
                         runGithubAction(json.i, json.s === 2 ? 10000 : 3000)
                     }
                 }
