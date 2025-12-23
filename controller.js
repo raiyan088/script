@@ -7,7 +7,6 @@ const axios = require('axios')
 let mPendingServer = {}
 let mLiveServer = {}
 let mWebUrl = null
-let DATABASE = null
 let mRepoData = {}
 let mClientConnection = null
 let mServerConnection = null
@@ -494,10 +493,8 @@ async function activeAction(user, repo, action, token) {
                     mPendingServer[repo] = Date.now()
 
                     try {
-                        await axios.patch('https://'+DATABASE+decode('LmZpcmViYXNlaW8uY29tLyVDMiVBM3VjayVFMyU4MCU4NXlvdS91c2VyLw==')+repo+'.json', JSON.stringify({ t: Date.now(), s:1 }), {
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            }
+                        await postAxios(STORAGE+encodeURIComponent('realtime/'+repo+'.json'), '', {
+                            'Content-Type':'1/'+Date.now()
                         })
                     } catch (error) {}
                 } catch (error) {}
@@ -537,10 +534,8 @@ async function activeAction(user, repo, action, token) {
             mPendingServer[repo] = Date.now()
 
             try {
-                await axios.patch('https://'+DATABASE+decode('LmZpcmViYXNlaW8uY29tLyVDMiVBM3VjayVFMyU4MCU4NXlvdS91c2VyLw==')+repo+'.json', JSON.stringify({ t: Date.now(), s:1 }), {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
+                await postAxios(STORAGE+encodeURIComponent('realtime/'+repo+'.json'), '', {
+                    'Content-Type':'1/'+Date.now()
                 })
             } catch (error) {}
         }
@@ -608,6 +603,16 @@ async function saveAction(repo, action) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
+        })
+    } catch (error) {}
+}
+
+async function postAxios(url, body, data) {
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: data,
+            body: body
         })
     } catch (error) {}
 }
