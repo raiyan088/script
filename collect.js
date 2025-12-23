@@ -311,8 +311,8 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
 
                     if (rapt) mRapt = rapt
                     
-                    let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, 'arafat.arf121@gmail.com')
-    
+                    let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, ['r.v.y.david121@gmail.com', 'arafatfilee@gmail.com'])
+        
                     console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
                     
                     rapt = await getRapt(await page.url())
@@ -513,7 +513,14 @@ async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
 
         if (newmRapt) await delay(500)
 
-        if (!mRecovery) mRecovery = getRandomUser()+'@oletters.com'
+        let recovery
+
+        if (Array.isArray(mRecovery) && mRecovery.length > 0) {
+            let index = Math.floor(Math.random() * mRecovery.length)
+            recovery = mRecovery[index]
+        } else {
+            recovery = getRandomUser() + '@oletters.com'
+        }
 
         let button = await findView(page, 'button', 'Add recovery email')
 
@@ -522,11 +529,11 @@ async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
             await waitForSelector(page, 'input[type="email"]', 10)
             await delay(500)
             await page.focus('input[type="email"]')
-            await page.keyboard.type(mRecovery)
+            await page.keyboard.type(recovery)
             await delay(500)
             await page.click('button[data-mdc-dialog-action="ok"]')
             await delay(3000)
-            return mRecovery
+            return recovery
         } else if (await exists(page, 'button[aria-label="Edit recovery email"]')) {
             await page.click('button[aria-label="Edit recovery email"]')
             await waitForSelector(page, 'input[type="email"]', 10)
@@ -538,11 +545,11 @@ async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
             await page.keyboard.up('Control')
             await page.keyboard.press('Backspace')
 
-            await page.keyboard.type(mRecovery)
+            await page.keyboard.type(recovery)
             await delay(500)
             await page.click('button[data-mdc-dialog-action="ok"]')
             await delay(3000)
-            return mRecovery
+            return recovery
         } else if (await exists(page, 'input[type="email"]')) {
             let hasMail = await page.evaluate(() => {
                 let root = document.querySelector('input[type="email"]')
@@ -560,12 +567,12 @@ async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
                 await page.keyboard.press('Backspace')
             }
             
-            await page.keyboard.type(mRecovery)
+            await page.keyboard.type(recovery)
             await delay(500)
             await page.click('button[type="submit"]')
             await delay(3000)
 
-            return mRecovery
+            return recovery
         }
     } catch (error) {}
 
