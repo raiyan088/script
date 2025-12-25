@@ -236,9 +236,11 @@ async function runClientWebSocket(url) {
             if (!isBinary) {
                 let json = JSON.parse(data.toString())
                 if (json.i && json.t) {
-                    mPendingServer[json.i] = json.t
-                    if (json.s === 0 || json.s === 2) {
-                        runGithubAction(json.i, json.s === 2 ? 10000 : 3000)
+                    if(mLiveServer[json.i]) {
+                        mPendingServer[json.i] = json.t
+                        if (json.s === 0 || json.s === 2) {
+                            runGithubAction(json.i, json.s === 2 ? 10000 : 3000)
+                        }
                     }
                 }
             }
