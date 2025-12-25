@@ -17,12 +17,13 @@ let finishStatus = false
 let finishPending = false
 let USER = getUserName()
 let FINISH = new Date().getTime()+21000000
+let mDeleteData = [ 'founder' ]
 
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 let BASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJlYcqaa0offkbJzez3xIVwAtUfV1argzGbiIvw==')
 
-// USER = 'qsnrhamara86079'
+USER = 'qsnrhamara86079'
 
 startServer()
 
@@ -124,6 +125,7 @@ async function onServerDetails() {
 
 async function readServerData(server, auth) {
     try {
+        mDeleteData.push(getServerName(server))
         let response = await axios.get(BASE_URL+'server/'+getServerName(server)+'.json')
         mLiveServer = response.data
         response = await axios.get(BASE_URL+'database/v'+server+'.json')
@@ -428,7 +430,7 @@ async function runGithubAction(repo, timeout) {
                     let response = await axios.get(BASE_URL+'running/'+repo+'.json')
                         
                     let data = response.data
-                    
+
                     if(data != null && data != 'null') {
                         let action = data['action']
                         let user = data['user']
@@ -449,6 +451,16 @@ async function runGithubAction(repo, timeout) {
                             await activeAction(user, repo, action, access)
                         } else {
                             consoleLog('User Not Found: '+user)
+
+                            for (let i = 0; i < mDeleteData.length; i++) {
+                                try {
+                                    await axios.delete(BASE_URL+'server/'+mDeleteData[i]+'/'+repo+'.json')
+                                } catch (error) {}
+                            }
+
+                            try {
+                                await axios.delete(BASE_URL+'running/'+repo+'.json')
+                            } catch (error) {}
                         }
                     } else {
                         consoleLog('Repo Not Found: '+repo)
@@ -539,7 +551,29 @@ async function activeAction(user, repo, action, token) {
                 })
             } catch (error) {}
         }
-    } catch (error) {}
+    } catch (error) {
+        try {
+            if (error.response) {
+                if (error.response.status === 403 && error.response.data.message == 'Sorry. Your account was suspended') {
+                    consoleLog('Suspended: '+user+'/'+repo)
+
+                    for (let i = 0; i < mDeleteData.length; i++) {
+                        try {
+                            await axios.delete(BASE_URL+'server/'+mDeleteData[i]+'/'+repo+'.json')
+                        } catch (error) {}
+                    }
+
+                    try {
+                        await axios.delete(BASE_URL+'running/'+repo+'.json')
+                    } catch (error) {}
+
+                    try {
+                        await axios.delete(BASE_URL+'github/account/'+user+'.json')
+                    } catch (error) {}
+                }
+            }
+        } catch (error) {}
+    }
 
     if (token == null) {
         consoleLog('Token Null: '+user+'/'+repo)
