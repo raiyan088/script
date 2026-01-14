@@ -408,6 +408,14 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
         } else {
             console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
 
+            try {
+                await axios.patch(BASE_URL+'expire/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: time }), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+            } catch (error) {}
+
             await axios.delete(BASE_URL+'collect/'+number+'.json')
         }
     } catch (error) {}
