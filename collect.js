@@ -352,6 +352,8 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
         
                         await waitForNameChange(page, mRapt)
+
+                        console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
                     } else {
                         try {
                             await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
