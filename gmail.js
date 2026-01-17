@@ -648,66 +648,85 @@ async function waitForFindView(page, tagName, matchText, timeout = 30) {
     return null
 }
 
-async function waitForDeviceLogout(page, mRapt) {
+async function waitForDeviceLogout(page, rapt) {
     try {
-        await page.goto('https://myaccount.google.com/device-activity?hl=en&rapt='+mRapt)
-        await delay(1000)
+        await page.goto('https://myaccount.google.com/security', { waitUntil: 'load', timeout: 0 })
+        await delay(500)
+        let data = await page.evaluate(async () => {
+            try {
+                let at = window.WIZ_global_data?.SNlM0e
 
-        let mDevice = await page.evaluate(() => {
-            let list = document.querySelectorAll('script')
-            let year = parseInt(new Date().getFullYear())
-            let logout = []
-            let years = []
-            let data = []
+                let body = `f.req=%5B%5B%5B%22uPexwe%22%2C%22%5B1%2C1%5D%22%2Cnull%2C%221%22%5D%5D%5D&at=${encodeURIComponent(at)}&`
 
-            for (let i = 0; i < list.length; i++) {
-                let html = list[i].innerHTML
-                if (html.startsWith('AF_initDataCallback') && !html.includes('mail.google.com') && !html.includes('meet.google.com')) {
-                    data = JSON.parse(html.substring(html.indexOf('['), html.lastIndexOf(']')+1))[1]
-                    break
-                }
+                let res = await fetch('/_/AccountSettingsUi/data/batchexecute?rpcids=uPexwe&hl=en&soc-app=1&soc-platform=1&soc-device=1&rt=c',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                        },
+                        body,
+                        credentials: 'same-origin'
+                    })
+                
+                return await res.text()
+            } catch (error) {
+                return error
             }
+        })
 
-            for(let i=0; i<data.length; i++) {
-                let child = data[i][2]
-                for(let j=0; j<child.length; j++) {
-                    let main = child[j]
-                    if(main.length > 9 && main[9]) {
-                        years.push(main[9])
-                    }
-                    if(main.length > 23) {
-                        if(main[12] == true && main[13] != null && main[22] != null && main[22] != 1) {
-                            logout.push(main[0])
-                        }
-                    }
-                }
+        if (data) {
+            let list = deviceList(extractArrays(data)[0])
+            let years = []
+
+            console.log('Process: [ Device Size: '+Object.keys(list).length+' --- Time: '+getTime()+' ]')
+
+            for (let [key, value] of Object.entries(list)) {
+                try {
+                    years.push(value.active)
+
+                    await page.evaluate(async (deviceId, deviceToken, rapt) => {
+                        try {
+                            let at = window.WIZ_global_data?.SNlM0e
+                            let payload = [[[ "YZ6Dc", JSON.stringify([ null, null, deviceToken ]), null, "generic" ]]]
+                            let body ='f.req='+encodeURIComponent(JSON.stringify(payload))+'&at='+encodeURIComponent(at)+'&'
+
+                            await fetch(`/_/AccountSettingsUi/data/batchexecute?rpcids=YZ6Dc&source-path=%2Fdevice-activity%2Fid%2F${encodeURIComponent(deviceId)}`+(rapt?`&rapt=${encodeURIComponent(rapt)}`:``)+`&hl=en&soc-app=1&soc-platform=1&soc-device=1&rt=c`, {
+                                method: 'POST',
+                                headers: {
+                                    'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                                },
+                                body,
+                                credentials: 'same-origin'
+                            })
+
+                            body ='f.req=%5B%5B%5B%22Z5lnef%22%2C%22%5B%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&at='+encodeURIComponent(at)+'&'
+
+                            await fetch(`/_/AccountSettingsUi/data/batchexecute?rpcids=Z5lnef&source-path=%2Fdevice-activity%2Fid%2F${encodeURIComponent(deviceId)}`+(rapt?`&rapt=${encodeURIComponent(rapt)}`:``)+`&hl=en&soc-app=1&soc-platform=1&soc-device=1&rt=c`, {
+                                method: 'POST',
+                                headers: {
+                                    'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                                },
+                                body,
+                                credentials: 'same-origin'
+                            })
+                        } catch (e) {}
+                    }, key, value.token, rapt)
+
+                    console.log('Process: [ Logout Success: '+value.name+' --- Time: '+getTime()+' ]')
+                } catch (error) {}
+
+                await delay(1000)
             }
 
             years.sort(function(a, b){return a-b})
-
+            
             if(years.length > 0) {
-                year = parseInt(new Date(years[0]).getFullYear())
-            }
-
-            if (year < 2000) parseInt(new Date().getFullYear())
-
-            return { list:logout, year:year }
-        })
-
-        console.log('Process: [ Login Devices: '+mDevice.list.length+' --- Time: '+getTime()+' ]')
-
-        for (let i = 0; i < mDevice.list.length; i++) {
-            try {
-                await page.goto('https://myaccount.google.com/device-activity/id/'+mDevice.list[i]+'?hl=en&rapt='+mRapt)
-                await delay(500)
-                await page.click('button[class="Rju2Ue-jPmIDe Rju2Ue-jPmIDe-OWXEXe-ssJRIf Rju2Ue-jPmIDe-OWXEXe-ssJRIf-hXIJHe"]')
-                await delay(1000)
-                await page.click('div[class="KsHAYd J9fJmf"] > button[class="VfPpkd-LgbsSe ksBjEc lKxP2d LQeN7 SdOXCb LjrPGf HvOprf evJWRb"]')
-                await delay(2000)
-            } catch (error) {}
+                let year = parseInt(new Date(years[0]).getFullYear())
+                if (year > 2000) {
+                    return year
+                }
+            }            
         }
-
-        return mDevice.year
     } catch (error) {}
 
     return parseInt(new Date().getFullYear())
@@ -1645,6 +1664,57 @@ function encrypt(text) {
     } catch (e) {
         return text
     }
+}
+
+function deviceList(data) {
+    let arrays = {}
+
+    try {
+        if (data) {
+            let json = JSON.parse(data[0][2])
+            let list = json[1]
+
+            for(let i=0; i<list.length; i++) {
+                let child = list[i][2]
+
+                for(let j=0; j<child.length; j++) {
+                    let main = child[j]
+
+                    if(main.length > 23) {
+                        if(main[12] == true && main[13] != null && main[22] != null && main[22] != 1) {
+                            arrays[main[0]] = {
+                                name : main[1],
+                                token : main[13],
+                                active: main[9]
+                            }
+                        }
+                    }
+                }
+            }   
+        }
+    } catch (error) {}
+
+    return arrays
+}
+
+function extractArrays(raw) {
+    raw = raw.replace(/^\)\]\}'\s*/g, '')
+
+    let lines = raw.split('\n')
+
+    let arrays = []
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim()
+
+        if (line.startsWith('[')) {
+            try {
+                arrays.push(JSON.parse(line))
+            } catch {}
+        }
+    }
+
+    return arrays
 }
 
 function getRandomInt(min, max) {
