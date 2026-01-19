@@ -314,7 +314,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
 
                     if (rapt) mRapt = rapt
                     
-                    let mRecovery = await waitForRecoveryAdd(page, mRapt, ['r.v.y.david121@gmail.com', 'arafatfilee@gmail.com'])
+                    let mRecovery = await waitForRecoveryAdd(page, mRapt, [])
     
                     console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
                     
@@ -514,7 +514,7 @@ async function waitForRecoveryAdd(page, mRapt, mRecovery) {
 
         let recovery
 
-        if (Array.isArray(mRecovery) && mRecovery.length > 0) {
+        if (mRecovery && Array.isArray(mRecovery) && mRecovery.length > 0) {
             let index = Math.floor(Math.random() * mRecovery.length)
             recovery = mRecovery[index]
         } else {
