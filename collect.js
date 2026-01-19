@@ -514,13 +514,9 @@ async function waitForRecoveryAdd(page, password, mRapt, mRecovery) {
         await page.goto('https://myaccount.google.com/recovery/email?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(1000)
 
-        let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
+        let newmRapt = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
 
-        if (status == 1) await delay(500)
-
-        if (status == 2 || status == 0) {
-            return null
-        }
+        if (newmRapt) await delay(500)
         
         let recovery
 
@@ -536,7 +532,7 @@ async function waitForRecoveryAdd(page, password, mRapt, mRecovery) {
         if (button) {
             await button.click()
             await waitForSelector(page, 'input[type="email"]', 10)
-            await delay(500)
+            await delay(1000)
             await page.focus('input[type="email"]')
             await page.keyboard.type(recovery)
             await delay(500)
@@ -546,13 +542,14 @@ async function waitForRecoveryAdd(page, password, mRapt, mRecovery) {
         } else if (await exists(page, 'button[aria-label="Edit recovery email"]')) {
             await page.click('button[aria-label="Edit recovery email"]')
             await waitForSelector(page, 'input[type="email"]', 10)
-            await delay(500)
+            await delay(1000)
 
             await page.focus('input[type="email"]')
             await page.keyboard.down('Control')
             await page.keyboard.press('A')
             await page.keyboard.up('Control')
             await page.keyboard.press('Backspace')
+            await delay(500)
 
             await page.keyboard.type(recovery)
             await delay(500)
@@ -574,8 +571,10 @@ async function waitForRecoveryAdd(page, password, mRapt, mRecovery) {
                 await page.keyboard.press('A')
                 await page.keyboard.up('Control')
                 await page.keyboard.press('Backspace')
+                await delay(500)
             }
             
+            await delay(500)
             await page.keyboard.type(recovery)
             await delay(500)
             await page.click('button[type="submit"]')
@@ -593,10 +592,10 @@ async function waitForLoginChallenge(page, password, target) {
         let url = await page.url()
 
         if (url.startsWith('https://accounts.google.com/v3/signin/challenge/pwd')) {
-            console.log('Node: [ Login Challange --- Time: '+getTime()+' ]')
+            console.log('Process: [ Login Challange --- Time: '+getTime()+' ]')
             await waitForSelector(page, 'input[type="password"]')
             await delay(500)
-            await page.type('input[type="password"]', password)
+            await waitForPasswordType(page, password)
             await delay(500)
             if (await exists(page, '#passwordNext')) {
                 await page.click('#passwordNext')
@@ -610,7 +609,12 @@ async function waitForLoginChallenge(page, password, target) {
 
                     if (url.startsWith(target)) {
                         return 1
-                    } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/dp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/collect') || url.startsWith('https://accounts.google.com/v3/signin/challenge/selection') || url.startsWith('https://accounts.google.com/v3/signin/challenge/kpp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/consent')) {
+                    } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/dp') || 
+                            url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/collect') || 
+                            url.startsWith('https://accounts.google.com/v3/signin/challenge/selection') || 
+                            url.startsWith('https://accounts.google.com/v3/signin/challenge/kpp') || 
+                            url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/consent') ||
+                            url.startsWith('https://accounts.google.com/v3/signin/rejected')) {
                         return 2
                     }
                 } catch (error) {}
@@ -1016,7 +1020,7 @@ async function waitForRaptToken(page, number, password) {
                     console.log('Process: [ Login Challange: '+number+' --- Time: '+getTime()+' ]')
                     await waitForSelector(page, 'input[type="password"]')
                     await delay(500)
-                    await page.type('input[type="password"]', password)
+                    await waitForPasswordType(page, password)
                     await delay(500)
                     if (await exists(page, '#passwordNext')) {
                         await page.click('#passwordNext')
@@ -1582,6 +1586,35 @@ async function getRapt(url) {
     return null
 }
 
+async function waitForPasswordType(page, password) {
+    
+    for (let i = 0; i < 10; i++) {
+        await delay(1000)
+
+        try {
+            let data = await exists(page, 'input[type="password"]')
+            if (data) {
+                
+
+                let success = await page.evaluate((password) => {
+                    try {
+                        let root = document.querySelector('input[type="password"]')
+                        if (root && root.value == password) {
+                            return true
+                        }
+                    } catch (error) {}
+
+                    return false
+                }, password)
+
+                if (success) {
+                    break
+                }
+            }
+        } catch (error) {}
+    }
+}
+
 async function waitForSelector(page, element, _timeout = 30) {
 
     for (let i = 0; i < _timeout; i++) {
@@ -1673,6 +1706,10 @@ function decrypt(text) {
 
 function encrypt(text) {
     try {
+        if (!text) {
+            return null
+        }
+
         let argv = process.argv.slice(2)
         if (argv.length < 3) {
             return text
