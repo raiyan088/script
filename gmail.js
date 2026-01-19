@@ -330,7 +330,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
 
                         if (rapt) mRapt = rapt
                         
-                        let mRecovery = await waitForRecoveryAdd(page, mRapt, ['r.v.y.david121@gmail.com', 'arafatfilee@gmail.com'])
+                        let mRecovery = await waitForRecoveryAdd(page, mRapt, [])
         
                         console.log('Process: [ Recovery Mail: '+mRecovery+' --- Time: '+getTime()+' ]')
                         
@@ -542,7 +542,7 @@ async function waitForRecoveryAdd(page, mRapt, mRecovery) {
 
         let recovery
 
-        if (Array.isArray(mRecovery) && mRecovery.length > 0) {
+        if (mRecovery && Array.isArray(mRecovery) && mRecovery.length > 0) {
             let index = Math.floor(Math.random() * mRecovery.length)
             recovery = mRecovery[index]
         } else {
@@ -1610,6 +1610,7 @@ function getRandomUser() {
     return user
 }
 
+
 function getRandomPass() {
     let L = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     let N = ['0','1','2','3','4','5','6','7','8','9']
@@ -1627,6 +1628,7 @@ function getRandomPass() {
     return pass
 }
 
+
 function decrypt(text) {
     try {
         let argv = process.argv.slice(2)
@@ -1641,6 +1643,7 @@ function decrypt(text) {
         return null
     }
 }
+
 
 function encrypt(text) {
     try {
