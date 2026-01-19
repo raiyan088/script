@@ -469,6 +469,12 @@ async function waitForPasswordChange(page, mRapt) {
     try {
         await page.goto('https://myaccount.google.com/signinoptions/password?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(500)
+
+        let url = await page.url()
+        if (!url.startsWith('https://myaccount.google.com/signinoptions/password')) {
+            return null
+        }
+
         let mPassword = getRandomPass()
         await page.type('input[name="password"]', mPassword)
         await delay(500)
@@ -508,9 +514,13 @@ async function waitForRecoveryAdd(page, password, mRapt, mRecovery) {
         await page.goto('https://myaccount.google.com/recovery/email?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(1000)
 
-        let newmRapt = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
+        let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
 
-        if (newmRapt) await delay(500)
+        if (status == 1) await delay(500)
+
+        if (status == 2 || status == 0) {
+            return null
+        }
         
         let recovery
 
@@ -599,19 +609,20 @@ async function waitForLoginChallenge(page, password, target) {
                     url = await page.url()
 
                     if (url.startsWith(target)) {
-                        return await getRapt(url)
+                        return 1
                     } else if (url.startsWith('https://accounts.google.com/v3/signin/challenge/dp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/collect') || url.startsWith('https://accounts.google.com/v3/signin/challenge/selection') || url.startsWith('https://accounts.google.com/v3/signin/challenge/kpp') || url.startsWith('https://accounts.google.com/v3/signin/challenge/ipp/consent')) {
-                        break
+                        return 2
                     }
                 } catch (error) {}
 
                 await delay(500)
             }
-
+        } else {
+            return 3
         }
     } catch (error) {}
 
-    return null
+    return 0
 }
 
 async function findView(page, tagName, matchText) {
@@ -1109,6 +1120,12 @@ async function waitForTwoFaActive(page, mRapt) {
         }
         await page.goto('https://myaccount.google.com/two-step-verification/authenticator?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(1000)
+
+        url = await page.url()
+        if (!url.startsWith('https://myaccount.google.com/two-step-verification/authenticator')) {
+            return { auth:null, backup:null, error:true }
+        }
+
         let previus = await findView(page, 'button', 'Change authenticator app')
         if (previus) {
             if (await exists(page, 'button[aria-label="Remove Google Authenticator"]')) {
