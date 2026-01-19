@@ -909,10 +909,7 @@ async function waitForRemoveRecovery(page, mRapt) {
                     
                     for (let i = 0; i < 10; i++) {
                         await delay(1000)
-                        let remove = await findView(page, 'div[role="button"]', 'Remove number')
-                        if (!remove) {
-                            remove = await findView(page, 'div[role="button"]', 'REMOVE NUMBER')
-                        }
+                        let remove = await findView(page, 'div[role="button"]', 'REMOVE NUMBER')
                         if (remove) {
                             await remove.click()
                             console.log('Process: [ Recovery Number: Delete Success --- Time: '+getTime()+' ]')
