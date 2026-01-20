@@ -288,6 +288,10 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                     let mToken = await waitForRaptToken(page, '+'+number.replace('8800', '880'), password)
                     mPassword = encrypt(mToken.password)
                     mRapt = mToken.token
+
+                    if (mPassword) {
+                        console.log('Process: [ Change Password: '+mPassword+' --- Time: '+getTime()+' ]')
+                    }
                 }
 
                 console.log('Process: [ Rapt Token: '+(mRapt == null ? 'NULL' : 'Received')+' --- Time: '+getTime()+' ]')
@@ -1068,7 +1072,7 @@ async function waitForRaptToken(page, number, password) {
                                 console.log('Process: [ OTP Send: '+number+' --- Time: '+getTime()+' ]')
                                 mCodeSend = true
                                 break
-                            } else if (url.startsWith('https://accounts.google.com/signin/v2/speedbump/changepassword/changepasswordform') && changePassword) {
+                            } else if ((url.startsWith('https://accounts.google.com/signin/v2/speedbump/changepassword/changepasswordform') || url.startsWith('https://accounts.google.com/v3/signin/speedbump/changepassword/changepasswordform')) && changePassword) {
                                 try {
                                     await waitForSelector(page, 'input[name="Passwd"]')
                                     await delay(500)
