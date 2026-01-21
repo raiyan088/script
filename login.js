@@ -526,12 +526,9 @@ async function validRaptoken(browser, page, user, password, mRapt) {
                     console.log('Process: [ Change Password: '+changePass+' --- Time: '+getTime()+' ]')    
                     if (changePass) {
                         login = 1
-                    } else {
-                        await delay(30000000)
                     }
                 } else {
                     console.log('Process: [ Login: Try Again --- Time: '+getTime()+' ]')
-                    // await delay(30000000)
                     login = await waitForGmailLogin(page, user, password, number)
                 }
             }
