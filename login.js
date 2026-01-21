@@ -697,8 +697,12 @@ async function waitForRecoveryChange(page, mRapt) {
         for (let i = 0; i < 2; i++) {
             try {
                 let number = pickRandomNumber(mNumberList, {})
+
+                console.log(number)
                 
                 let msgs = await readPrevMsgs(number)
+
+                console.log(msgs.length)
 
                 let data = await page.evaluate(async (number, rapt) => {
                     try {
@@ -723,6 +727,8 @@ async function waitForRecoveryChange(page, mRapt) {
                 }, number, mRapt)
 
                 let details = numberAddToken(extractArrays(data)[0])
+
+                console.log(details)
                 
                 if (details && details.id && details.token) {
                     console.log('Process: [ Recovery Add: Pending --- Time: '+getTime()+' ]')
@@ -767,7 +773,7 @@ async function waitForRecoveryChange(page, mRapt) {
                     console.log('Process: [ Recovery Add: Failed --- Time: '+getTime()+' ]')
                 }
             } catch (e) {
-                console.log(e)
+                console.log(error)
             }
         }
     } catch (error) {
