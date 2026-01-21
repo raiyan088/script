@@ -1075,15 +1075,6 @@ async function waitForDeviceLogout(page, rapt) {
                 await delay(1000)
             }
 
-            await page.goto('https://myaccount.google.com/security', { waitUntil: 'load', timeout: 0 })
-            await delay(500)
-
-            if (await exists(page, 'a[href*="two-step-verification/prompt"]')) {
-                console.log('Process: [ Google prompt: 1 device --- Time: '+getTime()+' ]')
-            }
-
-            await delay(30000)
-
             years.sort(function(a, b){return a-b})
             
             if(years.length > 0) {
