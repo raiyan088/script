@@ -486,7 +486,7 @@ async function validRaptoken(browser, page, user, password, mRapt) {
             console.log('Status:', status)
             
             if (status == 2 || status == 0) {
-                console.log('Process: [ Recovery Change: '+number+' --- Time: '+getTime()+' ]')
+                console.log('Process: [ Recovery Change --- Time: '+getTime()+' ]')
                 let number = await waitForRecoveryChange(page, mRapt)
 
                 console.log('Process: [ New Recovery: '+number+' --- Time: '+getTime()+' ]')
