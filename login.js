@@ -161,6 +161,8 @@ async function startServer() {
 
     mNumberList = await fetchNumbers()
 
+    console.log(mNumberList)
+
     while (true) {
         mWorkerActive = false
         let data = await getGmailData()
