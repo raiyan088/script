@@ -477,90 +477,97 @@ async function validRaptoken(browser, page, user, password, mRapt) {
         await page.goto('https://myaccount.google.com/recovery/email?hl=en&rapt='+mRapt, { waitUntil: 'load', timeout: 0 })
         await delay(1000)
 
-        let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
+        let url = await page.url()
+        if (url.startsWith('https://myaccount.google.com/recovery/email')) {
+            console.log('Process: [ Valid RAPT Token --- Time: '+getTime()+' ]')
+        } else {
+            let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
+
+            console.log('Status:', status)
             
-        if (status == 2 || status == 0) {
-            let number = await waitForRecoveryChange(page, mRapt)
+            if (status == 2 || status == 0) {
+                console.log('Process: [ Recovery Change: '+number+' --- Time: '+getTime()+' ]')
+                let number = await waitForRecoveryChange(page, mRapt)
 
-            console.log('Process: [ New Recovery: '+number+' --- Time: '+getTime()+' ]')
+                console.log('Process: [ New Recovery: '+number+' --- Time: '+getTime()+' ]')
 
-            try {
-                if (page != null) {
-                    await page.close()
+                try {
+                    if (page != null) {
+                        await page.close()
+                    }
+                } catch (error) {}
+
+                try {
+                    if (browser != null) {
+                        await browser.close()
+                    }
+                } catch (error) {}
+
+                mClose = true
+
+                await delay(3000)
+
+                browser = await puppeteer.launch({
+                    headless: false,
+                    headless: 'new',
+                    args: [
+                        '--no-sandbox',
+                        '--disable-notifications',
+                        '--disable-setuid-sandbox',
+                        '--ignore-certificate-errors',
+                        '--ignore-certificate-errors-skip-list',
+                        '--disable-dev-shm-usage'
+                    ]
+                })
+
+                page = (await browser.pages())[0]
+
+                page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
+
+                let login = await waitForGmailLogin(page, user, password, number)
+                let changePass = null
+                
+                if (login != 1) {
+                    if (login == 11) {
+                        changePass = await passwordChange(page)
+                        console.log('Process: [ Change Password: '+changePass+' --- Time: '+getTime()+' ]')    
+                        if (changePass) {
+                            login = 1
+                        }
+                    } else {
+                        console.log('Process: [ Login: Try Again --- Time: '+getTime()+' ]')
+                        login = await waitForGmailLogin(page, user, password, number)
+                    }
                 }
-            } catch (error) {}
 
-            try {
-                if (browser != null) {
-                    await browser.close()
-                }
-            } catch (error) {}
+                if (login == 1) {
+                    console.log('Process: [ New Login: Success --- Time: '+getTime()+' ]')
 
-            mClose = true
+                    let rapt = await getRapt(await page.url())
 
-            await delay(3000)
+                    if (!rapt) {
+                        await page.goto('https://myaccount.google.com/recovery/email?hl=en', { waitUntil: 'load', timeout: 0 })
+                        await delay(1000)
 
-            browser = await puppeteer.launch({
-                headless: false,
-                headless: 'new',
-                args: [
-                    '--no-sandbox',
-                    '--disable-notifications',
-                    '--disable-setuid-sandbox',
-                    '--ignore-certificate-errors',
-                    '--ignore-certificate-errors-skip-list',
-                    '--disable-dev-shm-usage'
-                ]
-            })
+                        let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
 
-            page = (await browser.pages())[0]
+                        if (status == 1 || status == 3) {
+                            rapt = await getRapt(await page.url())
+                        }
+                    }
 
-            page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
-
-            let login = await waitForGmailLogin(page, user, password, number)
-            let changePass = null
-            
-            if (login != 1) {
-                if (login == 11) {
-                    changePass = await passwordChange(page)
-                    console.log('Process: [ Change Password: '+changePass+' --- Time: '+getTime()+' ]')    
-                    if (changePass) {
-                        login = 1
+                    if (rapt) {
+                        return { change: true, browser: browser, page: page, number: number, pass:changePass, rapt: rapt }
                     }
                 } else {
-                    console.log('Process: [ Login: Try Again --- Time: '+getTime()+' ]')
-                    login = await waitForGmailLogin(page, user, password, number)
+                    console.log('Process: [ New Login: Failed --- Time: '+getTime()+' ]')
                 }
+
+                return { change:true, browser: browser, page: page, number: number, pass:changePass, rapt:null }
             }
-
-            if (login == 1) {
-                console.log('Process: [ New Login: Success --- Time: '+getTime()+' ]')
-
-                let rapt = await getRapt(await page.url())
-
-                if (!rapt) {
-                    await page.goto('https://myaccount.google.com/recovery/email?hl=en', { waitUntil: 'load', timeout: 0 })
-                    await delay(1000)
-
-                    let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
-
-                    if (status == 1 || status == 3) {
-                        rapt = await getRapt(await page.url())
-                    }
-                }
-
-                if (rapt) {
-                    return { change: true, browser: browser, page: page, number: number, pass:changePass, rapt: rapt }
-                }
-            } else {
-                console.log('Process: [ New Login: Failed --- Time: '+getTime()+' ]')
-            }
-
-            return { change:true, browser: browser, page: page, number: number, pass:changePass, rapt:null }
         }
     } catch (error) {
-        console.log(error)
-        await delay(1000000)
+        console.log('Error:', error)
     }
 
     if (mClose) {
@@ -963,7 +970,7 @@ async function waitForLoginChallenge(page, password, target) {
 
                 await delay(500)
             }
-        } else {
+        } else if (url.startsWith(target)) {
             return 3
         }
     } catch (error) {}
