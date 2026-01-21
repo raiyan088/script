@@ -161,7 +161,7 @@ async function startServer() {
 
     mNumberList = await fetchNumbers()
 
-    console.log(mNumberList)
+    console.log('Number:', mNumberList)
 
     while (true) {
         mWorkerActive = false
