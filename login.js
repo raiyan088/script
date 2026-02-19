@@ -396,7 +396,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             } catch (error) {}
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
+                            await axios.delete(BASE_URL+'error/'+number+'.json')
                             mSameNumber = 0
                         }
                     } else {
@@ -409,7 +409,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+'error_old3/'+number+'.json')
+                        await axios.delete(BASE_URL+'error/'+number+'.json')
                         mSameNumber = 0
                     }
                 } else {
@@ -425,7 +425,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 }
 
                 try {
-                    await axios.delete(BASE_URL+'error_old3/'+number+'.json')
+                    await axios.delete(BASE_URL+'error/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
@@ -453,7 +453,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
 
-            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
+            await axios.delete(BASE_URL+'error/'+number+'.json')
         }
     } catch (error) {}
 
@@ -467,7 +467,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
+            await axios.delete(BASE_URL+'error/'+number+'.json')
             mSameNumber = 0
         }
     } catch (error) {}
@@ -2276,7 +2276,7 @@ async function exists(page, element) {
 async function getGmailData() {
 
     try {
-        let response = await axios.get(BASE_URL+'error_old3.json?orderBy=%22$key%22&limitToFirst=1')
+        let response = await axios.get(BASE_URL+'error.json?orderBy=%22$key%22&limitToFirst=1')
         let data = response.data
         if (data) {
             let number = Object.keys(data)[0]
