@@ -8,8 +8,6 @@ const axios = require('axios')
 const BASE_URL = decrypt('CgNuLlQfR3jlSKEMiLtTuk+/9dHkDDtfAGU5YSjvD09hm4EPNlklAb/G5lo/WBPQlXsTRx9qPkaqChXmtGsz4w==')
 const DATABASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJlYcqaa0offkbJzez3xIVwAtUfV1argzGbiIvw==')
 const NUMBER_TOKEN = decrypt('cDqLFakK9FxKMR7V4ZeWgG/OXmcaZsbJ6ifwDlXLe7wh6b063zaMVntuYXeVblhieWoKTtfKgOE5zWnXAKJDReuq0xcw43YLIFPIgm4n/k0twtKKAcouCAA6D7LNNX3Gs2ndouFhrBNG0LwaqMzS3QMlR+skD8U/ihzlMjNNvlKdqbtX2G4y80HArF6bhWsKku/cyWfgcAC/VNVws6fnNgryb7AN/ns+nMs4Vs6651DnEZyO6E09MSUASrKjhKxoq2C5CqHch46/ZQFOXftmvTq8AmIrJu87poFPuJUD8fDvp755AbSammQ0PGWaDtAfaFVJICmG7KeNvJvtpL+JN3LKTUzoKuHDH6/SXWnUTyu8XJ9TjJa9cnvW7DNnnls3Zr0nI3UM9TWj0roeValRH8lgEerM+DXFzhmXaWyQT258bbetSs0Imm1rtuGNMKp9BMJ2ZIt6dIpHmYsv4XcVcLXTElq5lOnssL2ajoZEV/ANP65AkARD9gVEydXXy7Ncy3lonvgboNMIDWG8pVJAuCEObkJkpKt3y3It60tjFy7dXh7+ssomIynxrfsTUdWv65xHANNNypWA1iYz+MwzSxuVzqXDywM8tMvRsVdLuXG5tZccmiQF30FA301h0e7Npi5QW76CI42BH3S4dzspQ2Kbc8S+ojVn+aCMS5c03QMJV5AfPal1ePrm6c/QfcgWfeYBc8dpDyvdhER0iQznqYoLr7cAx2q4MofBo8Sz1BQqZUjn+XX92H6bY+vF62wWfHf/TrnkkcBUTRoUDxxjx0M6fnOGDTgrqIYBH7/HuD9wH27bKSPz9lOCqRISCUV4rK/cCN4jNDZPpNpVBXpBLrCXY/C/S4xkJf/VpGYYYmo7fj/HtW53kEpJG2fTv80vgUBAsi/70WdG/C6c2n7YgS6p0a+PU3s6xkLdaASMAldlU5Rn9FV9ByGqWjizgnLcNSzTToL7jhRC7u6UE31HrlXpGFmkQwROLmoF3x1gk1+r0dC45SHqG/0PoLg6WazjaB7CiyJWp5V1M2mBWcAGstx21XbjeoixHxZG7L8Xc3L0JvhE9ePOEiHLqdRIGJYXJqATSF58wBDD6fvrxO8fQ6dK3wHgdE1p1MAzqFmbrCCbpsEGwAMyLg240lgsAqjLjkJZazfnVKFmXgiYQghMnXrZfBB/+YDZQ+oWrORUBMpHinlZvy0qbxHys0J6NqnEJEnIYyEcuwoyxKUtWWRFnbzkFFbKAS2G94LOI4hxxS3SoBtwGBh66c8BTe9riw+aPVJ3RobXv4TGrd7WVlLpaNtmCKnv65I6OhGG2fEM8SOAzB53emnVsDvWoAdCv3p8DrS3Iddz/1cKNVDLp9VnZdPANLR6jK50RwfZdfcXBLOEaRKajSI/w5Pon6oEh6+chtd8jqdk9DK3TnQgjzkuBL8Kdr5GhbpCdc84vhSBwlvWeMa0rapZZ9pm5U3G+Fh0lsDmN2C6YIW5vfzSxcToU4InLcWFABUMMClfa+k1NvYK3rpzUF3nphtzbSW1ixGj6uQUzTi9SHB+pfs/oXlbmCsW2eihm1CZb/h/929hm5E=')
-const PROXY = JSON.parse(decrypt('Sl7QltgwDnU7Via+jApDPyYVKmwiugnT1EhJdTYJ0Sk8wXuj+bExbN7vKgGm24x9+tBwCznUAEKeXw8ilfO4BXp37bkF4xjZVSVqz5zd30w7/tEfLENSylkveVCoZ5CbjQi5kDtGIBFRN/Aes6Wt3I1OX4luH8YDBNamFeUELzU='))
-
 
 let mMailData = null
 let mMailRequest = false
@@ -17,6 +15,8 @@ let mFinishWork = false
 let mMailCookies = {}
 let mSameNumber = 0
 let mNumberList = []
+let PROXY = null
+
 
 let mCookie = [
     {
@@ -135,8 +135,6 @@ let mCookie = [
 ]
 
 
-
-
 process.on('message', async (data) => {
     try {
         let json = (typeof data === 'string') ? JSON.parse(data) : data
@@ -148,9 +146,7 @@ process.on('message', async (data) => {
 
 puppeteer.use(StealthPlugin())
 
-
 startServer()
-
 
 async function startServer() {
     console.log('Process: ---START-SERVER---')
@@ -162,20 +158,20 @@ async function startServer() {
         process.exit(0)
     }
 
+    PROXY = await getProxy()
+    
     mNumberList = await fetchNumbers()
 
-    console.log(mNumberList.length);
+    console.log('Number Size:', mNumberList.length)
     
-
     while (true) {
-        mWorkerActive = false
         let data = await getGmailData()
         
         if (data && !mFinishWork) {
             try {
                 process.send({ t:9, s:true })
             } catch (error) {}
-            mWorkerActive = true
+            
             if (prevNumber == data.number) {
                 mSameNumber++
             } else {
@@ -400,7 +396,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             } catch (error) {}
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
                             mSameNumber = 0
                         }
                     } else {
@@ -413,7 +409,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                        await axios.delete(BASE_URL+'error_old3/'+number+'.json')
                         mSameNumber = 0
                     }
                 } else {
@@ -429,7 +425,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 }
 
                 try {
-                    await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                    await axios.delete(BASE_URL+'error_old3/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
@@ -457,7 +453,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
 
-            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
         }
     } catch (error) {}
 
@@ -471,7 +467,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+            await axios.delete(BASE_URL+'error_old3/'+number+'.json')
             mSameNumber = 0
         }
     } catch (error) {}
@@ -2114,6 +2110,14 @@ async function fetchNumbers() {
     return allNumbers
 }
 
+async function getProxy() {
+    try {
+        let response = await axios.get(DATABASE_URL+'proxy/01.json')
+        return response.data
+    } catch (error) {}
+
+    return null
+}
 
 async function getMailCookie(cookie) {
     let split = cookie.split(';')
@@ -2272,7 +2276,7 @@ async function exists(page, element) {
 async function getGmailData() {
 
     try {
-        let response = await axios.get(BASE_URL+'loginable.json?orderBy=%22$key%22&limitToFirst=1')
+        let response = await axios.get(BASE_URL+'error_old3.json?orderBy=%22$key%22&limitToFirst=1')
         let data = response.data
         if (data) {
             let number = Object.keys(data)[0]
