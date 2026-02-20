@@ -543,14 +543,18 @@ async function validRaptoken(browser, page, user, password, mRapt) {
                 if (login == 1) {
                     console.log('Process: [ New Login: Success --- Time: '+getTime()+' ]')
 
-                    let rapt = await getRapt(await page.url())
-
+                    let url = await page.url()
+                    let rapt = await getRapt(url)
+                    console.log('Url:', rapt, url)
+                    
                     if (!rapt) {
                         await page.goto('https://myaccount.google.com/recovery/email?hl=en', { waitUntil: 'load', timeout: 0 })
                         await delay(1000)
 
                         let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
 
+                        url = await page.url()
+                        console.log(url)
                         if (status == 1 || status == 3) {
                             rapt = await getRapt(await page.url())
                         }
