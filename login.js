@@ -17,7 +17,7 @@ let mSameNumber = 0
 let mNumberList = []
 let PROXY = null
 
-let NAME = 'loginable'
+let FILE_NAME = 'loginable'
 
 
 let mCookie = [
@@ -398,7 +398,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                             } catch (error) {}
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
+                            await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
                             mSameNumber = 0
                         }
                     } else {
@@ -411,7 +411,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         } catch (error) {}
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-                        await axios.delete(BASE_URL+NAME+'/'+number+'.json')
+                        await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
                         mSameNumber = 0
                     }
                 } else {
@@ -427,7 +427,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 }
 
                 try {
-                    await axios.delete(BASE_URL+NAME+'/'+number+'.json')
+                    await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
@@ -447,7 +447,6 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
         } else {
             console.log('Process: [ Coocies Expire: '+number+' --- Time: '+getTime()+' ]')
 
-            await delay(10000000)
             try {
                 await axios.patch(BASE_URL+'expire/'+number+'.json', JSON.stringify({ password:password, cookies:cookies, worker:worker, create: time }), {
                     headers: {
@@ -456,7 +455,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
 
-            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
+            await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
         }
     } catch (error) {}
 
@@ -470,7 +469,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 })
             } catch (error) {}
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
-            await axios.delete(BASE_URL+NAME+'/'+number+'.json')
+            await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
             mSameNumber = 0
         }
     } catch (error) {}
@@ -2260,7 +2259,7 @@ async function exists(page, element) {
 async function getGmailData() {
 
     try {
-        let response = await axios.get(BASE_URL+NAME+'.json?orderBy=%22$key%22&limitToFirst=1')
+        let response = await axios.get(BASE_URL+FILE_NAME+'.json?orderBy=%22$key%22&limitToFirst=1')
         let data = response.data
         if (data) {
             let number = Object.keys(data)[0]
