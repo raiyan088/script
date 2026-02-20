@@ -694,7 +694,7 @@ async function waitForRecoveryChange(page, mRapt) {
         await page.goto('https://myaccount.google.com/phone', { waitUntil: 'load', timeout: 0 })
         await delay(500)
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 3; i++) {
             try {
                 let number = pickRandomNumber(mNumberList, {})
                 
