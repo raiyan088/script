@@ -20,123 +20,6 @@ let PROXY = null
 let FILE_NAME = 'loginable'
 
 
-let mCookie = [
-    {
-      name: 'LSID',
-      value: '',       
-      domain: 'accounts.google.com',
-      path: '/',
-      expires: 1800212948.828837,
-      size: 94,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameSite: 'None',
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'OSID',
-      value: '',
-      domain: 'myaccount.google.com',
-      path: '/',
-      expires: 1800212948.153073,
-      size: 157,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SAPISID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957588,
-      size: 41,
-      httpOnly: false,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'APISID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957573,
-      size: 40,
-      httpOnly: false,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957563,
-      size: 21,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: '__Secure-1PSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957496,
-      size: 167,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: true,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957482,
-      size: 156,
-      httpOnly: false,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'HSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957553,
-      size: 21,
-      httpOnly: true,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    }
-]
-
-
 process.on('message', async (data) => {
     try {
         let json = (typeof data === 'string') ? JSON.parse(data) : data
@@ -220,26 +103,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 ]
             })
 
-            let loadCookie = {}
-            let tempCookie = cookies.split(';')
-
-            for (let i = 0; i < tempCookie.length; i++) {
-                try {
-                    let split = tempCookie[i].trim().split('=')
-                    if (split.length == 2) {
-                        loadCookie[split[0]] = split[1]
-                    }
-                } catch (error) {}
-            }
-
-            mCookie.forEach((cookie) => {
-                let value = loadCookie[cookie['name']]
-
-                if (value) {
-                    cookie['value'] = value
-                    cookie['size'] = value.length
-                }
-            })
+            let mCookie = parseCookie(cookies)
             
             let page = (await browser.pages())[0]
 
@@ -670,6 +534,8 @@ async function passwordChange(page) {
         await waitForSelector(page, 'input[name="Passwd"]')
         await delay(500)
         let password = getRandomPass()
+
+        console.log(password)
         
         await page.type('input[name="Passwd"]', password)
         await delay(500)
@@ -2143,8 +2009,31 @@ async function putCookies(data) {
                 }
             } catch (error) {}
         }
-    }
-    
+    }   
+}
+
+function parseCookie(cookieString, domain = '.google.com') {
+    let oneMonthLater = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)
+
+    return cookieString
+        .split(';')
+        .map(c => c.trim())
+        .filter(Boolean)
+        .map(c => {
+            let [name, ...rest] = c.split('=')
+            let value = rest.join('=')
+
+            return {
+                name,
+                value,
+                domain,
+                path: '/',
+                expires: oneMonthLater,
+                httpOnly: false,
+                secure: true,
+                sameSite: 'None'
+            }
+    })
 }
 
 function getMailHeaders(cookies) {
