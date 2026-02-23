@@ -2020,20 +2020,32 @@ function parseCookie(cookieString, domain = '.google.com') {
         .map(c => c.trim())
         .filter(Boolean)
         .map(c => {
+
             let [name, ...rest] = c.split('=')
             let value = rest.join('=')
 
-            return {
+            let cookie = {
                 name,
                 value,
-                domain,
                 path: '/',
                 expires: oneMonthLater,
                 httpOnly: false,
                 secure: true,
                 sameSite: 'None'
             }
-    })
+
+            if (name === '__Host-GAPS' || name.startsWith('__Host-')) {
+                cookie.url = 'https://accounts.google.com'
+            } else if (name === 'LSID') {
+                cookie.domain = 'accounts.google.com'
+            } else if (name === 'OSID') {
+                cookie.domain = 'myaccount.google.com'
+            } else {
+                cookie.domain = domain
+            }
+
+            return cookie
+        })
 }
 
 function getMailHeaders(cookies) {
