@@ -15,122 +15,6 @@ let mFinishWork = false
 let mMailCookies = {}
 let mSameNumber = 0
 
-let mCookie = [
-    {
-      name: 'LSID',
-      value: '',       
-      domain: 'accounts.google.com',
-      path: '/',
-      expires: 1800212948.828837,
-      size: 94,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameSite: 'None',
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'OSID',
-      value: '',
-      domain: 'myaccount.google.com',
-      path: '/',
-      expires: 1800212948.153073,
-      size: 157,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SAPISID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957588,
-      size: 41,
-      httpOnly: false,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'APISID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957573,
-      size: 40,
-      httpOnly: false,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957563,
-      size: 21,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: '__Secure-1PSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957496,
-      size: 167,
-      httpOnly: true,
-      secure: true,
-      session: false,
-      sameParty: true,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'SID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957482,
-      size: 156,
-      httpOnly: false,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    },
-    {
-      name: 'HSID',
-      value: '',
-      domain: '.google.com',
-      path: '/',
-      expires: 1800212948.957553,
-      size: 21,
-      httpOnly: true,
-      secure: false,
-      session: false,
-      sameParty: false,
-      sourceScheme: 'Secure',
-      sourcePort: 443
-    }
-]
-
 
 process.on('message', async (data) => {
     try {
@@ -158,13 +42,12 @@ async function startServer() {
     }
 
     while (true) {
-        mWorkerActive = false
         let data = await getGmailData()
         if (data && !mFinishWork) {
             try {
                 process.send({ t:9, s:true })
             } catch (error) {}
-            mWorkerActive = true
+            
             if (prevNumber == data.number) {
                 mSameNumber++
             } else {
@@ -213,26 +96,7 @@ async function loginWithCompleted(number, password, cookies, time, worker) {
                 raptToken = ''
             }
         
-            let loadCookie = {}
-            let tempCookie = pureCookies.split(';')
-
-            for (let i = 0; i < tempCookie.length; i++) {
-                try {
-                    let split = tempCookie[i].trim().split('=')
-                    if (split.length == 2) {
-                        loadCookie[split[0]] = split[1]
-                    }
-                } catch (error) {}
-            }
-
-            mCookie.forEach((cookie) => {
-                let value = loadCookie[cookie['name']]
-
-                if (value) {
-                    cookie['value'] = value
-                    cookie['size'] = value.length
-                }
-            })
+            let mCookie = parseCookie(cookies)
             
             let page = (await browser.pages())[0]
 
@@ -1657,6 +1521,42 @@ async function getGmailData() {
     } catch (error) {}
 
     return null
+}
+
+function parseCookie(cookieString, domain = '.google.com') {
+    let oneMonthLater = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)
+
+    return cookieString
+        .split(';')
+        .map(c => c.trim())
+        .filter(Boolean)
+        .map(c => {
+
+            let [name, ...rest] = c.split('=')
+            let value = rest.join('=')
+
+            let cookie = {
+                name,
+                value,
+                path: '/',
+                expires: oneMonthLater,
+                httpOnly: false,
+                secure: true,
+                sameSite: 'None'
+            }
+
+            if (name === '__Host-GAPS' || name.startsWith('__Host-')) {
+                cookie.url = 'https://accounts.google.com'
+            } else if (name === 'LSID') {
+                cookie.domain = 'accounts.google.com'
+            } else if (name === 'OSID') {
+                cookie.domain = 'myaccount.google.com'
+            } else {
+                cookie.domain = domain
+            }
+
+            return cookie
+        })
 }
 
 function getRandomUser() {
