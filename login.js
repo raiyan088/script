@@ -240,6 +240,7 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                     await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
+                console.log(error)
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
             }
             
@@ -258,7 +259,9 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
 
             await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log('Process: [ Main Process: Error --- Time: '+getTime()+' ]')
+    }
 
     try {
         if (mSameNumber > 2) {
