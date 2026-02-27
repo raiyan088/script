@@ -173,7 +173,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
                                 })
-                            } catch (error) {}
+                            } catch (error) {
+                                console.log(error)
+                                console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+                            }
 
                             if (worker) {
                                 try {
@@ -182,7 +185,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                             'Content-Type': 'application/x-www-form-urlencoded'
                                         }
                                     })
-                                } catch (error) {}
+                                } catch (error) {
+                                    console.log(error)
+                                    console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+                                }
                             }
             
                             console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
@@ -205,7 +211,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
                                 })
-                            } catch (error) {}
+                            } catch (error) {
+                                console.log(error)
+                                console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+                            }
                             
                             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
                             await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
@@ -218,7 +227,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 }
                             })
-                        } catch (error) {}
+                        } catch (error) {
+                            console.log(error)
+                            console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+                        }
                         
                         console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
                         await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
@@ -233,7 +245,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         })
-                    } catch (error) {}
+                    } catch (error) {
+                        console.log(error)
+                        console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+                    }
                 }
 
                 try {
@@ -255,7 +270,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 })
-            } catch (error) {}
+            } catch (error) {
+                console.log(error)
+                console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+            }
 
             await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
         }
@@ -271,7 +289,10 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 })
-            } catch (error) {}
+            } catch (error) {
+                console.log(error)
+                console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
+            }
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
             await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
             mSameNumber = 0
