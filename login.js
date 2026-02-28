@@ -74,8 +74,8 @@ async function loginWithCompleted(number, password, cookiesData, time, worker, c
     try {
         let raptToken = null
         let index = cookiesData.indexOf('||')
-        if (index > 0) {
-            raptToken = cookiesData.substring(0, index)
+        if (index >= 0) {
+            if(index > 0) raptToken = cookiesData.substring(0, index)
             cookies = cookiesData.substring(index+2)
         }
 
