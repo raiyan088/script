@@ -69,8 +69,9 @@ async function startServer() {
 }
 
 async function loginWithCompleted(number, password, cookiesData, time, worker) {
+    let cookies = cookiesData
+    
     try {
-        let cookies = cookiesData
         let raptToken = null
         let index = cookiesData.indexOf('||')
         if (index > 0) {
