@@ -58,7 +58,7 @@ async function startPrecoss() {
             mFinish = {}
 
             try {
-                mNumbers = makeNumberList(mConfig.number, mConfig.target)
+                mNumbers = makeNumberList(mConfig.number, mConfig.target, mConfig.list)
                 mStatus = {
                     found:0,
                     recaptcha:0,
@@ -664,7 +664,11 @@ function randomToken() {
     return result
 }
 
-function makeNumberList(number, target) {
+function makeNumberList(number, target, isList) {
+    if (isList) {
+        return number
+    }
+    
     let list = []
 
     for (let i = 0; i < target; i++) {
