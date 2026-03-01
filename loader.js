@@ -1,6 +1,6 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const HttpsProxyAgent = require('https-proxy-agent')
-const HttpProxyAgent = require('http-proxy-agent')
+const { HttpsProxyAgent } = require('https-proxy-agent')
+const { HttpProxyAgent } = require('http-proxy-agent')
 const { CookieJar } = require('tough-cookie')
 const puppeteer = require('puppeteer-extra')
 const crypto = require('crypto')
