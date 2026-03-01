@@ -39,7 +39,7 @@ process.on('message', async (data) => {
             mConfig = json
         } else if (json.type == 2) {
             let running = mConfig != null
-            process.send({ t: 3, s: 'gmail_collect_status', d: { type:2, running:running, user:json.user, server:USER, active:parseInt((Date.now()-mStart)/1000) } })
+            process.send({ t: 3, s: 'gmail_collect_status', d: { type:2, running:running, server:USER, active:parseInt((Date.now()-mStart)/1000) } })
         }
     } catch (error) {}
 })
@@ -80,7 +80,7 @@ async function startPrecoss() {
                 await waitForCompleted(mConfig.tab, mNumbers.length*(mConfig.pass.length+2)*4000)
                 mNumbers = []
 
-                process.send({ t: 5, s: 'gmail_collect_status', c:USER, d: { type:1, user:mConfig.user, server:USER, status:mStatus } })
+                process.send({ t: 5, s: 'gmail_collect_status', c:USER, d: { type:1, server:USER, status:mStatus } })
             } catch (error) {}
 
             mConfig = null
@@ -668,7 +668,7 @@ function makeNumberList(number, target, isList) {
     if (isList) {
         return number
     }
-    
+
     let list = []
 
     for (let i = 0; i < target; i++) {
