@@ -1,11 +1,11 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const { HttpsProxyAgent } = require('https-proxy-agent')
-const { HttpProxyAgent } = require('http-proxy-agent')
+const HttpsProxyAgent = require('https-proxy-agent')
+const HttpProxyAgent = require('http-proxy-agent')
 const { CookieJar } = require('tough-cookie')
 const puppeteer = require('puppeteer-extra')
-const got = require('got').default
 const crypto = require('crypto')
 const axios = require('axios')
+const got = require('got')
 
 const args = process.argv.slice(2)
 
@@ -63,6 +63,7 @@ async function startPrecoss() {
                     found:0,
                     recaptcha:0,
                     captcha:0,
+                    procaptcha:0,
                     error:0,
                     pass:0,
                     login:0,
@@ -194,7 +195,10 @@ async function startWork(load) {
 
                 if (!mConfig.always && mConfig.proxy) {
                     data = await getLoginStatus(mPage[load], load, '+'+number, 'proxy')
-                    console.log(number, data)
+                    
+                    if (data.status == 5) {
+                        mStatus.procaptcha++
+                    }
                 }
             }
 
@@ -569,13 +573,9 @@ async function proxyRequest(page, url, reqHeaders, postData, proxyUrl, load) {
                     },
                     signal
                 })
-            } catch (error) {
-                console.log(error)
-            }
+            } catch (error) {}
         }
-    } catch (err) {
-        console.log(err)
-    }
+    } catch (err) {}
 
     return null
 }
