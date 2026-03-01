@@ -5,7 +5,7 @@ const { CookieJar } = require('tough-cookie')
 const puppeteer = require('puppeteer-extra')
 const crypto = require('crypto')
 const axios = require('axios')
-const got = require('got')
+const got = require('got').default
 
 const args = process.argv.slice(2)
 
