@@ -413,7 +413,7 @@ async function runGithubAction(repo, timeout) {
         try {
             if (timeout > 0) {
                 try {
-                    let res = await axios.post('https://database.raiyan086.xyz/status', { id: repo })
+                    let res = await axios.post('https://database.kbrms.xyz/status', { id: repo })
                     if (res.data.active) {
                         checking = false
                         isActionChecking = false
