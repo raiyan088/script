@@ -194,6 +194,7 @@ async function startWork(load) {
 
                 if (!mConfig.always && mConfig.proxy) {
                     data = await getLoginStatus(mPage[load], load, '+'+number, 'proxy')
+                    console.log(number, data)
                 }
             }
 
@@ -568,9 +569,13 @@ async function proxyRequest(page, url, reqHeaders, postData, proxyUrl, load) {
                     },
                     signal
                 })
-            } catch (error) {}
+            } catch (error) {
+                console.log(error)
+            }
         }
-    } catch (err) {}
+    } catch (err) {
+        console.log(err)
+    }
 
     return null
 }
