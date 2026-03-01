@@ -64,6 +64,7 @@ async function startPrecoss() {
                     recaptcha:0,
                     captcha:0,
                     procaptcha:0,
+                    proerror:0,
                     error:0,
                     pass:0,
                     login:0,
@@ -196,7 +197,9 @@ async function startWork(load) {
                 if (!mConfig.always && mConfig.proxy) {
                     data = await getLoginStatus(mPage[load], load, '+'+number, 'proxy')
                     
-                    if (data.status == 5) {
+                    if(data.status == 0) {
+                        mStatus.proerror++
+                    } else if (data.status == 5) {
                         mStatus.procaptcha++
                     }
                 }
