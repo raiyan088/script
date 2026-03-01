@@ -186,10 +186,10 @@ async function startWork(load) {
             if (data.status == 0 || data.status == 5 || data.status == 1) {
                 if(data.status == 0) {
                     mStatus.error++
-                    await delayCancelable(3000, signal)
+                    await delay(3000)
                 } else if (data.status == 5) {
                     mStatus.captcha++
-                    await delayCancelable(3000, signal)
+                    await delay(3000)
                 }
 
                 if (!mConfig.always && mConfig.proxy) {
@@ -249,7 +249,7 @@ async function startWork(load) {
 
             if (mStop || signal.aborted) break
 
-            await delayCancelable(Math.min(mConfig.delay?mConfig.delay:0, 2000), signal)
+            await delay(Math.min(mConfig.delay?mConfig.delay:0, 2000))
         } catch (error) {
             if (signal.aborted) break
         }
@@ -612,18 +612,6 @@ async function saveData(user, country, number, password, cookies) {
             }
         })
     } catch (error) {}
-}
-
-function delayCancelable(ms, signal) {
-    return new Promise((resolve, reject) => {
-        let t = setTimeout(resolve, ms)
-        if (signal) {
-            signal.addEventListener('abort', () => {
-                clearTimeout(t)
-                reject(new Error('delay aborted'))
-            })
-        }
-    })
 }
 
 function decrypt(text) {
