@@ -186,8 +186,10 @@ async function startWork(load) {
             let data = await getLoginStatus(mPage[load], load, '+'+number, mConfig.always?'proxy':'manually')
             
             if (data.status == 0 || data.status == 5 || data.status == 1) {
+                let mainErr = false
                 if(data.status == 0) {
                     mStatus.error++
+                    mainErr = true
                     await delay(3000)
                 } else if (data.status == 5) {
                     mStatus.captcha++
@@ -198,7 +200,9 @@ async function startWork(load) {
                     data = await getLoginStatus(mPage[load], load, '+'+number, 'proxy')
                     
                     if(data.status == 0) {
-                        mStatus.proerror++
+                        if (!mainErr) {
+                            mStatus.proerror++
+                        }
                     } else if (data.status == 5) {
                         mStatus.procaptcha++
                     }
@@ -560,7 +564,7 @@ async function proxyRequest(page, url, reqHeaders, postData, proxyUrl, load) {
             https: new HttpsProxyAgent(proxyUrl)
         } : undefined
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 3; i++) {
             try {
                 return await got(url, {
                     method: 'POST',
@@ -572,7 +576,7 @@ async function proxyRequest(page, url, reqHeaders, postData, proxyUrl, load) {
                     followRedirect: false,
                     throwHttpErrors: false,
                     timeout: {
-                        request: 15000
+                        request: 30000
                     },
                     signal
                 })
