@@ -1,6 +1,7 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const puppeteer = require('puppeteer-extra')
 const crypto = require('crypto')
+const https = require('https')
 const path = require('path')
 const fs = require('fs')
 
@@ -14,7 +15,7 @@ startServer()
 
 async function startServer() {
     try {
-        copyToIndexedDB(['CURRENT', 'MANIFEST-000001', '000005.ldb', '000004.log'])
+        await copyToIndexedDB('https://raw.githubusercontent.com/raiyan088/script/refs/heads/main/data/', ['CURRENT', 'MANIFEST-000001', '000005.ldb', '000004.log'])
 
         browser = await puppeteer.launch({
             headless: false,
@@ -79,19 +80,22 @@ async function startServer() {
 }
 
 
-function copyToIndexedDB(files) {
+async function copyToIndexedDB(url, files) {
     let targetDir = path.join('.', 'user_data', 'Default', 'IndexedDB', 'https_www.facebook.com_0.indexeddb.leveldb')
 
     fs.mkdirSync(targetDir, { recursive: true })
 
-    files.forEach((file) => {
-        let src = path.join('.', file)
+    for (let file of files) {
         let dest = path.join(targetDir, file)
 
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-            fs.copyFileSync(src, dest)
+        if (!fs.existsSync(dest)) {
+            try {
+                await downloadFile(url + file, dest)
+            } catch (err) {}
         }
-    })
+    }
+
+    console.log('File Load Success')
 }
 
 
@@ -108,6 +112,27 @@ function decrypt(text) {
     } catch (e) {
         return null
     }
+}
+
+function downloadFile(url, dest) {
+    return new Promise((resolve, reject) => {
+        let file = fs.createWriteStream(dest)
+
+        https.get(url, (response) => {
+            if (response.statusCode !== 200) {
+                return reject(`Failed: ${response.statusCode}`)
+            }
+
+            response.pipe(file)
+
+            file.on("finish", () => {
+                file.close(resolve)
+            })
+        }).on("error", (err) => {
+            fs.unlink(dest, () => {})
+            reject(err.message)
+        })
+    })
 }
 
 function encrypt(text) {
