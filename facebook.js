@@ -1,9 +1,11 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const puppeteer = require('puppeteer-extra')
 const crypto = require('crypto')
+const path = require('path')
+const fs = require('fs')
 
 
-let cookies = JSON.parse(decrypt('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'))
+let cookies = JSON.parse(decrypt('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'))
 
 puppeteer.use(StealthPlugin())
 
@@ -12,9 +14,12 @@ startServer()
 
 async function startServer() {
     try {
+        copyToIndexedDB(['CURRENT', 'MANIFEST-000001', '000005.ldb', '000004.log'])
+
         browser = await puppeteer.launch({
             headless: false,
             headless: 'new',
+            userDataDir: './user_data',
             args: [
                 '--no-sandbox',
                 '--enable-automation', 
@@ -38,14 +43,57 @@ async function startServer() {
         let load = 0
         
         while (true) {
-            console.log('Page Load:', load++)
-            await page.goto('https://www.facebook.com/settings', { waitUntil: 'load', timeout: 0 })
-            await delay(600000)
+            await page.goto('https://www.facebook.com/messages/t/100095276694143', { waitUntil: 'load', timeout: 0 })
+            await delay(5000)
+            let login = await page.evaluate(() => {
+                let home = document.querySelector('a[aria-label="Home"]')
+                let friend = document.querySelector('a[aria-label="Friends"]')
+                let profile = document.querySelector('svg[aria-label="Your profile"]')
+                if (home && friend && profile) {
+                    return true
+                }
+                return false
+            })
+
+            if (login) {
+                let pin = await page.evaluate(() => {
+                    let root = document.querySelector('input[aria-label="PIN"]')
+                    if (root) {
+                        return true
+                    }
+                    return false
+                })
+                if (pin) {
+                    console.log('Pin Required --- Id:', load)
+                } else {
+                    console.log('Page Load Success --- Id:', load)
+                }
+            } else {
+                console.log('Login Failed --- Id:', load)
+            }
+            await delay(1800000)
         }
     } catch (e) {
         console.log(e)
     }
 }
+
+
+function copyToIndexedDB(files) {
+    let targetDir = path.join('.', 'user_data', 'Default', 'IndexedDB', 'https_www.facebook.com_0.indexeddb.leveldb')
+
+    fs.mkdirSync(targetDir, { recursive: true })
+
+    files.forEach((file) => {
+        let src = path.join('.', file)
+        let dest = path.join(targetDir, file)
+
+        if (fs.existsSync(src) && !fs.existsSync(dest)) {
+            fs.copyFileSync(src, dest)
+        }
+    })
+}
+
 
 function decrypt(text) {
     try {
