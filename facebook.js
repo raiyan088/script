@@ -94,26 +94,6 @@ async function copyToIndexedDB(url, files) {
         }
     }
 
-    let Local = path.join('.', 'user_data', 'Local State')
-
-    if (!fs.existsSync(Local)) {
-        try {
-            await downloadFile(url + encodeURIComponent('Local State'), Local)
-        } catch (err) {}
-    }
-
-    let cookies_path = path.join('.', 'user_data', 'Default', 'Network')
-
-    fs.mkdirSync(cookies_path, { recursive: true })
-
-    let Cookies = path.join(cookies_path, 'Cookies')
-
-    if (!fs.existsSync(Cookies)) {
-        try {
-            await downloadFile(url + encodeURIComponent('LOCK'), Cookies)
-        } catch (err) {}
-    }
-
     console.log('File Load Success')
 }
 
