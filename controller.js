@@ -23,7 +23,7 @@ let mDeleteData = [ 'founder' ]
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 let BASE_URL = decrypt('Ho3w4e0EI9uVPoN9hhxdI4hRUNMBXjo9s8vy5IT9Wh3WhysrJlYcqaa0offkbJzez3xIVwAtUfV1argzGbiIvw==')
 
-// USER = 'qsnrhamara86079'
+// USER = 'ashrafqwrk23647'
 
 startServer()
 
@@ -84,9 +84,10 @@ async function startServer() {
             try {
                 if(mLiveServer[key]) {
                     mPendingServer[key] = value.t
-                    if (value.s == 0 || value.t < Date.now()-400000) {
+                    if (value.s == 0 || value.t < Date.now()-400000 || key == 'cshackrxrx42019') {
                         await delay(delayPerLoop)
                         runGithubAction(key, 0)
+                        
                         active++
                     }
                 }
@@ -95,6 +96,7 @@ async function startServer() {
 
         if (active > 0) {
             consoleLog('Active Server: '+active)
+            
         } else {
             consoleLog('Node: ---ACTION-SERVER-START---')
         }
@@ -437,13 +439,12 @@ async function runGithubAction(repo, timeout) {
                         let action = data['action']
                         let user = data['user']
 
-                        response = await axios.get(BASE_URL+'github/account/'+user+'.json')
-                    
-                        data = response.data
-
-                        if(data != null && data != 'null') {
-                            let access = data['access']
-
+                        response = await axios.get(BASE_URL+'github/account/'+user+'/access.json')
+                        
+                        let access = response.data
+    
+                        if(access != null && access != 'null') {
+                            
                             mRepoData[repo] = {
                                 user: user,
                                 action: action,
@@ -486,7 +487,18 @@ async function activeAction(user, repo, action, token) {
 
         let body = response.data
 
-        if (body.status == 'completed') {
+        if (body.run_attempt >= 50) {
+            let newId = await runNewAction(user, repo, token)
+            if (newId) {
+                if (mRepoData[repo]) {
+                    mRepoData[repo].action = newId
+                }
+                await saveAction(repo, newId)
+                consoleLog('New Action Success: '+user+'/'+repo)
+            } else {
+                consoleLog('New Action Failed: '+user+'/'+repo)
+            }
+        } else if (body.status == 'completed') {
             try {
                 response = await axios.post(`https://api.github.com/repos/${user}/${repo}/actions/runs/${action}/rerun`,{}, {
                     headers: {
