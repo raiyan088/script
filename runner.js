@@ -9,6 +9,7 @@ let mScript = null
 let CONNECTION = null
 let reconnecting = false
 let finishStatus = false
+let finishIsWork = false
 let processIsWork = false
 let finishRequire = false
 let USER = getUserName()
@@ -143,7 +144,9 @@ function sendWSMessage(connection, data) {
 }
 
 async function checkStatus(firstTime) {
-    if (FINISH > 0 && FINISH < new Date().getTime()) {
+    if (finishIsWork) {
+        await closeProcess()
+    } else if (FINISH > 0 && FINISH < new Date().getTime()) {
         if (finishRequire) {
             if (processIsWork) {
                 try {
@@ -253,6 +256,11 @@ async function runDynamicServer(data) {
                 
                 if (json.t == 9) {
                     processIsWork = json.s ?? false
+                } else if (json.t == 8) {
+                    finishIsWork = json.s ?? false
+                    if (finishIsWork) {
+                        closeProcess()
+                    }
                 } else {
                     sendWSMessage(CONNECTION, JSON.stringify(json))
                 }
