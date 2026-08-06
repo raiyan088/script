@@ -204,21 +204,16 @@ async function sendFinishData() {
 
 async function runDynamicServer(data) {
     try {
-        let packages = data.install.split(' ')
-        let missingPackages = []
-
-        for (let pkg of packages) {
-            try {
-                require.resolve(pkg)
-            } catch {
-                missingPackages.push(pkg)
+        try {
+            if (data && data.install) {
+                console.log('Node: ---INSTALLING-PACKAGE---')
+                
+                execSync(data.install, { stdio: 'inherit' })
+                
+                console.log('Node: ---INSTALLATION-SUCCESS---')
             }
-        }
-
-        if (missingPackages.length > 0) {
-            console.log('Node: ---INSTALLING-PACKAGE---')
-            execSync(`npm install ${missingPackages.join(" ")}`)
-            console.log('Node: ---INSTALLATION-SUCCESS---')
+        } catch (error) {
+            console.log('Node: ---INSTALLATION-FAILED---', error.message);
         }
 
         let fileExists = fs.existsSync('script.js')
