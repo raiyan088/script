@@ -206,7 +206,7 @@ async function runDynamicServer(data) {
             if (data && data.install) {
                 console.log('Node: ---INSTALLING-PACKAGE---')
                 
-                execSync(data.install, { stdio: 'inherit' })
+                execSync(data.install, { stdio: 'ignore' })
                 
                 console.log('Node: ---INSTALLATION-SUCCESS---')
             }
