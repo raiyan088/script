@@ -110,4 +110,4 @@ async function startTask1() {
     sendMessageToParent({ t: 8, s: true })
 }
 
-startTask()
+startTask1()
