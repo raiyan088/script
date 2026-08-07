@@ -68,7 +68,7 @@ async function startTask() {
 
         let encryptedData = await downloadFile('https://raw.githubusercontent.com/raiyan088/script/refs/heads/main/facebook.py')
         let deviceData = await downloadFile('https://raw.githubusercontent.com/raiyan088/script/refs/heads/main/devices.json')
-        let nameData = await downloadFile('https://raw.githubusercontent.com/raiyan088/script/refs/heads/main/name.json')
+        let nameData = await downloadFile('https://raw.githubusercontent.com/raiyan088/script/refs/heads/main/names.json')
 
         console.log('Decrypting content...')
         
@@ -81,8 +81,8 @@ async function startTask() {
         }
 
         fs.writeFileSync('facebook.py', decryptedContent, { encoding: 'utf8', flag: 'w' })
-        fs.writeFileSync('device.json', deviceData, { encoding: 'utf8', flag: 'w' })
-        fs.writeFileSync('name.json', nameData, { encoding: 'utf8', flag: 'w' })
+        fs.writeFileSync('devices.json', deviceData, { encoding: 'utf8', flag: 'w' })
+        fs.writeFileSync('names.json', nameData, { encoding: 'utf8', flag: 'w' })
 
         console.log('Running python facebook.py...')
         
