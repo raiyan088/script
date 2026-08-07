@@ -86,7 +86,7 @@ async function startTask() {
 
         console.log('Running python facebook.py...')
         
-        let pyProcess = spawn('python', ['-u', 'facebook1.py', argv[1], argv[2]])
+        let pyProcess = spawn('python', ['-u', 'facebook.py', argv[1], argv[2]])
 
         pyProcess.stdout.on('data', (data) => {
             console.log(data.toString().replace(/\n$/, ''))
@@ -105,4 +105,9 @@ async function startTask() {
     }
 }
 
-startTask()
+async function startTask1() {
+    await new Promise(resolve => setTimeout(resolve, 600000))
+    sendMessageToParent({ t: 8, s: true })
+}
+
+startTask1()
