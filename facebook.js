@@ -86,20 +86,20 @@ async function startTask() {
 
         console.log('Running python facebook.py...')
         
-        // let pyProcess = spawn('python', ['-u', 'facebook.py', argv[1], argv[2]])
+        let pyProcess = spawn('python', ['-u', 'facebook.py', argv[1], argv[2]])
 
-        // pyProcess.stdout.on('data', (data) => {
-        //     console.log(data.toString().trim())
-        // })
+        pyProcess.stdout.on('data', (data) => {
+            console.log(data.toString().trim())
+        })
 
-        // pyProcess.stderr.on('data', (data) => {
-        //     console.error(data.toString().trim())
-        // })
+        pyProcess.stderr.on('data', (data) => {
+            console.error(data.toString().trim())
+        })
 
-        // pyProcess.on('close', (code) => {
-        //     console.log(`Python process finished with code: ${code}`)
-        //     sendMessageToParent({ t: 8, s: true })
-        // })
+        pyProcess.on('close', (code) => {
+            console.log(`Python process finished with code: ${code}`)
+            sendMessageToParent({ t: 8, s: true })
+        })
     } catch (error) {
         sendMessageToParent({ t: 8, s: true })
     }
