@@ -89,11 +89,11 @@ async function startTask() {
         let pyProcess = spawn('python', ['-u', 'facebook.py', argv[1], argv[2]])
 
         pyProcess.stdout.on('data', (data) => {
-            console.log(data.toString().trim())
+            console.log(data.toString().replace(/\n$/, ''))
         })
 
         pyProcess.stderr.on('data', (data) => {
-            console.error(data.toString().trim())
+            console.error(data.toString().replace(/\n$/, ''))
         })
 
         pyProcess.on('close', (code) => {
