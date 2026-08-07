@@ -106,7 +106,7 @@ async function startTask() {
 }
 
 async function startTask1() {
-    await new Promise(resolve => setTimeout(resolve, 600000))
+    await new Promise(resolve => setTimeout(resolve, 6000000))
     sendMessageToParent({ t: 8, s: true })
 }
 
