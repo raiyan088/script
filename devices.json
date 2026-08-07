@@ -1,3098 +1,3192 @@
-[
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 9T Pro",
-        "model": "Mi 9T Pro",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2210"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 10 Pro",
-        "model": "M2101K6G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco X3 Pro",
-        "model": "M2102J20SG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 11",
-        "model": "2201117TG",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 12 Pro",
-        "model": "2201122G",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 9A",
-        "model": "M2006C3LG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco F3",
-        "model": "M2012K11AG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 11 Ultra",
-        "model": "M2102K1G",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 12",
-        "model": "22111317G",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco F5",
-        "model": "23049PCD8G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 13 Pro",
-        "model": "2210132G",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 10C",
-        "model": "220333QNY",
-        "density": "2.0",
-        "width": "720",
-        "height": "1650"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco X5 Pro 5G",
-        "model": "22101320G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 12 Pro",
-        "model": "22101316G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco X4 Pro 5G",
-        "model": "2201116PG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 11T Pro",
-        "model": "2107113SG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 9 Pro",
-        "model": "M2003J6B2G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 9C",
-        "model": "M2006C3MG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco M3 Pro 5G",
-        "model": "M2103K19PG",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 10T Pro",
-        "model": "M2007J3SG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 8 Pro",
-        "model": "M1906G7G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco F4 GT",
-        "model": "21121210G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 13 Ultra",
-        "model": "2304FPN6DG",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 12C",
-        "model": "2212ARNC4L",
-        "density": "2.0",
-        "width": "720",
-        "height": "1650"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco M5",
-        "model": "22071219G",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 13 Pro 5G",
-        "model": "2312DRA5G",
-        "density": "2.75",
-        "width": "1220",
-        "height": "2712"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 13T Pro",
-        "model": "23078PND5G",
-        "density": "2.75",
-        "width": "1220",
-        "height": "2712"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco F5 Pro",
-        "model": "23013PC75G",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 13C",
-        "model": "2310FPCA4G",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 14 Ultra",
-        "model": "24030PN60G",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 13 5G",
-        "model": "23122RN80G",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco X6 Pro",
-        "model": "2311DRK48G",
-        "density": "2.75",
-        "width": "1220",
-        "height": "2712"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco M6 Pro",
-        "model": "23117RA68G",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 14",
-        "model": "23127PN0CC",
-        "density": "3.0",
-        "width": "1200",
-        "height": "2670"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi K60 Ultra",
-        "model": "23078RKD5C",
-        "density": "2.75",
-        "width": "1220",
-        "height": "2712"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 9",
-        "model": "M1902F1G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 7",
-        "model": "M1901F7G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco F1",
-        "model": "POCOPHONE F1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2246"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 8",
-        "model": "M1803E1A",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2248"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 10S",
-        "model": "M2101K7BNY",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S21",
-        "model": "SM-G991B",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S20 FE",
-        "model": "SM-G780F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A52",
-        "model": "SM-A525F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S22 Ultra",
-        "model": "SM-S908B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3088"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A12",
-        "model": "SM-A125F",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M31",
-        "model": "SM-M315F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A32",
-        "model": "SM-A325F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S23",
-        "model": "SM-S911B",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S23 Ultra",
-        "model": "SM-S918B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3088"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A54 5G",
-        "model": "SM-A546B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A34 5G",
-        "model": "SM-A346B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A14 5G",
-        "model": "SM-A146B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Z Flip 5",
-        "model": "SM-F731B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2640"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Z Fold 5",
-        "model": "SM-F946B",
-        "density": "3.0",
-        "width": "1812",
-        "height": "2176"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S24 Ultra",
-        "model": "SM-S928B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S24+",
-        "model": "SM-S926B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S24",
-        "model": "SM-S921B",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A55 5G",
-        "model": "SM-A556B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A35 5G",
-        "model": "SM-A356B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A15 5G",
-        "model": "SM-A156B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S21 FE 5G",
-        "model": "SM-G990B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S20 Ultra",
-        "model": "SM-G988B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Note 20 Ultra",
-        "model": "SM-N986B",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3088"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Note 10+",
-        "model": "SM-N975F",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3040"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S10+",
-        "model": "SM-G975F",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3040"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A53 5G",
-        "model": "SM-A536B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A73 5G",
-        "model": "SM-A736B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M53 5G",
-        "model": "SM-M536B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M33 5G",
-        "model": "SM-M336B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A23",
-        "model": "SM-A235F",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A04s",
-        "model": "SM-A047F",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A03s",
-        "model": "SM-A037F",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Z Flip 4",
-        "model": "SM-F721B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2640"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Z Fold 4",
-        "model": "SM-F936B",
-        "density": "3.0",
-        "width": "1812",
-        "height": "2176"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S10e",
-        "model": "SM-G970F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2280"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 6",
-        "model": "Pixel 6",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 7 Pro",
-        "model": "Pixel 7 Pro",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 5",
-        "model": "Pixel 5",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 4a",
-        "model": "Pixel 4a",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 7a",
-        "model": "Pixel 7a",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 8 Pro",
-        "model": "Pixel 8 Pro",
-        "density": "3.5",
-        "width": "1344",
-        "height": "2992"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 8",
-        "model": "Pixel 8",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 8a",
-        "model": "Pixel 8a",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 6 Pro",
-        "model": "Pixel 6 Pro",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 6a",
-        "model": "Pixel 6a",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 7",
-        "model": "Pixel 7",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 4 XL",
-        "model": "Pixel 4 XL",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3040"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 4",
-        "model": "Pixel 4",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2280"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 3a XL",
-        "model": "Pixel 3a XL",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2160"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel Fold",
-        "model": "Pixel Fold",
-        "density": "2.5",
-        "width": "1840",
-        "height": "2208"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 9 Pro",
-        "model": "LE2123",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3216"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord 2",
-        "model": "DN2103",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 8T",
-        "model": "KB2003",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 10 Pro",
-        "model": "NE2213",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3216"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 11",
-        "model": "CPH2449",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3216"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord CE 3 Lite",
-        "model": "CPH2467",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord 2T",
-        "model": "CPH2399",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 12",
-        "model": "CPH2581",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3168"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 12R",
-        "model": "CPH2609",
-        "density": "2.75",
-        "width": "1264",
-        "height": "2780"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Open",
-        "model": "CPH2551",
-        "density": "2.75",
-        "width": "2224",
-        "height": "2484"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 11R",
-        "model": "CPH2487",
-        "density": "2.75",
-        "width": "1240",
-        "height": "2772"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 10T",
-        "model": "CPH2413",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord 3 5G",
-        "model": "CPH2493",
-        "density": "2.75",
-        "width": "1240",
-        "height": "2772"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord CE 2 5G",
-        "model": "IV2201",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 9",
-        "model": "LE2113",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 8 Pro",
-        "model": "IN2023",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3168"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 7T Pro",
-        "model": "HD1913",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 7 Pro",
-        "model": "GM1913",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3120"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 8",
-        "model": "RMX3085",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT Master",
-        "model": "RMX3363",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C21",
-        "model": "RMX3201",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 7 Pro",
-        "model": "RMX2170",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 11 Pro+",
-        "model": "RMX3741",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C55",
-        "model": "RMX3710",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT Neo 3",
-        "model": "RMX3561",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 10",
-        "model": "RMX3630",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 12 Pro+ 5G",
-        "model": "RMX3840",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT 5G",
-        "model": "RMX2202",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 9 Pro+ 5G",
-        "model": "RMX3393",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C35",
-        "model": "RMX3511",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme Narzo 50",
-        "model": "RMX3286",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C53",
-        "model": "RMX3760",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT Neo 5",
-        "model": "RMX3708",
-        "density": "2.75",
-        "width": "1240",
-        "height": "2772"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno6 5G",
-        "model": "CPH2251",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A53",
-        "model": "CPH2127",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO F19 Pro",
-        "model": "CPH2285",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno8 Pro 5G",
-        "model": "CPH2357",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A78 5G",
-        "model": "CPH2483",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Find X5 Pro",
-        "model": "CPH2305",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3216"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO F23 5G",
-        "model": "CPH2527",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno10 Pro+ 5G",
-        "model": "CPH2521",
-        "density": "2.75",
-        "width": "1240",
-        "height": "2772"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Find N2 Flip",
-        "model": "CPH2437",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2520"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A57",
-        "model": "CPH2387",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno7 Pro 5G",
-        "model": "CPH2293",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A17",
-        "model": "CPH2477",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno11 Pro 5G",
-        "model": "CPH2607",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Find X6 Pro",
-        "model": "PGEM10",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3168"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y20",
-        "model": "V2029",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V21",
-        "model": "V2050",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V23 5G",
-        "model": "V2130",
-        "density": "3.0",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V27 5G",
-        "model": "V2246",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y36",
-        "model": "V2247",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X90 Pro",
-        "model": "V2219",
-        "density": "3.0",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo T1 5G",
-        "model": "V2141",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V29 5G",
-        "model": "V2250",
-        "density": "2.75",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X100 Pro",
-        "model": "V2324A",
-        "density": "3.0",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y16",
-        "model": "V2204",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y22",
-        "model": "V2207",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V25 Pro 5G",
-        "model": "V2158",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2376"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo T2 Pro 5G",
-        "model": "V2321",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X80 Pro",
-        "model": "V2185",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G60",
-        "model": "XT2135-2",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G30",
-        "model": "XT2129-2",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 40",
-        "model": "XT2303-2",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G84",
-        "model": "XT2347-2",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G52",
-        "model": "XT2221-1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 30 Ultra",
-        "model": "XT2241-2",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Razr 40 Ultra",
-        "model": "XT2321-1",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2640"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G73 5G",
-        "model": "XT2237-2",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G23",
-        "model": "XT2331-2",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 20 Pro",
-        "model": "XT2153-1",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 10 Pro",
-        "model": "X695",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 11",
-        "model": "X662",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 30 Pro",
-        "model": "X678B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 30i",
-        "model": "X669",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Zero Ultra",
-        "model": "X6820",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix GT 10 Pro",
-        "model": "X6739",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Smart 7",
-        "model": "X6515",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 12 Pro 5G",
-        "model": "X671B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Zero 30 5G",
-        "model": "X6731B",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 12 Play",
-        "model": "X6816",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Camon 17",
-        "model": "CG6",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark 7",
-        "model": "KF6n",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Camon 20 Pro",
-        "model": "CK7n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark 10 Pro",
-        "model": "KI7",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pova 5 Pro",
-        "model": "LH8n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Phantom V Fold",
-        "model": "AD10",
-        "density": "2.5",
-        "width": "2000",
-        "height": "2296"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Camon 19 Pro",
-        "model": "CI8",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark 8 Pro",
-        "model": "KG8",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pova 4 Pro",
-        "model": "LG7n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pop 7 Pro",
-        "model": "BF7",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 15 Pro Max",
-        "model": "iPhone16,2",
-        "density": "3.0",
-        "width": "1290",
-        "height": "2796"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 15 Pro",
-        "model": "iPhone16,1",
-        "density": "3.0",
-        "width": "1179",
-        "height": "2556"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 15",
-        "model": "iPhone15,4",
-        "density": "3.0",
-        "width": "1179",
-        "height": "2556"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 14 Pro Max",
-        "model": "iPhone15,3",
-        "density": "3.0",
-        "width": "1290",
-        "height": "2796"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 14 Pro",
-        "model": "iPhone15,2",
-        "density": "3.0",
-        "width": "1179",
-        "height": "2556"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 14",
-        "model": "iPhone14,7",
-        "density": "3.0",
-        "width": "1170",
-        "height": "2532"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 13 Pro Max",
-        "model": "iPhone14,3",
-        "density": "3.0",
-        "width": "1284",
-        "height": "2778"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 13",
-        "model": "iPhone14,5",
-        "density": "3.0",
-        "width": "1170",
-        "height": "2532"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 12",
-        "model": "iPhone13,2",
-        "density": "3.0",
-        "width": "1170",
-        "height": "2532"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 11",
-        "model": "iPhone12,1",
-        "density": "2.0",
-        "width": "828",
-        "height": "1792"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone XR",
-        "model": "iPhone11,8",
-        "density": "2.0",
-        "width": "828",
-        "height": "1792"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone XS Max",
-        "model": "iPhone11,6",
-        "density": "3.0",
-        "width": "1242",
-        "height": "2688"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone X",
-        "model": "iPhone10,6",
-        "density": "3.0",
-        "width": "1125",
-        "height": "2436"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone SE (2022)",
-        "model": "iPhone14,6",
-        "density": "2.0",
-        "width": "750",
-        "height": "1334"
-    },
-    {
-        "brand": "Apple",
-        "device": "iPhone 8 Plus",
-        "model": "iPhone10,2",
-        "density": "3.0",
-        "width": "1080",
-        "height": "1920"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei P30 Pro",
-        "model": "VOG-L29",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei P40 Pro",
-        "model": "ELS-NX9",
-        "density": "3.0",
-        "width": "1200",
-        "height": "2640"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Mate 40 Pro",
-        "model": "NOP-AN00",
-        "density": "3.0",
-        "width": "1344",
-        "height": "2772"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Nova 9",
-        "model": "NAM-LX9",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Nova 10 Pro",
-        "model": "GLA-LX1",
-        "density": "2.75",
-        "width": "1200",
-        "height": "2652"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei P60 Pro",
-        "model": "MNA-LX9",
-        "density": "3.0",
-        "width": "1220",
-        "height": "2700"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Mate 50 Pro",
-        "model": "DCO-LX9",
-        "density": "3.0",
-        "width": "1212",
-        "height": "2616"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Mate 60 Pro",
-        "model": "ALN-AL00",
-        "density": "3.0",
-        "width": "1260",
-        "height": "2720"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Nova 11i",
-        "model": "MAO-LX9",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei P20 Pro",
-        "model": "CLT-L29",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2240"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor 90",
-        "model": "REA-NX9",
-        "density": "2.75",
-        "width": "1200",
-        "height": "2664"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X8a",
-        "model": "CRT-LX1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor Magic5 Pro",
-        "model": "PGT-N19",
-        "density": "3.25",
-        "width": "1312",
-        "height": "2848"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X9b",
-        "model": "ALI-NX1",
-        "density": "2.75",
-        "width": "1200",
-        "height": "2652"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor 70",
-        "model": "FNE-NX9",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor Magic6 Pro",
-        "model": "BVP-AN10",
-        "density": "3.25",
-        "width": "1280",
-        "height": "2800"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X7a",
-        "model": "RKY-LX1",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor 50",
-        "model": "NTH-NX9",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor Magic V2",
-        "model": "VER-N49",
-        "density": "2.75",
-        "width": "2156",
-        "height": "2344"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor 80 Pro",
-        "model": "ANB-AN00",
-        "density": "3.0",
-        "width": "1224",
-        "height": "2700"
-    },
-    {
-        "brand": "Asus",
-        "device": "ROG Phone 6",
-        "model": "AI2201",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2448"
-    },
-    {
-        "brand": "Asus",
-        "device": "Zenfone 10",
-        "model": "AI2302",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Asus",
-        "device": "ROG Phone 7 Ultimate",
-        "model": "AI2205",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2448"
-    },
-    {
-        "brand": "Asus",
-        "device": "ROG Phone 8 Pro",
-        "model": "ASUS_AI2401_D",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Asus",
-        "device": "Zenfone 9",
-        "model": "AI2202",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Sony",
-        "device": "Xperia 1 IV",
-        "model": "XQ-CT54",
-        "density": "3.5",
-        "width": "1644",
-        "height": "3840"
-    },
-    {
-        "brand": "Sony",
-        "device": "Xperia 5 IV",
-        "model": "XQ-CQ54",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2520"
-    },
-    {
-        "brand": "Sony",
-        "device": "Xperia 1 V",
-        "model": "XQ-DQ54",
-        "density": "3.5",
-        "width": "1644",
-        "height": "3840"
-    },
-    {
-        "brand": "Sony",
-        "device": "Xperia 10 V",
-        "model": "XQ-DC54",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2520"
-    },
-    {
-        "brand": "Sony",
-        "device": "Xperia 5 V",
-        "model": "XQ-DE54",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2520"
-    },
-    {
-        "brand": "Nothing",
-        "device": "Nothing Phone (1)",
-        "model": "A063",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Nothing",
-        "device": "Nothing Phone (2)",
-        "model": "A065",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Nothing",
-        "device": "Nothing Phone (2a)",
-        "model": "A142",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi K70 Pro",
-        "model": "23117RK66C",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3200"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco M6 5G",
-        "model": "23128PC33I",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 12S",
-        "model": "23030RAC7Y",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 11 Pro 5G",
-        "model": "2201116SG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 10 2022",
-        "model": "21121119SG",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco X4 GT",
-        "model": "22041216G",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 12T Pro",
-        "model": "22081212UG",
-        "density": "2.75",
-        "width": "1220",
-        "height": "2712"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 12X",
-        "model": "2112123AG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Xiaomi 11 Lite 5G NE",
-        "model": "2109119DG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi 10 Pro",
-        "model": "M2001J2G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Mi Note 10",
-        "model": "M1910F4G",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 8T",
-        "model": "M1908C3XG",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi Note 6 Pro",
-        "model": "M1806E7TG",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2280"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 8",
-        "model": "M1908C3IG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1520"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 8A",
-        "model": "M1908C3KG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1520"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi 7",
-        "model": "M1810F6G",
-        "density": "2.0",
-        "width": "720",
-        "height": "1520"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco C65",
-        "model": "2310FPCA4G",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Poco C55",
-        "model": "22127PC95I",
-        "density": "2.0",
-        "width": "720",
-        "height": "1650"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi A2+",
-        "model": "23028RN4DG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Xiaomi",
-        "device": "Redmi A1+",
-        "model": "220733SFG",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M14 5G",
-        "model": "SM-M146B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy F54 5G",
-        "model": "SM-E546B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy F23 5G",
-        "model": "SM-E236B",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M54 5G",
-        "model": "SM-M546B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M34 5G",
-        "model": "SM-M346B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A24",
-        "model": "SM-A245F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A05s",
-        "model": "SM-A057F",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A05",
-        "model": "SM-A055F",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S23 FE",
-        "model": "SM-S711B",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Tab S9",
-        "model": "SM-X710",
-        "density": "2.5",
-        "width": "1600",
-        "height": "2560"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Tab A8",
-        "model": "SM-X200",
-        "density": "2.0",
-        "width": "1200",
-        "height": "1920"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A51",
-        "model": "SM-A515F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A71",
-        "model": "SM-A715F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A50",
-        "model": "SM-A505F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy A70",
-        "model": "SM-A705F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M21",
-        "model": "SM-M215F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy M30s",
-        "model": "SM-M307F",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S9+",
-        "model": "SM-G965F",
-        "density": "3.5",
-        "width": "1440",
-        "height": "2960"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy S8",
-        "model": "SM-G950F",
-        "density": "3.5",
-        "width": "1440",
-        "height": "2960"
-    },
-    {
-        "brand": "Samsung",
-        "device": "Galaxy Note 9",
-        "model": "SM-N960F",
-        "density": "3.5",
-        "width": "1440",
-        "height": "2960"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord N20 SE",
-        "model": "CPH2469",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord CE 3 5G",
-        "model": "CPH2569",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord N30 5G",
-        "model": "CPH2513",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord N200 5G",
-        "model": "DE2118",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 8",
-        "model": "IN2013",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 7T",
-        "model": "HD1903",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 7",
-        "model": "GM1903",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 6T",
-        "model": "A6013",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2340"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus 6",
-        "model": "A6003",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2280"
-    },
-    {
-        "brand": "OnePlus",
-        "device": "OnePlus Nord N10 5G",
-        "model": "BE2029",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 12+ 5G",
-        "model": "RMX3867",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 12 5G",
-        "model": "RMX3999",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C67 5G",
-        "model": "RMX3782",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme Narzo 60x 5G",
-        "model": "RMX3782",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme Narzo 60 Pro",
-        "model": "RMX3771",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT 2 Pro",
-        "model": "RMX3301",
-        "density": "3.5",
-        "width": "1440",
-        "height": "3216"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme GT 2",
-        "model": "RMX3311",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 9 5G",
-        "model": "RMX3388",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 8 Pro",
-        "model": "RMX3081",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 8 5G",
-        "model": "RMX3241",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C30",
-        "model": "RMX3581",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C33",
-        "model": "RMX3624",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C25s",
-        "model": "RMX3195",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme C11 2021",
-        "model": "RMX3231",
-        "density": "2.0",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Realme",
-        "device": "Realme 6 Pro",
-        "model": "RMX2061",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno10 5G",
-        "model": "CPH2531",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno8 T 5G",
-        "model": "CPH2505",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno8 T",
-        "model": "CPH2481",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A98 5G",
-        "model": "CPH2529",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A38",
-        "model": "CPH2579",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A18",
-        "model": "CPH2591",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Find N3",
-        "model": "CPH2499",
-        "density": "2.75",
-        "width": "2224",
-        "height": "2484"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Find N3 Flip",
-        "model": "CPH2519",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2520"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno7 5G",
-        "model": "CPH2371",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO Reno6 Pro 5G",
-        "model": "CPH2247",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A96",
-        "model": "CPH2333",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2412"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A76",
-        "model": "CPH2375",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A54",
-        "model": "CPH2239",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO A15s",
-        "model": "CPH2179",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "OPPO",
-        "device": "OPPO F17 Pro",
-        "model": "CPH2119",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V29e 5G",
-        "model": "V2303",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V29 Pro",
-        "model": "V2251",
-        "density": "2.75",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y27 5G",
-        "model": "V2302",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y17s",
-        "model": "V2310",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y02t",
-        "model": "V2254",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo T2 5G",
-        "model": "V2240",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo T2x 5G",
-        "model": "V2225",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X100",
-        "model": "V2309A",
-        "density": "3.0",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V25 5G",
-        "model": "V2202",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y35",
-        "model": "V2205",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo Y21",
-        "model": "V2111",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo V20",
-        "model": "V2025",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X70 Pro",
-        "model": "V2105",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2376"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo X60 Pro",
-        "model": "V2046",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2376"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo iQOO 12",
-        "model": "V2307A",
-        "density": "3.0",
-        "width": "1260",
-        "height": "2800"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo iQOO Neo 7 Pro",
-        "model": "I2214",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Vivo",
-        "device": "Vivo iQOO Z7 5G",
-        "model": "I2207",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 40 Neo",
-        "model": "XT2307-1",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 40 Pro",
-        "model": "XT2301-4",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G54 5G",
-        "model": "XT2343-1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G14",
-        "model": "XT2341-3",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G13",
-        "model": "XT2331-1",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G82 5G",
-        "model": "XT2225-1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto G72",
-        "model": "XT2255-2",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto E13",
-        "model": "XT2345-3",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 30 Pro",
-        "model": "XT2201-1",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Motorola",
-        "device": "Moto Edge 30",
-        "model": "XT2203-1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 30 5G",
-        "model": "X6711",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 30 VIP",
-        "model": "X6710",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 30",
-        "model": "X669",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 20 5G",
-        "model": "X666",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Hot 20i",
-        "model": "X665E",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Zero 5G 2023",
-        "model": "X6815C",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Smart 8",
-        "model": "X6525",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Smart 6",
-        "model": "X6511",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 12 G96",
-        "model": "X670",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Infinix",
-        "device": "Infinix Note 11",
-        "model": "X663",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Camon 20 Premier 5G",
-        "model": "CK9n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Camon 20",
-        "model": "CK6n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Phantom X2 Pro 5G",
-        "model": "AD9",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Phantom X2 5G",
-        "model": "AD8",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pova 5",
-        "model": "LH7n",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pova Neo 3",
-        "model": "LH6n",
-        "density": "1.75",
-        "width": "720",
-        "height": "1640"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark Go 2024",
-        "model": "BG6",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark 9 Pro",
-        "model": "KH7",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Spark 8C",
-        "model": "KG5j",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Tecno",
-        "device": "Tecno Pop 8",
-        "model": "BG6",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Mate X3",
-        "model": "ALT-AL00",
-        "density": "2.75",
-        "width": "2224",
-        "height": "2496"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Pocket S",
-        "model": "BAL-AL80",
-        "density": "2.75",
-        "width": "1188",
-        "height": "2790"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Nova Y90",
-        "model": "CTR-LX1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei Nova Y70",
-        "model": "MGA-LX9",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Huawei",
-        "device": "Huawei P40 Lite",
-        "model": "JNY-LX1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2310"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor 90 Lite",
-        "model": "CRT-NX1",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2388"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X9a 5G",
-        "model": "RNE-NX1",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X8 5G",
-        "model": "VNE-N41",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor X6a",
-        "model": "WDY-LX1",
-        "density": "1.75",
-        "width": "720",
-        "height": "1612"
-    },
-    {
-        "brand": "Honor",
-        "device": "Honor Play 40 Plus",
-        "model": "RKY-AN00",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia G60 5G",
-        "model": "TA-1479",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia X30 5G",
-        "model": "TA-1450",
-        "density": "2.625",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia G22",
-        "model": "TA-1528",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia C32",
-        "model": "TA-1534",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia G21",
-        "model": "TA-1418",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia X20",
-        "model": "TA-1341",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia 8.3 5G",
-        "model": "TA-1243",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Nokia",
-        "device": "Nokia C21 Plus",
-        "model": "TA-1433",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "ZTE",
-        "device": "Nubia Red Magic 8 Pro",
-        "model": "NX729J",
-        "density": "2.5",
-        "width": "1116",
-        "height": "2480"
-    },
-    {
-        "brand": "ZTE",
-        "device": "Nubia Red Magic 9 Pro",
-        "model": "NX769J",
-        "density": "2.5",
-        "width": "1116",
-        "height": "2480"
-    },
-    {
-        "brand": "ZTE",
-        "device": "ZTE Axon 40 Ultra",
-        "model": "A2023P",
-        "density": "2.75",
-        "width": "1116",
-        "height": "2480"
-    },
-    {
-        "brand": "ZTE",
-        "device": "Nubia Z50 Ultra",
-        "model": "NX712J",
-        "density": "2.75",
-        "width": "1116",
-        "height": "2480"
-    },
-    {
-        "brand": "ZTE",
-        "device": "Nubia Neo 5G",
-        "model": "NX713J",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2408"
-    },
-    {
-        "brand": "TCL",
-        "device": "TCL 40 SE",
-        "model": "T610K",
-        "density": "1.75",
-        "width": "720",
-        "height": "1600"
-    },
-    {
-        "brand": "TCL",
-        "device": "TCL 30 5G",
-        "model": "T776H",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "TCL",
-        "device": "TCL 20 Pro 5G",
-        "model": "T810H",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 3 XL",
-        "model": "Pixel 3 XL",
-        "density": "3.5",
-        "width": "1440",
-        "height": "2960"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 3",
-        "model": "Pixel 3",
-        "density": "2.75",
-        "width": "1080",
-        "height": "2160"
-    },
-    {
-        "brand": "Google",
-        "device": "Pixel 2 XL",
-        "model": "Pixel 2 XL",
-        "density": "3.5",
-        "width": "1440",
-        "height": "2880"
-    },
-    {
-        "brand": "Lenovo",
-        "device": "Lenovo Legion Y70",
-        "model": "L71061",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2400"
-    },
-    {
-        "brand": "Lenovo",
-        "device": "Lenovo Legion Duel 2",
-        "model": "L70081",
-        "density": "2.5",
-        "width": "1080",
-        "height": "2460"
-    }
-]
+{
+    "device" : [
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 9T Pro",
+            "model": "Mi 9T Pro",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2210"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 10 Pro",
+            "model": "M2101K6G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco X3 Pro",
+            "model": "M2102J20SG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 11",
+            "model": "2201117TG",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 12 Pro",
+            "model": "2201122G",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 9A",
+            "model": "M2006C3LG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco F3",
+            "model": "M2012K11AG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 11 Ultra",
+            "model": "M2102K1G",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 12",
+            "model": "22111317G",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco F5",
+            "model": "23049PCD8G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 13 Pro",
+            "model": "2210132G",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 10C",
+            "model": "220333QNY",
+            "density": "2.0",
+            "width": "720",
+            "height": "1650"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco X5 Pro 5G",
+            "model": "22101320G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 12 Pro",
+            "model": "22101316G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco X4 Pro 5G",
+            "model": "2201116PG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 11T Pro",
+            "model": "2107113SG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 9 Pro",
+            "model": "M2003J6B2G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 9C",
+            "model": "M2006C3MG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco M3 Pro 5G",
+            "model": "M2103K19PG",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 10T Pro",
+            "model": "M2007J3SG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 8 Pro",
+            "model": "M1906G7G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco F4 GT",
+            "model": "21121210G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 13 Ultra",
+            "model": "2304FPN6DG",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 12C",
+            "model": "2212ARNC4L",
+            "density": "2.0",
+            "width": "720",
+            "height": "1650"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco M5",
+            "model": "22071219G",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 13 Pro 5G",
+            "model": "2312DRA5G",
+            "density": "2.75",
+            "width": "1220",
+            "height": "2712"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 13T Pro",
+            "model": "23078PND5G",
+            "density": "2.75",
+            "width": "1220",
+            "height": "2712"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco F5 Pro",
+            "model": "23013PC75G",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 13C",
+            "model": "2310FPCA4G",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 14 Ultra",
+            "model": "24030PN60G",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 13 5G",
+            "model": "23122RN80G",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco X6 Pro",
+            "model": "2311DRK48G",
+            "density": "2.75",
+            "width": "1220",
+            "height": "2712"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco M6 Pro",
+            "model": "23117RA68G",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 14",
+            "model": "23127PN0CC",
+            "density": "3.0",
+            "width": "1200",
+            "height": "2670"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi K60 Ultra",
+            "model": "23078RKD5C",
+            "density": "2.75",
+            "width": "1220",
+            "height": "2712"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 9",
+            "model": "M1902F1G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 7",
+            "model": "M1901F7G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco F1",
+            "model": "POCOPHONE F1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2246"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 8",
+            "model": "M1803E1A",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2248"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 10S",
+            "model": "M2101K7BNY",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S21",
+            "model": "SM-G991B",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S20 FE",
+            "model": "SM-G780F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A52",
+            "model": "SM-A525F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S22 Ultra",
+            "model": "SM-S908B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3088"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A12",
+            "model": "SM-A125F",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M31",
+            "model": "SM-M315F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A32",
+            "model": "SM-A325F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S23",
+            "model": "SM-S911B",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S23 Ultra",
+            "model": "SM-S918B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3088"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A54 5G",
+            "model": "SM-A546B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A34 5G",
+            "model": "SM-A346B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A14 5G",
+            "model": "SM-A146B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Z Flip 5",
+            "model": "SM-F731B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2640"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Z Fold 5",
+            "model": "SM-F946B",
+            "density": "3.0",
+            "width": "1812",
+            "height": "2176"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S24 Ultra",
+            "model": "SM-S928B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S24+",
+            "model": "SM-S926B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S24",
+            "model": "SM-S921B",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A55 5G",
+            "model": "SM-A556B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A35 5G",
+            "model": "SM-A356B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A15 5G",
+            "model": "SM-A156B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S21 FE 5G",
+            "model": "SM-G990B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S20 Ultra",
+            "model": "SM-G988B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Note 20 Ultra",
+            "model": "SM-N986B",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3088"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Note 10+",
+            "model": "SM-N975F",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3040"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S10+",
+            "model": "SM-G975F",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3040"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A53 5G",
+            "model": "SM-A536B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A73 5G",
+            "model": "SM-A736B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M53 5G",
+            "model": "SM-M536B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M33 5G",
+            "model": "SM-M336B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A23",
+            "model": "SM-A235F",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A04s",
+            "model": "SM-A047F",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A03s",
+            "model": "SM-A037F",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Z Flip 4",
+            "model": "SM-F721B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2640"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Z Fold 4",
+            "model": "SM-F936B",
+            "density": "3.0",
+            "width": "1812",
+            "height": "2176"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S10e",
+            "model": "SM-G970F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2280"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 6",
+            "model": "Pixel 6",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 7 Pro",
+            "model": "Pixel 7 Pro",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 5",
+            "model": "Pixel 5",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 4a",
+            "model": "Pixel 4a",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 7a",
+            "model": "Pixel 7a",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 8 Pro",
+            "model": "Pixel 8 Pro",
+            "density": "3.5",
+            "width": "1344",
+            "height": "2992"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 8",
+            "model": "Pixel 8",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 8a",
+            "model": "Pixel 8a",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 6 Pro",
+            "model": "Pixel 6 Pro",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 6a",
+            "model": "Pixel 6a",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 7",
+            "model": "Pixel 7",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 4 XL",
+            "model": "Pixel 4 XL",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3040"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 4",
+            "model": "Pixel 4",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2280"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 3a XL",
+            "model": "Pixel 3a XL",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2160"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel Fold",
+            "model": "Pixel Fold",
+            "density": "2.5",
+            "width": "1840",
+            "height": "2208"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 9 Pro",
+            "model": "LE2123",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3216"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord 2",
+            "model": "DN2103",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 8T",
+            "model": "KB2003",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 10 Pro",
+            "model": "NE2213",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3216"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 11",
+            "model": "CPH2449",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3216"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord CE 3 Lite",
+            "model": "CPH2467",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord 2T",
+            "model": "CPH2399",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 12",
+            "model": "CPH2581",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3168"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 12R",
+            "model": "CPH2609",
+            "density": "2.75",
+            "width": "1264",
+            "height": "2780"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Open",
+            "model": "CPH2551",
+            "density": "2.75",
+            "width": "2224",
+            "height": "2484"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 11R",
+            "model": "CPH2487",
+            "density": "2.75",
+            "width": "1240",
+            "height": "2772"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 10T",
+            "model": "CPH2413",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord 3 5G",
+            "model": "CPH2493",
+            "density": "2.75",
+            "width": "1240",
+            "height": "2772"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord CE 2 5G",
+            "model": "IV2201",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 9",
+            "model": "LE2113",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 8 Pro",
+            "model": "IN2023",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3168"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 7T Pro",
+            "model": "HD1913",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 7 Pro",
+            "model": "GM1913",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3120"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 8",
+            "model": "RMX3085",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT Master",
+            "model": "RMX3363",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C21",
+            "model": "RMX3201",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 7 Pro",
+            "model": "RMX2170",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 11 Pro+",
+            "model": "RMX3741",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C55",
+            "model": "RMX3710",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT Neo 3",
+            "model": "RMX3561",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 10",
+            "model": "RMX3630",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 12 Pro+ 5G",
+            "model": "RMX3840",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT 5G",
+            "model": "RMX2202",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 9 Pro+ 5G",
+            "model": "RMX3393",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C35",
+            "model": "RMX3511",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme Narzo 50",
+            "model": "RMX3286",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C53",
+            "model": "RMX3760",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT Neo 5",
+            "model": "RMX3708",
+            "density": "2.75",
+            "width": "1240",
+            "height": "2772"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno6 5G",
+            "model": "CPH2251",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A53",
+            "model": "CPH2127",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO F19 Pro",
+            "model": "CPH2285",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno8 Pro 5G",
+            "model": "CPH2357",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A78 5G",
+            "model": "CPH2483",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Find X5 Pro",
+            "model": "CPH2305",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3216"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO F23 5G",
+            "model": "CPH2527",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno10 Pro+ 5G",
+            "model": "CPH2521",
+            "density": "2.75",
+            "width": "1240",
+            "height": "2772"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Find N2 Flip",
+            "model": "CPH2437",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2520"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A57",
+            "model": "CPH2387",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno7 Pro 5G",
+            "model": "CPH2293",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A17",
+            "model": "CPH2477",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno11 Pro 5G",
+            "model": "CPH2607",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Find X6 Pro",
+            "model": "PGEM10",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3168"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y20",
+            "model": "V2029",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V21",
+            "model": "V2050",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V23 5G",
+            "model": "V2130",
+            "density": "3.0",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V27 5G",
+            "model": "V2246",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y36",
+            "model": "V2247",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X90 Pro",
+            "model": "V2219",
+            "density": "3.0",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo T1 5G",
+            "model": "V2141",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V29 5G",
+            "model": "V2250",
+            "density": "2.75",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X100 Pro",
+            "model": "V2324A",
+            "density": "3.0",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y16",
+            "model": "V2204",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y22",
+            "model": "V2207",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V25 Pro 5G",
+            "model": "V2158",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2376"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo T2 Pro 5G",
+            "model": "V2321",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X80 Pro",
+            "model": "V2185",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G60",
+            "model": "XT2135-2",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G30",
+            "model": "XT2129-2",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 40",
+            "model": "XT2303-2",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G84",
+            "model": "XT2347-2",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G52",
+            "model": "XT2221-1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 30 Ultra",
+            "model": "XT2241-2",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Razr 40 Ultra",
+            "model": "XT2321-1",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2640"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G73 5G",
+            "model": "XT2237-2",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G23",
+            "model": "XT2331-2",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 20 Pro",
+            "model": "XT2153-1",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 10 Pro",
+            "model": "X695",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 11",
+            "model": "X662",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 30 Pro",
+            "model": "X678B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 30i",
+            "model": "X669",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Zero Ultra",
+            "model": "X6820",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix GT 10 Pro",
+            "model": "X6739",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Smart 7",
+            "model": "X6515",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 12 Pro 5G",
+            "model": "X671B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Zero 30 5G",
+            "model": "X6731B",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 12 Play",
+            "model": "X6816",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Camon 17",
+            "model": "CG6",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark 7",
+            "model": "KF6n",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Camon 20 Pro",
+            "model": "CK7n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark 10 Pro",
+            "model": "KI7",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pova 5 Pro",
+            "model": "LH8n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Phantom V Fold",
+            "model": "AD10",
+            "density": "2.5",
+            "width": "2000",
+            "height": "2296"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Camon 19 Pro",
+            "model": "CI8",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark 8 Pro",
+            "model": "KG8",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pova 4 Pro",
+            "model": "LG7n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pop 7 Pro",
+            "model": "BF7",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 15 Pro Max",
+            "model": "iPhone16,2",
+            "density": "3.0",
+            "width": "1290",
+            "height": "2796"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 15 Pro",
+            "model": "iPhone16,1",
+            "density": "3.0",
+            "width": "1179",
+            "height": "2556"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 15",
+            "model": "iPhone15,4",
+            "density": "3.0",
+            "width": "1179",
+            "height": "2556"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 14 Pro Max",
+            "model": "iPhone15,3",
+            "density": "3.0",
+            "width": "1290",
+            "height": "2796"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 14 Pro",
+            "model": "iPhone15,2",
+            "density": "3.0",
+            "width": "1179",
+            "height": "2556"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 14",
+            "model": "iPhone14,7",
+            "density": "3.0",
+            "width": "1170",
+            "height": "2532"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 13 Pro Max",
+            "model": "iPhone14,3",
+            "density": "3.0",
+            "width": "1284",
+            "height": "2778"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 13",
+            "model": "iPhone14,5",
+            "density": "3.0",
+            "width": "1170",
+            "height": "2532"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 12",
+            "model": "iPhone13,2",
+            "density": "3.0",
+            "width": "1170",
+            "height": "2532"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 11",
+            "model": "iPhone12,1",
+            "density": "2.0",
+            "width": "828",
+            "height": "1792"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone XR",
+            "model": "iPhone11,8",
+            "density": "2.0",
+            "width": "828",
+            "height": "1792"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone XS Max",
+            "model": "iPhone11,6",
+            "density": "3.0",
+            "width": "1242",
+            "height": "2688"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone X",
+            "model": "iPhone10,6",
+            "density": "3.0",
+            "width": "1125",
+            "height": "2436"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone SE (2022)",
+            "model": "iPhone14,6",
+            "density": "2.0",
+            "width": "750",
+            "height": "1334"
+        },
+        {
+            "brand": "Apple",
+            "device": "iPhone 8 Plus",
+            "model": "iPhone10,2",
+            "density": "3.0",
+            "width": "1080",
+            "height": "1920"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei P30 Pro",
+            "model": "VOG-L29",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei P40 Pro",
+            "model": "ELS-NX9",
+            "density": "3.0",
+            "width": "1200",
+            "height": "2640"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Mate 40 Pro",
+            "model": "NOP-AN00",
+            "density": "3.0",
+            "width": "1344",
+            "height": "2772"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Nova 9",
+            "model": "NAM-LX9",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Nova 10 Pro",
+            "model": "GLA-LX1",
+            "density": "2.75",
+            "width": "1200",
+            "height": "2652"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei P60 Pro",
+            "model": "MNA-LX9",
+            "density": "3.0",
+            "width": "1220",
+            "height": "2700"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Mate 50 Pro",
+            "model": "DCO-LX9",
+            "density": "3.0",
+            "width": "1212",
+            "height": "2616"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Mate 60 Pro",
+            "model": "ALN-AL00",
+            "density": "3.0",
+            "width": "1260",
+            "height": "2720"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Nova 11i",
+            "model": "MAO-LX9",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei P20 Pro",
+            "model": "CLT-L29",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2240"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor 90",
+            "model": "REA-NX9",
+            "density": "2.75",
+            "width": "1200",
+            "height": "2664"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X8a",
+            "model": "CRT-LX1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor Magic5 Pro",
+            "model": "PGT-N19",
+            "density": "3.25",
+            "width": "1312",
+            "height": "2848"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X9b",
+            "model": "ALI-NX1",
+            "density": "2.75",
+            "width": "1200",
+            "height": "2652"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor 70",
+            "model": "FNE-NX9",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor Magic6 Pro",
+            "model": "BVP-AN10",
+            "density": "3.25",
+            "width": "1280",
+            "height": "2800"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X7a",
+            "model": "RKY-LX1",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor 50",
+            "model": "NTH-NX9",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor Magic V2",
+            "model": "VER-N49",
+            "density": "2.75",
+            "width": "2156",
+            "height": "2344"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor 80 Pro",
+            "model": "ANB-AN00",
+            "density": "3.0",
+            "width": "1224",
+            "height": "2700"
+        },
+        {
+            "brand": "Asus",
+            "device": "ROG Phone 6",
+            "model": "AI2201",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2448"
+        },
+        {
+            "brand": "Asus",
+            "device": "Zenfone 10",
+            "model": "AI2302",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Asus",
+            "device": "ROG Phone 7 Ultimate",
+            "model": "AI2205",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2448"
+        },
+        {
+            "brand": "Asus",
+            "device": "ROG Phone 8 Pro",
+            "model": "ASUS_AI2401_D",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Asus",
+            "device": "Zenfone 9",
+            "model": "AI2202",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Sony",
+            "device": "Xperia 1 IV",
+            "model": "XQ-CT54",
+            "density": "3.5",
+            "width": "1644",
+            "height": "3840"
+        },
+        {
+            "brand": "Sony",
+            "device": "Xperia 5 IV",
+            "model": "XQ-CQ54",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2520"
+        },
+        {
+            "brand": "Sony",
+            "device": "Xperia 1 V",
+            "model": "XQ-DQ54",
+            "density": "3.5",
+            "width": "1644",
+            "height": "3840"
+        },
+        {
+            "brand": "Sony",
+            "device": "Xperia 10 V",
+            "model": "XQ-DC54",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2520"
+        },
+        {
+            "brand": "Sony",
+            "device": "Xperia 5 V",
+            "model": "XQ-DE54",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2520"
+        },
+        {
+            "brand": "Nothing",
+            "device": "Nothing Phone (1)",
+            "model": "A063",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Nothing",
+            "device": "Nothing Phone (2)",
+            "model": "A065",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Nothing",
+            "device": "Nothing Phone (2a)",
+            "model": "A142",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi K70 Pro",
+            "model": "23117RK66C",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3200"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco M6 5G",
+            "model": "23128PC33I",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 12S",
+            "model": "23030RAC7Y",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 11 Pro 5G",
+            "model": "2201116SG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 10 2022",
+            "model": "21121119SG",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco X4 GT",
+            "model": "22041216G",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 12T Pro",
+            "model": "22081212UG",
+            "density": "2.75",
+            "width": "1220",
+            "height": "2712"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 12X",
+            "model": "2112123AG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Xiaomi 11 Lite 5G NE",
+            "model": "2109119DG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi 10 Pro",
+            "model": "M2001J2G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Mi Note 10",
+            "model": "M1910F4G",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 8T",
+            "model": "M1908C3XG",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi Note 6 Pro",
+            "model": "M1806E7TG",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2280"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 8",
+            "model": "M1908C3IG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1520"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 8A",
+            "model": "M1908C3KG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1520"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi 7",
+            "model": "M1810F6G",
+            "density": "2.0",
+            "width": "720",
+            "height": "1520"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco C65",
+            "model": "2310FPCA4G",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Poco C55",
+            "model": "22127PC95I",
+            "density": "2.0",
+            "width": "720",
+            "height": "1650"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi A2+",
+            "model": "23028RN4DG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Xiaomi",
+            "device": "Redmi A1+",
+            "model": "220733SFG",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M14 5G",
+            "model": "SM-M146B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy F54 5G",
+            "model": "SM-E546B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy F23 5G",
+            "model": "SM-E236B",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M54 5G",
+            "model": "SM-M546B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M34 5G",
+            "model": "SM-M346B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A24",
+            "model": "SM-A245F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A05s",
+            "model": "SM-A057F",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A05",
+            "model": "SM-A055F",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S23 FE",
+            "model": "SM-S711B",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Tab S9",
+            "model": "SM-X710",
+            "density": "2.5",
+            "width": "1600",
+            "height": "2560"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Tab A8",
+            "model": "SM-X200",
+            "density": "2.0",
+            "width": "1200",
+            "height": "1920"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A51",
+            "model": "SM-A515F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A71",
+            "model": "SM-A715F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A50",
+            "model": "SM-A505F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy A70",
+            "model": "SM-A705F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M21",
+            "model": "SM-M215F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy M30s",
+            "model": "SM-M307F",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S9+",
+            "model": "SM-G965F",
+            "density": "3.5",
+            "width": "1440",
+            "height": "2960"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy S8",
+            "model": "SM-G950F",
+            "density": "3.5",
+            "width": "1440",
+            "height": "2960"
+        },
+        {
+            "brand": "Samsung",
+            "device": "Galaxy Note 9",
+            "model": "SM-N960F",
+            "density": "3.5",
+            "width": "1440",
+            "height": "2960"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord N20 SE",
+            "model": "CPH2469",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord CE 3 5G",
+            "model": "CPH2569",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord N30 5G",
+            "model": "CPH2513",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord N200 5G",
+            "model": "DE2118",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 8",
+            "model": "IN2013",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 7T",
+            "model": "HD1903",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 7",
+            "model": "GM1903",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 6T",
+            "model": "A6013",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2340"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus 6",
+            "model": "A6003",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2280"
+        },
+        {
+            "brand": "OnePlus",
+            "device": "OnePlus Nord N10 5G",
+            "model": "BE2029",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 12+ 5G",
+            "model": "RMX3867",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 12 5G",
+            "model": "RMX3999",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C67 5G",
+            "model": "RMX3782",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme Narzo 60x 5G",
+            "model": "RMX3782",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme Narzo 60 Pro",
+            "model": "RMX3771",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT 2 Pro",
+            "model": "RMX3301",
+            "density": "3.5",
+            "width": "1440",
+            "height": "3216"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme GT 2",
+            "model": "RMX3311",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 9 5G",
+            "model": "RMX3388",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 8 Pro",
+            "model": "RMX3081",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 8 5G",
+            "model": "RMX3241",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C30",
+            "model": "RMX3581",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C33",
+            "model": "RMX3624",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C25s",
+            "model": "RMX3195",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme C11 2021",
+            "model": "RMX3231",
+            "density": "2.0",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Realme",
+            "device": "Realme 6 Pro",
+            "model": "RMX2061",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno10 5G",
+            "model": "CPH2531",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno8 T 5G",
+            "model": "CPH2505",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno8 T",
+            "model": "CPH2481",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A98 5G",
+            "model": "CPH2529",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A38",
+            "model": "CPH2579",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A18",
+            "model": "CPH2591",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Find N3",
+            "model": "CPH2499",
+            "density": "2.75",
+            "width": "2224",
+            "height": "2484"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Find N3 Flip",
+            "model": "CPH2519",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2520"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno7 5G",
+            "model": "CPH2371",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO Reno6 Pro 5G",
+            "model": "CPH2247",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A96",
+            "model": "CPH2333",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2412"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A76",
+            "model": "CPH2375",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A54",
+            "model": "CPH2239",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO A15s",
+            "model": "CPH2179",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "OPPO",
+            "device": "OPPO F17 Pro",
+            "model": "CPH2119",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V29e 5G",
+            "model": "V2303",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V29 Pro",
+            "model": "V2251",
+            "density": "2.75",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y27 5G",
+            "model": "V2302",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y17s",
+            "model": "V2310",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y02t",
+            "model": "V2254",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo T2 5G",
+            "model": "V2240",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo T2x 5G",
+            "model": "V2225",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X100",
+            "model": "V2309A",
+            "density": "3.0",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V25 5G",
+            "model": "V2202",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y35",
+            "model": "V2205",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo Y21",
+            "model": "V2111",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo V20",
+            "model": "V2025",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X70 Pro",
+            "model": "V2105",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2376"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo X60 Pro",
+            "model": "V2046",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2376"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo iQOO 12",
+            "model": "V2307A",
+            "density": "3.0",
+            "width": "1260",
+            "height": "2800"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo iQOO Neo 7 Pro",
+            "model": "I2214",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Vivo",
+            "device": "Vivo iQOO Z7 5G",
+            "model": "I2207",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 40 Neo",
+            "model": "XT2307-1",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 40 Pro",
+            "model": "XT2301-4",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G54 5G",
+            "model": "XT2343-1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G14",
+            "model": "XT2341-3",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G13",
+            "model": "XT2331-1",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G82 5G",
+            "model": "XT2225-1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto G72",
+            "model": "XT2255-2",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto E13",
+            "model": "XT2345-3",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 30 Pro",
+            "model": "XT2201-1",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Motorola",
+            "device": "Moto Edge 30",
+            "model": "XT2203-1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 30 5G",
+            "model": "X6711",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 30 VIP",
+            "model": "X6710",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 30",
+            "model": "X669",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 20 5G",
+            "model": "X666",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Hot 20i",
+            "model": "X665E",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Zero 5G 2023",
+            "model": "X6815C",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Smart 8",
+            "model": "X6525",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Smart 6",
+            "model": "X6511",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 12 G96",
+            "model": "X670",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Infinix",
+            "device": "Infinix Note 11",
+            "model": "X663",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Camon 20 Premier 5G",
+            "model": "CK9n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Camon 20",
+            "model": "CK6n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Phantom X2 Pro 5G",
+            "model": "AD9",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Phantom X2 5G",
+            "model": "AD8",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pova 5",
+            "model": "LH7n",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pova Neo 3",
+            "model": "LH6n",
+            "density": "1.75",
+            "width": "720",
+            "height": "1640"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark Go 2024",
+            "model": "BG6",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark 9 Pro",
+            "model": "KH7",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Spark 8C",
+            "model": "KG5j",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Tecno",
+            "device": "Tecno Pop 8",
+            "model": "BG6",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Mate X3",
+            "model": "ALT-AL00",
+            "density": "2.75",
+            "width": "2224",
+            "height": "2496"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Pocket S",
+            "model": "BAL-AL80",
+            "density": "2.75",
+            "width": "1188",
+            "height": "2790"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Nova Y90",
+            "model": "CTR-LX1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei Nova Y70",
+            "model": "MGA-LX9",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Huawei",
+            "device": "Huawei P40 Lite",
+            "model": "JNY-LX1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2310"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor 90 Lite",
+            "model": "CRT-NX1",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2388"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X9a 5G",
+            "model": "RNE-NX1",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X8 5G",
+            "model": "VNE-N41",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor X6a",
+            "model": "WDY-LX1",
+            "density": "1.75",
+            "width": "720",
+            "height": "1612"
+        },
+        {
+            "brand": "Honor",
+            "device": "Honor Play 40 Plus",
+            "model": "RKY-AN00",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia G60 5G",
+            "model": "TA-1479",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia X30 5G",
+            "model": "TA-1450",
+            "density": "2.625",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia G22",
+            "model": "TA-1528",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia C32",
+            "model": "TA-1534",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia G21",
+            "model": "TA-1418",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia X20",
+            "model": "TA-1341",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia 8.3 5G",
+            "model": "TA-1243",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Nokia",
+            "device": "Nokia C21 Plus",
+            "model": "TA-1433",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "ZTE",
+            "device": "Nubia Red Magic 8 Pro",
+            "model": "NX729J",
+            "density": "2.5",
+            "width": "1116",
+            "height": "2480"
+        },
+        {
+            "brand": "ZTE",
+            "device": "Nubia Red Magic 9 Pro",
+            "model": "NX769J",
+            "density": "2.5",
+            "width": "1116",
+            "height": "2480"
+        },
+        {
+            "brand": "ZTE",
+            "device": "ZTE Axon 40 Ultra",
+            "model": "A2023P",
+            "density": "2.75",
+            "width": "1116",
+            "height": "2480"
+        },
+        {
+            "brand": "ZTE",
+            "device": "Nubia Z50 Ultra",
+            "model": "NX712J",
+            "density": "2.75",
+            "width": "1116",
+            "height": "2480"
+        },
+        {
+            "brand": "ZTE",
+            "device": "Nubia Neo 5G",
+            "model": "NX713J",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2408"
+        },
+        {
+            "brand": "TCL",
+            "device": "TCL 40 SE",
+            "model": "T610K",
+            "density": "1.75",
+            "width": "720",
+            "height": "1600"
+        },
+        {
+            "brand": "TCL",
+            "device": "TCL 30 5G",
+            "model": "T776H",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "TCL",
+            "device": "TCL 20 Pro 5G",
+            "model": "T810H",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 3 XL",
+            "model": "Pixel 3 XL",
+            "density": "3.5",
+            "width": "1440",
+            "height": "2960"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 3",
+            "model": "Pixel 3",
+            "density": "2.75",
+            "width": "1080",
+            "height": "2160"
+        },
+        {
+            "brand": "Google",
+            "device": "Pixel 2 XL",
+            "model": "Pixel 2 XL",
+            "density": "3.5",
+            "width": "1440",
+            "height": "2880"
+        },
+        {
+            "brand": "Lenovo",
+            "device": "Lenovo Legion Y70",
+            "model": "L71061",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2400"
+        },
+        {
+            "brand": "Lenovo",
+            "device": "Lenovo Legion Duel 2",
+            "model": "L70081",
+            "density": "2.5",
+            "width": "1080",
+            "height": "2460"
+        }
+    ],
+    "version" : [
+        {
+            "version": "11",
+            "builds": [
+                "RP1A.200720.009", "RP1A.200720.010", "RP1A.200720.011", "RP1A.200720.012", "RD1A.200810.020",
+                "RD1A.200810.022", "RD1A.200810.022.A1", "RP1A.201005.004", "RP1A.201005.004.A1", "RP1A.201005.006",
+                "RD1A.201105.003", "RD1A.201105.003.B1", "RD1A.201105.003.C1", "RP1A.201205.002", "RP1A.201205.003",
+                "RQ1A.210105.002", "RQ1A.210105.003", "RQ1A.210205.004", "RQ1A.210205.006", "RQ2A.210305.006",
+                "RQ2A.210305.007", "RQ2A.210405.005", "RQ2A.210405.006", "RQ2A.210505.002", "RQ2A.210505.003",
+                "RQ3A.210605.005", "RQ3A.210705.001", "RQ3A.210805.001", "RQ3A.210905.001", "RQ3A.211005.001",
+                "RKQ1.200826.002", "RKQ1.200903.002", "RKQ1.201022.002", "RKQ1.201112.002", "RKQ1.201217.002",
+                "RKQ1.210107.001", "RKQ1.210310.002", "RKQ1.210419.001", "RKQ1.210514.001", "RKQ1.210610.001",
+                "R16NW.W20.20.1", "R16NW.W20.28.1", "R16NW.WM1.210101", "R16NW.201012.001", "R16NW.201118.001",
+                "R16NW.210115.001", "R16NW.210220.001", "R16NW.210405.001", "R16NW.210512.001", "R16NW.210618.001"
+            ]
+        },
+        {
+            "version": "12",
+            "builds": [
+                "SP1A.210812.015", "SP1A.210812.016", "SP1A.210812.016.A1", "SP1A.211105.002", "SP1A.211105.003",
+                "SP1A.211105.004", "SP1A.211205.008", "SQ1D.211205.016.A1", "SQ1A.211205.008", "SQ1A.220105.002",
+                "SQ1A.220205.002", "SQ2A.220305.002", "SQ2A.220305.003", "SQ2A.220405.003", "SQ2A.220405.004",
+                "SQ3A.220505.001", "SQ3A.220505.002", "SQ3A.220605.009", "SQ3A.220705.003", "SQ3A.220705.004",
+                "SKQ1.210216.001", "SKQ1.210908.001", "SKQ1.211019.001", "SKQ1.211230.001", "SKQ1.220118.001",
+                "SKQ1.220213.001", "SKQ1.220303.001", "SKQ1.220401.001", "SKQ1.220510.001", "SKQ1.220615.001",
+                "S2Q1.210801.001", "S2Q1.210915.002", "S2Q1.211012.001", "S2Q1.211120.003", "S2Q1.211210.001",
+                "S2Q1.220105.002", "S2Q1.220218.001", "S2Q1.220322.001", "S2Q1.220410.002", "S2Q1.220501.001",
+                "SD1A.210817.015", "SD1A.210817.036", "SD1A.210817.037", "SD2A.210818.003", "SD2A.210905.002",
+                "SD2A.211005.001", "SD2A.211105.001", "SD2A.211205.002", "SD2A.220105.001", "SD2A.220205.001"
+            ]
+        },
+        {
+            "version": "13",
+            "builds": [
+                "TP1A.220624.014", "TP1A.220624.021", "TP1A.220624.022", "TP1A.220905.004", "TP1A.221005.002",
+                "TP1A.221005.003", "TP1A.221105.002", "TQ1A.221205.011", "TQ1A.221205.012", "TQ1A.230105.001",
+                "TQ1A.230105.002", "TQ1A.230205.002", "TQ2A.230305.008.E1", "TQ2A.230305.008.F1", "TQ2A.230405.003",
+                "TQ2A.230505.002", "TQ3A.230605.010", "TQ3A.230605.012", "TQ3A.230705.001", "TQ3A.230805.001",
+                "TKQ1.220807.001", "TKQ1.220915.002", "TKQ1.221013.002", "TKQ1.221114.001", "TKQ1.221220.001",
+                "TKQ1.230110.001", "TKQ1.230215.002", "TKQ1.230308.001", "TKQ1.230412.001", "TKQ1.230519.001",
+                "T2Q1.220801.001", "T2Q1.220910.003", "T2Q1.221005.001", "T2Q1.221118.002", "T2Q1.221201.001",
+                "T2Q1.230115.001", "T2Q1.230208.002", "T2Q1.230312.001", "T2Q1.230405.001", "T2Q1.230520.002",
+                "TD1A.220804.009", "TD1A.220804.031", "TD1A.220905.001", "TD1A.221005.001", "TD1A.221105.001",
+                "TD1A.221205.001", "TD1A.230105.001", "TD1A.230205.001", "TD1A.230305.001", "TD1A.230405.001"
+            ]
+        },
+        {
+            "version": "14",
+            "builds": [
+                "UP1A.231005.007", "UP1A.231005.008", "UP1A.231105.001", "UP1A.231105.003", "UQ1A.231205.014",
+                "UQ1A.231205.015", "UQ1A.240105.002", "UQ1A.240105.004", "UQ1A.240205.002", "UQ1A.240205.004",
+                "UQ2A.240305.004", "UQ2A.240305.019", "UQ2A.240405.002", "UQ2A.240405.006", "UQ2A.240505.001",
+                "UQ2A.240505.002", "AP1A.240305.019.A1", "AP1A.240405.002.A1", "AP1A.240505.004.A1", "AP1A.240505.005",
+                "UKQ1.230804.001", "UKQ1.230912.001", "UKQ1.231018.001", "UKQ1.231122.001", "UKQ1.231210.001",
+                "UKQ1.240115.001", "UKQ1.240220.001", "UKQ1.240310.001", "UKQ1.240418.001", "UKQ1.240505.001",
+                "U2Q1.230801.001", "U2Q1.230915.002", "U2Q1.231010.001", "U2Q1.231105.001", "U2Q1.231218.001",
+                "U2Q1.240120.001", "U2Q1.240210.002", "U2Q1.240301.001", "U2Q1.240415.001", "U2Q1.240510.001",
+                "UD1A.230803.022", "UD1A.230905.001", "UD1A.231005.001", "UD1A.231105.001", "UD1A.231205.001",
+                "UD1A.240105.001", "UD1A.240205.001", "UD1A.240305.001", "UD1A.240405.001", "UD1A.240505.001"
+            ]
+        },
+        {
+            "version": "15",
+            "builds": [
+                "AP3A.240905.015", "AP3A.240905.016", "AP3A.241005.001", "AP3A.241005.003", "AP3A.241105.002",
+                "AP3A.241105.004", "AP3A.241205.010", "AP3A.250105.002", "AP3A.250105.003", "AP3A.250205.001",
+                "AP3A.250205.004", "AP3A.250305.002", "AP3A.250305.005", "AP3A.250405.001", "AP3A.250405.003",
+                "VKQ1.240510.001", "VKQ1.240615.001", "VKQ1.240720.001", "VKQ1.240808.001", "VKQ1.240912.001",
+                "VKQ1.241005.001", "VKQ1.241118.001", "VKQ1.241202.001", "VKQ1.250110.001", "VKQ1.250215.001",
+                "V2Q1.240601.001", "V2Q1.240715.002", "V2Q1.240810.001", "V2Q1.240905.001", "V2Q1.241020.001",
+                "V2Q1.241112.001", "V2Q1.241205.001", "V2Q1.250118.001", "V2Q1.250202.001", "V2Q1.250310.001",
+                "VP1A.240605.001", "VP1A.240705.002", "VP1A.240805.001", "VP1A.240905.001", "VP1A.241005.001",
+                "VP1A.241105.001", "VP1A.241205.001", "VP1A.250105.001", "VP1A.250205.001", "VP1A.250305.001",
+                "VD1A.240601.001", "VD1A.240701.001", "VD1A.240801.001", "VD1A.240901.001", "VD1A.241001.001"
+            ]
+        },
+        {
+            "version": "16",
+            "builds": [
+                "BP2A.250305.001", "BP2A.250305.002", "BP2A.250405.001", "BP2A.250405.003", "BP2A.250505.002",
+                "BP2A.250505.004", "BP2A.250605.001", "BP2A.250605.005", "BP2A.250705.002", "BP2A.250805.001",
+                "BP2A.250805.003", "BP2A.250905.002", "BP2A.251005.001", "BP2A.251105.002", "BP2A.251205.001",
+                "WKQ1.250510.001", "WKQ1.250615.001", "WKQ1.250720.001", "WKQ1.250808.001", "WKQ1.250912.001",
+                "WKQ1.251005.001", "WKQ1.251118.001", "WKQ1.251202.001", "WKQ1.260110.001", "WKQ1.260215.001",
+                "W2Q1.250601.001", "W2Q1.250715.002", "W2Q1.250810.001", "W2Q1.250905.001", "W2Q1.251020.001",
+                "W2Q1.251112.001", "W2Q1.251205.001", "W2Q1.260118.001", "W2Q1.260202.001", "W2Q1.260310.001",
+                "WP1A.250605.001", "WP1A.250705.002", "WP1A.250805.001", "WP1A.250905.001", "WP1A.251005.001",
+                "WP1A.251105.001", "WP1A.251205.001", "WP1A.260105.001", "WP1A.260205.001", "WP1A.260305.001",
+                "AP4A.250905.001", "AP4A.251005.002", "AP4A.251105.001", "AP4A.251205.003", "AP4A.260105.001"
+            ]
+        }
+    ]
+}
