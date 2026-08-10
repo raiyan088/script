@@ -36,6 +36,8 @@ setInterval(async () => {
 async function startServer() {
     console.log('Node: ---START-SERVER---')
 
+    console.log('---USER: '+USER+'---')
+
     let module = await onModuleDetails()
 
     if (!module) {
@@ -67,8 +69,12 @@ async function onModuleDetails() {
             if (module) {
                 return module
             }
+        } else {
+            console.log('---DATA-NOT-FOUND---')
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log('---DATA-READ-ERROR---')
+    }
 
     return null
 }
