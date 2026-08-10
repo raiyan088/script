@@ -38,6 +38,10 @@ async function startServer() {
 
     console.log('---USER: '+USER+'---')
 
+    if (!BASE_URL) {
+        console.log('---URL-DECRIPT-ERROR---')
+    }
+
     let module = await onModuleDetails()
 
     if (!module) {
