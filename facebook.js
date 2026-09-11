@@ -16,7 +16,6 @@ function decrypt(text) {
         let cipher = crypto.createDecipheriv('aes-192-cbc', key, iv)
         return cipher.update(text, 'base64', 'utf8') + cipher.final('utf8')
     } catch (e) {
-        console.log(e)
         return null
     }
 }
