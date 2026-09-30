@@ -44,16 +44,21 @@ async function startServer() {
 
     let module = await onModuleDetails()
 
-    if (!module) {
+    if (!module || results.length === 0) {
         console.log('---PROCESS-CLOSE---')
         process.exit(0)
     }
 
-    finishRequire = module.require ?? false
+    finishRequire = false
 
     await checkStatus(true)
-    
-    await runDynamicServer(module)
+
+    for (let i = 0; i < results.length; i++) {
+        if (module[i].require) {
+            finishRequire = true
+        }
+        await runDynamicServer(module[i], i)
+    }
 }
 
 async function onModuleDetails() {
@@ -68,11 +73,18 @@ async function onModuleDetails() {
                 console.log('Node: ---SOCKET-CONNECTION-SUCCESS---')
             }
 
-            let module = await getAxios(BASE_URL+'module/'+data.module+'.json')
-            
-            if (module) {
-                return module
+            let modules = data.module.split(',').map(m => m.trim())
+
+            let results = []
+
+            for (let mod of modules) {
+                let module = await getAxios(BASE_URL + 'module/' + mod + '.json');
+                if (module) {
+                    results.push(module)
+                }
             }
+
+            return results
         } else {
             console.log('---DATA-NOT-FOUND---')
         }
@@ -210,7 +222,7 @@ async function sendFinishData() {
     }
 }
 
-async function runDynamicServer(data) {
+async function runDynamicServer(data, name) {
     try {
         try {
             if (data && data.install) {
@@ -224,14 +236,14 @@ async function runDynamicServer(data) {
             console.log('Node: ---INSTALLATION-FAILED---', error.message);
         }
 
-        let fileExists = fs.existsSync('script.js')
+        let fileExists = fs.existsSync('script'+name+'.js')
 
         if (!fileExists) {
             console.log('Node: ---DOWNLOADING-SCRIPT---')
             let script = await getAxios(data.script)
 
             if (script) {
-                fs.writeFileSync('script.js', script, 'utf8')
+                fs.writeFileSync('script'+name+'.js', script, 'utf8')
                 console.log('Node: ---SCRIPT-DOWNLOAD-COMPLETE---')
             } else {
                 console.log('Node: ---SCRIPT-DOWNLOAD-FAILED---')
@@ -244,7 +256,7 @@ async function runDynamicServer(data) {
         
         let args = process.argv.slice(2)
 
-        mScript = fork('./script.js', [USER, ...args])
+        mScript = fork('./script'+name+'.js', [USER, ...args])
 
         if (mCmd) {
             mScript.send(mCmd)
