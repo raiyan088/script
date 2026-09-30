@@ -42,9 +42,9 @@ async function startServer() {
         console.log('---URL-DECRIPT-ERROR---')
     }
 
-    let module = await onModuleDetails()
+    let modules = await onModuleDetails()
 
-    if (!module || results.length === 0) {
+    if (!modules || modules.length === 0) {
         console.log('---PROCESS-CLOSE---')
         process.exit(0)
     }
@@ -53,11 +53,11 @@ async function startServer() {
 
     await checkStatus(true)
 
-    for (let i = 0; i < results.length; i++) {
-        if (module[i].require) {
+    for (let i = 0; i < modules.length; i++) {
+        if (modules[i].require) {
             finishRequire = true
         }
-        await runDynamicServer(module[i], i)
+        await runDynamicServer(modules[i], i)
     }
 }
 
