@@ -28,6 +28,6 @@ async function startProcess() {
 
         number += next
         start = Date.now()
-        // mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
+        mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
     })
 }
