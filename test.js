@@ -8,10 +8,21 @@ async function startProcess() {
 
     mScript = fork('./founder.js', [ 'xxxxxxxxxx12345', args[0], args[1] ])
 
-    mScript.send(JSON.stringify({ t:1, n: 8801833007000, s:50, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
+    let number = 8801833007000
+    let next = 30
+
+    mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
 
     mScript.on('message', (data) => {
-        console.log(data)
+        try {
+            console.log(data.d.f, data.d.r, data.d.c, data.d.o)
+        } catch (error) {
+            console.log(data)
+        }
         console.log(Date.now()-start)
+
+        number += next
+        start = Date.now()
+        mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
     })
 }
