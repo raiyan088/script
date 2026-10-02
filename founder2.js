@@ -10,7 +10,7 @@ let mConfig = null
 let mLoaded = false
 let page = null
 let pageCookies = null
-let mAutoDelay = 250
+let mAutoDelay = 300
 let mPendingData = {}
 let mFinishData = 0
 let mStart = Date.now()
@@ -19,6 +19,8 @@ let isFirstRequest = true
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
 puppeteer.use(StealthPlugin())
+
+console.log(mAutoDelay)
 
 
 process.on('message', async (data) => {
