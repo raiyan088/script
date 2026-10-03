@@ -14,7 +14,7 @@ async function startProcess() {
 
 
     let number = 8801830000000+getRandom7Digit()
-    let next = 30
+    let next = 50
 
     mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0 }))
 
