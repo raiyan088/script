@@ -230,29 +230,25 @@ async function loginDataProcess(url, reqHeaders, postData) {
 
             let data = await res.text()
 
-            if (data) {
-                let json = extractArrays(data)[0][0]
+            let json = extractArrays(data)[0][0]
 
-                if (json[1] == 'MI613e') {
-                    let value = JSON.parse(json[2])
-                    if (value[21]) {
-                        let values = JSON.stringify(value[21])
-                        if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                            status = 1
-                        } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                            status = 2
-                        } else {
-                            status = 3
-                        }
-                    } else if (value[18] && value[18][0]) {
-                        status = 5
+            if (json[1] == 'MI613e') {
+                let value = JSON.parse(json[2])
+                if (value[21]) {
+                    let values = JSON.stringify(value[21])
+                    if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
+                        status = 1
+                    } else if (values.includes('/v3/signin/challenge/recaptcha')) {
+                        status = 2
                     } else {
-                        status = 4
+                        status = 3
                     }
+                } else if (value[18] && value[18][0]) {
+                    status = 5
+                } else {
+                    status = 4
                 }
             }
-
-            console.log(status, data)
         } catch (e) {}
 
         mPendingData[number] = {
