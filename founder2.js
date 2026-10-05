@@ -40,6 +40,8 @@ setInterval(async () => {
 
 
 async function startBrowser() {
+    console.log('Delay:', mAutoDelay)
+    
     try {
         let browser = await puppeteer.launch({
             headless: false,
