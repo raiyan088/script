@@ -251,6 +251,8 @@ async function loginDataProcess(url, reqHeaders, postData) {
                     }
                 }
             }
+
+            console.log(status, data)
         } catch (e) {}
 
         mPendingData[number] = {
