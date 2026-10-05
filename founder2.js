@@ -1,7 +1,5 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const { CookieJar } = require('tough-cookie')
 const puppeteer = require('puppeteer-extra')
-const got = require('got')
 
 
 let USER = process.argv.slice(2)[0]
@@ -9,8 +7,7 @@ let USER = process.argv.slice(2)[0]
 let mConfig = null
 let mLoaded = false
 let page = null
-let pageCookies = null
-let mAutoDelay = 700
+let mAutoDelay = 500
 let mPendingData = {}
 let mFinishData = 0
 let mStart = Date.now()
@@ -19,8 +16,6 @@ let isFirstRequest = true
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
 puppeteer.use(StealthPlugin())
-
-console.log(mAutoDelay)
 
 
 process.on('message', async (data) => {
@@ -225,9 +220,16 @@ async function loginDataProcess(url, reqHeaders, postData) {
         let status = 0
 
         try {
-            let response = await requestHandle(url, reqHeaders, postData, pageCookies)
-            if (response) {
-                let json = extractArrays(response.body.toString())[0][0]
+            let res = await fetch(url, {
+                method: 'POST',
+                headers: reqHeaders,
+                body: postData
+            })
+
+            let data = await res.text()
+
+            if (data) {
+                let json = extractArrays(data)[0][0]
 
                 if (json[1] == 'MI613e') {
                     let value = JSON.parse(json[2])
@@ -258,63 +260,6 @@ async function loginDataProcess(url, reqHeaders, postData) {
     } catch (error) {}
 }
 
-async function requestHandle(url, reqHeaders, postData, puppeteerCookies) {
-    try {
-        let headers = {
-            ...reqHeaders,
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en',
-            'sec-fetch-mode': 'no-cors',
-            'sec-fetch-site': 'same-origin',
-            'host': new URL(url).hostname
-        }
-
-        let cookies = puppeteerCookies.map(cookie => ({
-            creation: new Date().toISOString(),
-            domain: cookie.domain.replace(/^\./, ''),
-            expires: cookie.expires === -1 ? Infinity : new Date(cookie.expires * 1000).toISOString(),
-            hostOnly: !cookie.domain.startsWith('.'),
-            httpOnly: cookie.httpOnly,
-            key: cookie.name,
-            lastAccessed: new Date().toISOString(),
-            path: cookie.path,
-            secure: cookie.secure,
-            value: cookie.value
-        }))
-
-        let jar = CookieJar.deserializeSync({
-            cookies,
-            rejectPublicSuffixes: true,
-            storeType: 'MemoryCookieStore',
-            version: 'tough-cookie@2.0.0'
-        })
-
-        for (let i = 0; i < 2; i++) {
-            try {
-                return await got(url, {
-                    method: 'POST',
-                    headers,
-                    body: postData,
-                    cookieJar: jar,
-                    agent: undefined,
-                    responseType: 'buffer',
-                    followRedirect: false,
-                    throwHttpErrors: false,
-                    timeout: {
-                        request: 15000
-                    }
-                })
-            } catch (error) {
-                console.log(error)
-            }
-        }
-    } catch(e) {
-        console.log(e)
-    }
-}
-
-
 async function pageReload() {
     mLoaded = false
     console.log('Page Reloading...')
@@ -339,7 +284,7 @@ async function loadLoginPage() {
                     root.remove()
                 }
             })
-            pageCookies = await page.cookies()
+            
             isFirstRequest = true
             break
         } catch (error) {}
