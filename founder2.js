@@ -35,7 +35,7 @@ startBrowser()
 
 setInterval(async () => {
     await pageReload()
-}, 3600000)
+}, 120000)
 
 
 async function startBrowser() {
