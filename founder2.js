@@ -35,7 +35,7 @@ startBrowser()
 
 setInterval(async () => {
     await pageReload()
-}, 1200000)
+}, 3600000)
 
 
 async function startBrowser() {
@@ -200,16 +200,14 @@ async function getLoginStatus(number) {
         mPostData = null
         
         if (url && postData && headers) {
-            let data = await page.evaluate(async (u, h, p) => {
-                let res = await fetch(u, {
-                    method: 'POST',
-                    headers: h,
-                    body: p
-                })
+            let res = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: postData
+            })
 
-                return await res.text()
-            }, url+(url.endsWith('&') ? '': '&')+'request=manually', headers, postData)
-
+            let data =  await res.text()
+            
             let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
             temp = temp.substring(0, temp.lastIndexOf(']]')+2)
 
