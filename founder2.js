@@ -30,6 +30,9 @@ process.on('message', async (data) => {
     } catch (error) {}
 })
 
+setInterval(async () => {
+    await pageReload()
+}, 3600000)
 
 startBrowser()
 
