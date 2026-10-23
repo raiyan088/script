@@ -4,10 +4,10 @@ const puppeteer = require('puppeteer-extra')
 
 let USER = process.argv.slice(2)[0]
 
+let mAutoDelay = 800
 let mConfig = null
 let mLoaded = false
 let page = null
-let mAutoDelay = 900
 let mPendingData = {}
 let mFinishData = 0
 let mStart = Date.now()
@@ -66,7 +66,7 @@ async function startBrowser() {
             try {
                 let url = request.url()
                 if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    loginDataProcess(url, request.headers(), request.postData())
+                    loginDataProcess(page, url, request.headers(), request.postData())
                     
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
@@ -214,7 +214,7 @@ async function setLoginRequest(number) {
     } catch (error) {}
 }
 
-async function loginDataProcess(url, reqHeaders, postData) {
+async function loginDataProcess(page, url, reqHeaders, postData) {
     try {
         let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])[1]
         let number = data.replace('+', '')
@@ -222,14 +222,16 @@ async function loginDataProcess(url, reqHeaders, postData) {
         let status = 0
 
         try {
-            let res = await fetch(url, {
-                method: 'POST',
-                headers: reqHeaders,
-                body: postData
-            })
+            let data = await page.evaluate(async (url, reqHeaders, postData) => {
+                let res = await fetch(url, {
+                    method: 'POST',
+                    headers: reqHeaders,
+                    body: postData
+                })
 
-            let data = await res.text()
-
+                return await res.text()
+            }, url+(url.endsWith('&') ? '': '&')+'request=manually', reqHeaders, postData)
+            
             let json = extractArrays(data)[0][0]
 
             if (json[1] == 'MI613e') {
