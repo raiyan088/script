@@ -4,7 +4,7 @@ const puppeteer = require('puppeteer-extra')
 
 let USER = process.argv.slice(2)[0]
 
-let mAutoDelay = 800
+let mAutoDelay = 900
 let mConfig = null
 let mLoaded = false
 let page = null
@@ -32,11 +32,6 @@ process.on('message', async (data) => {
 
 
 startBrowser()
-
-
-setInterval(async () => {
-    await pageReload()
-}, 3600000)
 
 
 async function startBrowser() {
