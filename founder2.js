@@ -4,7 +4,7 @@ const puppeteer = require('puppeteer-extra')
 
 let USER = process.argv.slice(2)[0]
 
-let mAutoDelay = 1000
+let mAutoDelay = 950
 let mConfig = null
 let mLoaded = false
 let page = null
