@@ -81,11 +81,6 @@ process.on('message', async (data) => {
 startBrowser()
 
 
-setInterval(async () => {
-    await pageReload()
-}, 3600000)
-
-
 async function startBrowser() {
     mAutoDelay = controller.update(mCapture)
     console.log('Delay:', mAutoDelay)
