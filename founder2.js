@@ -291,7 +291,7 @@ async function startBrowser() {
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 mProxyList.push({
-                    proxy:'http://127.0.0.1:'+(8888+i)
+                    proxy:'http://127.0.0.1:'+result.port
                 })
                 console.log('Proxy Name: '+result.name)
                 console.log('Ip Address: '+result.ip)
@@ -307,8 +307,13 @@ async function startBrowser() {
                 console.log('--------------------------------')
             }
         }
+        await checkProxyWithAxios('http://127.0.0.1:8888');
+        await checkProxyWithAxios('http://127.0.0.1:8889');
+        await checkProxyWithAxios('http://127.0.0.1:8890');
     }
     
+    process.exit(0)
+
     try {
         let browser = await puppeteer.launch({
             headless: false,
@@ -366,6 +371,23 @@ async function startBrowser() {
     }
 }
 
+async function checkProxyWithAxios(proxyUrl) {
+    try {
+        const agent = new HttpsProxyAgent(proxyUrl)
+
+        const response = await axios.get('https://api.ipify.org?format=json', {
+            httpAgent: agent,
+            httpsAgent: agent,
+            timeout: 10000
+        });
+        
+        console.log('IP:', response.data.ip);
+        return true;
+    } catch (error) {
+        console.log('Error:', error.message);
+        return false;
+    }
+}
 
 async function foundLoginNumber() {
     while (true) {
