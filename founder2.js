@@ -289,11 +289,11 @@ async function startBrowser() {
         for (let i = 0; i < vpnConfig.length; i++) {
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
-                mProxyList.push({
-                    proxy:'http://127.0.0.1:'+result.port
-                })
+                let proxy = 'http://127.0.0.1:'+result.port
+                mProxyList.push({ proxy })
                 console.log('Proxy Name: '+result.name)
                 console.log('Ip Address: '+result.ip)
+                await checkProxyWithAxios(proxy)
                 console.log('Load Time: '+result.time+'s')
                 console.log('--------------------------------')
             } else {
@@ -364,7 +364,6 @@ async function startBrowser() {
         console.log('Browser Error: '+error)
     }
 }
-
 
 async function foundLoginNumber() {
     while (true) {
@@ -670,6 +669,22 @@ async function getVpnConfig(user, key, iv) {
             }))
         }
     } catch (error) {}
+}
+
+async function checkProxyWithAxios(proxyUrl) {
+    try {
+        let agent = new HttpsProxyAgent(proxyUrl)
+
+        let response = await axios.get('https://api.ipify.org?format=json', {
+            httpAgent: agent,
+            httpsAgent: agent,
+            timeout: 10000
+        })
+        
+        console.log('IP Address:', response.data.ip)
+    } catch (error) {
+        console.log('IP Error:', error.message)
+    }
 }
 
 function extractArrays(raw) {
