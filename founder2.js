@@ -545,7 +545,7 @@ async function sendRequest(task, id) {
         let agent = undefined
 
         if (id > 0) {
-            let proxy = mProxyList.get(id-1)
+            let proxy = mProxyList[id-1]
             if (proxy) {
                 agent = {
                     http: new HttpProxyAgent(proxy),
