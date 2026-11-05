@@ -15,7 +15,7 @@ class Proxy {
         testHost: 'api.ipify.org',
     }
 
-    letructor() {
+    constructor() {
         fs.mkdirSync(path.resolve(Proxy.CONFIG.workDir), { recursive: true })
     }
 
