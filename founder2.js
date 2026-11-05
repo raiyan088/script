@@ -306,12 +306,7 @@ async function startBrowser() {
                 console.log('--------------------------------')
             }
         }
-        await checkProxyWithAxios('http://127.0.0.1:8888');
-        await checkProxyWithAxios('http://127.0.0.1:8889');
-        await checkProxyWithAxios('http://127.0.0.1:8890');
     }
-    
-    process.exit(0)
 
     try {
         let browser = await puppeteer.launch({
@@ -370,23 +365,6 @@ async function startBrowser() {
     }
 }
 
-async function checkProxyWithAxios(proxyUrl) {
-    try {
-        const agent = new HttpsProxyAgent(proxyUrl)
-
-        const response = await axios.get('https://api.ipify.org?format=json', {
-            httpAgent: agent,
-            httpsAgent: agent,
-            timeout: 10000
-        });
-        
-        console.log('IP:', response.data.ip);
-        return true;
-    } catch (error) {
-        console.log('Error:', error.message);
-        return false;
-    }
-}
 
 async function foundLoginNumber() {
     while (true) {
