@@ -1,6 +1,5 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const HttpsProxyAgent = require('https-proxy-agent')
-const HttpProxyAgent = require('http-proxy-agent')
 const puppeteer = require('puppeteer-extra')
 const {CookieJar} = require('tough-cookie')
 const {execFile} = require('child_process')
@@ -571,7 +570,7 @@ async function sendRequest(task, id) {
             let proxy = mProxyList[id-1]
             if (proxy) {
                 agent = {
-                    http: new HttpProxyAgent(proxy),
+                    http: new HttpsProxyAgent(proxy),
                     https: new HttpsProxyAgent(proxy)
                 }
             }
