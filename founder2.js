@@ -292,7 +292,6 @@ async function startBrowser() {
                 let proxy = 'http://127.0.0.1:'+result.port
                 mProxyList.push({ proxy })
                 console.log('Proxy Name: '+result.name)
-                console.log('Ip Address: '+result.ip)
                 await checkProxyWithAxios(proxy)
                 console.log('Load Time: '+result.time+'s')
                 console.log('--------------------------------')
@@ -544,11 +543,12 @@ async function sendRequest(task, id) {
         let agent = undefined
 
         if (id > 0) {
-            let proxy = mProxyList[id-1]
-            if (proxy) {
+            let proxyObj = mProxyList[id-1]
+
+            if (proxyObj && proxyObj.proxy) {
                 agent = {
-                    http: new HttpsProxyAgent(proxy),
-                    https: new HttpsProxyAgent(proxy)
+                    http: new HttpsProxyAgent(proxyObj.proxy),
+                    https: new HttpsProxyAgent(proxyObj.proxy)
                 }
             }
         }
