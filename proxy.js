@@ -1,6 +1,8 @@
 const { execFile } = require('child_process')
+const { HttpsProxyAgent } = require('https-proxy-agent');
 const { promisify } = require('util')
 const fs = require('fs')
+const axios = require('axios')
 const path = require('path')
 const http = require('http')
 const tls = require('tls')
@@ -78,6 +80,9 @@ class Proxy {
     }
 
     async buildImage() {
+        if (process.platform !== 'linux') {
+            return
+        }
         let dir = path.resolve(Proxy.CONFIG.workDir)
         fs.writeFileSync(
             path.join(dir, 'Dockerfile'),
@@ -102,12 +107,18 @@ class Proxy {
             error: null,
         }
 
+        if (process.platform !== 'linux') {
+            return result
+        }
+
         let tempOvpnPath = path.resolve(Proxy.CONFIG.workDir, `client-${index}.ovpn`)
 
         try {
+            await Proxy.docker(['stop', name]).catch(() => {})
+            await Proxy.docker(['rm', '-f', name]).catch(() => {})
+
             fs.writeFileSync(tempOvpnPath, ovpnContentString)
 
-            await Proxy.docker(['rm', '-f', name]).catch(() => {})
             await Proxy.docker([
                 'run', '-d',
                 '--name', name,
@@ -158,10 +169,28 @@ class Proxy {
     }
 
     async cleanup(name) {
+        await Proxy.docker(['stop', name]).catch(() => {})
         await Proxy.docker(['rm', '-f', name]).catch(() => {})
     }
 }
 
+async function checkProxyWithAxios(proxyUrl) {
+    try {
+        const agent = new HttpsProxyAgent(proxyUrl)
+
+        const response = await axios.get('https://api.ipify.org?format=json', {
+            httpAgent: agent,
+            httpsAgent: agent,
+            timeout: 10000
+        });
+        
+        console.log('IP:', response.data.ip);
+        return true;
+    } catch (error) {
+        console.log('Error:', error.message);
+        return false;
+    }
+}
 
 (async () => {
     let proxyManager = new Proxy()
@@ -288,5 +317,7 @@ b65c07b9f1511a3962b9c9316401d598
 
     const res = await proxyManager.connect(ovpnString, 8888, 1)
     console.log(res)
+    
+    await checkProxyWithAxios('http://127.0.0.1:8888');
 
 })()
