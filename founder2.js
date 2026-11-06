@@ -331,9 +331,6 @@ async function startBrowser() {
             try {
                 let url = request.url()
                 if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    if (!mCookiesJar) {
-                        mCookiesJar = await getCookiesJar(page)
-                    }
                     loginDataProcess(url, request.headers(), request.postData())
                     
                     let contentType = 'application/json; charset=utf-8'
@@ -387,6 +384,8 @@ async function foundLoginNumber() {
 
                 await waitForFirstStepFinish(worker)
                 seartNextNumberToken(mConfig.n, worker, target)
+
+                mCookiesJar = await getCookiesJar(page)
 
                 let result = await workerStart(worker)                
 
@@ -524,10 +523,9 @@ async function loginDataProcess(url, headers, postData) {
         let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])
 
         let number = data[1].replace('+', '')
-        let token = data[37][2][0][1]
 
         mPendingData++
-        mNumberTask.addData({ number, token, url, headers, postData })
+        mNumberTask.addData({ number, url, headers, postData })
 
         if (pendingResolvers.length > 0) {
             pendingResolvers = pendingResolvers.filter(waiter => {
@@ -564,10 +562,6 @@ async function sendRequest(task, id) {
             'sec-fetch-site': 'same-origin',
             'sec-fetch-mode': 'no-cors',
         }        
-
-        let params = new URLSearchParams()
-        params.append('f.req', `[[[ 'V1UmUe', '[null,"+${task.number}",1,null,null,1,1,null,null,"",null,null,null,null,null,null,null,null,null,null,"",null,null,null,null,null,null,null,7,null,[["identity-signin-identifier","${task.token}"]],null]', null, 'generic' ]]]`);
-        params.append('at', mReqTime)
 
         let options = {
             cookieJar: mCookiesJar,
