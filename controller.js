@@ -15,6 +15,7 @@ let serverReconnecting = false
 let isActionChecking = false
 let finishStatus = false
 let finishPending = false
+let mUpdateServer = {}
 let USER = getUserName()
 let FINISH = new Date().getTime()+21000000
 let mDeleteData = [ 'founder' ]
@@ -151,9 +152,14 @@ async function callEveryMinute() {
                 } else {
                     if(mLiveServer[key]) {
                         if (value < Date.now()-400000) {
+                            mUpdateServer[key] = (mUpdateServer[key] || 0) + 1
                             await delay(delayPerLoop)
                             runGithubAction(key, 0)
                             active++
+
+                            if (mUpdateServer[key] > 5) {
+                                console.log('Need Repair: '+key)
+                            }
                         }
                     }
                 }
@@ -407,6 +413,7 @@ async function getStorageData(liveServer, auth) {
 }
 
 async function runGithubAction(repo, timeout) {
+
     isActionChecking = true
 
     setTimeout(async () => {
@@ -415,7 +422,8 @@ async function runGithubAction(repo, timeout) {
         try {
             if (timeout > 0) {
                 try {
-                    let res = await axios.post('https://database.kbrms.xyz/status', { id: repo })
+                    let res = await axios.post('https://database.raiyanbd.com/status', { id: repo })
+                    
                     if (res.data.active) {
                         checking = false
                         isActionChecking = false
