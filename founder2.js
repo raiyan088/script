@@ -435,7 +435,7 @@ async function workerStart(workerSize) {
                     result.o++
                 }
 
-                await delay(700)
+                await delay(1000)
             }
         })()
 
