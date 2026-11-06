@@ -17,10 +17,8 @@ let ENC_KEY = process.argv.slice(2)[1]
 let ENC_IV = process.argv.slice(2)[2]
 
 let mConfig = null
-let mLoaded = false
 let page = null
 let mPendingData = 0
-let mReqTime = null
 let mCookiesJar = null
 let mNumberTask = null
 let mStart = Date.now()
@@ -274,11 +272,6 @@ process.on('message', async (data) => {
 startBrowser()
 
 
-setInterval(async () => {
-    await pageReload()
-}, 3600000)
-
-
 async function startBrowser() {
     await mProxyManager.buildImage()
 
@@ -330,7 +323,7 @@ async function startBrowser() {
         page.on('request', async request => {
             try {
                 let url = request.url()
-                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
+                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e')) {
                     loginDataProcess(url, request.headers(), request.postData())
                     
                     let contentType = 'application/json; charset=utf-8'
@@ -353,8 +346,6 @@ async function startBrowser() {
         console.log('Browser Load Success')
 
         await loadLoginPage()
-
-        mLoaded = true
 
         console.log('Page Load Success')
         
@@ -435,7 +426,7 @@ async function workerStart(workerSize) {
                     result.o++
                 }
 
-                await delay(1000)
+                await delay(500)
             }
         })()
 
@@ -492,28 +483,19 @@ async function seartNextNumberToken(number, next, target) {
 
 async function setLoginRequest(number) {
     try {
-        for (let i = 0; i < 60; i++) {
-            if (mLoaded) {
-                break
-            }
-            await delay(500)
-        }
+        page.evaluate((number) => {
+            document.querySelector('input#identifierId').value = number
+            document.querySelector('#identifierNext').click()
+        }, '+'+number)
 
-        if (mLoaded) {
-            page.evaluate((number) => {
-                document.querySelector('input#identifierId').value = number
-                document.querySelector('#identifierNext').click()
-            }, '+'+number)
-
-            if (isFirstRequest) {
-                for (let i = 0; i < 20; i++) {
-                    if(mPendingData > 0) {
-                        break
-                    }
-                    await delay(250)
+        if (isFirstRequest) {
+            for (let i = 0; i < 20; i++) {
+                if(mPendingData > 0) {
+                    break
                 }
-                isFirstRequest = false
+                await delay(250)
             }
+            isFirstRequest = false
         }
     } catch (error) {}
 }
@@ -576,43 +558,39 @@ async function sendRequest(task, id) {
             followRedirect: false
         }
 
-        let response = await got(task.url, options)
+        for (let i = 0; i < 2; i++) {
+            try {
+                let response = await got(task.url, options)
         
-        let data = response.body.toString()
+                let data = response.body.toString()
 
-        let json = extractArrays(data)[0][0]
+                let json = extractArrays(data)[0][0]
 
-        if (json[1] == 'MI613e') {
-            let value = JSON.parse(json[2])
-            
-            if (value[21]) {
-                let values = JSON.stringify(value[21])
-                if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                    return 1
-                } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                    return 2
-                } else {
-                    return 3
+                if (json[1] == 'MI613e') {
+                    let value = JSON.parse(json[2])
+                    
+                    if (value[21]) {
+                        let values = JSON.stringify(value[21])
+                        if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
+                            return 1
+                        } else if (values.includes('/v3/signin/challenge/recaptcha')) {
+                            return 2
+                        } else {
+                            return 3
+                        }
+                    } else if (value[18] && value[18][0]) {
+                        return 5
+                    } else {
+                        return 4
+                    }
                 }
-            } else if (value[18] && value[18][0]) {
-                return 5
-            } else {
-                return 4
+            } catch (error) {
+                await delay(1000)
             }
         }
-    } catch (error) {
-        console.log('Error:', error.message)
-    }
+    } catch (error) {}
 
     return 0
-}
-
-async function pageReload() {
-    mLoaded = false
-    console.log('Page Reloading...')
-    await loadLoginPage()
-    console.log('Page Reload Success')
-    mLoaded = true
 }
 
 async function loadLoginPage() {
@@ -630,8 +608,6 @@ async function loadLoginPage() {
                     root.remove()
                 }
             })
-
-            mReqTime = await page.evaluate(() => window.WIZ_global_data.SNlM0e)
 
             isFirstRequest = true
             break
