@@ -19,12 +19,15 @@ let ENC_IV = process.argv.slice(2)[2]
 let mConfig = null
 let page = null
 let mPendingData = 0
+let mProxyLimit = 0
 let mCookiesJar = null
 let mNumberTask = null
 let mStart = Date.now()
 let isFirstRequest = true
 let pendingResolvers = []
 let mProxyList = []
+let mCapture = []
+let mDelayControll = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -196,6 +199,52 @@ class Proxy {
     }
 }
 
+class AdaptiveDelay {
+    constructor({minDelay = 500, maxDelay = 1500, step = 200, incCooldown = 5000, decCooldown = 30000 } = {}) {
+        this.delay = minDelay
+        this.minDelay = minDelay
+        this.maxDelay = maxDelay
+        this.step = step
+
+        this.incCooldown = incCooldown
+        this.decCooldown = decCooldown
+
+        this.lastIncTime = 0
+        this.lastDecTime = 0
+
+        this.lastSignalCount = 0
+        this.lastSignalTime = 0
+    }
+
+    update(signalCount) {
+        if (signalCount == 0) {
+            return this.delay
+        }
+        
+        let now = Date.now()
+
+        if (signalCount > this.lastSignalCount) {
+            if (now - this.lastIncTime < this.incCooldown) {
+                return this.delay
+            }
+
+            this.delay = Math.min(this.delay + this.step, this.maxDelay)
+            this.lastIncTime = now
+        } else {
+            if (now - this.lastDecTime < this.decCooldown) {
+                return this.delay
+            }
+
+            this.delay = Math.max(this.delay - this.step, this.minDelay)
+            this.lastDecTime = now
+        }
+
+        this.lastSignalCount = signalCount
+        this.lastSignalTime = now
+
+        return this.delay
+    }
+}
 
 class SharedQueue {
     constructor(maxSize = 100) {
@@ -274,12 +323,18 @@ startBrowser()
 
 async function startBrowser() {
     await mProxyManager.buildImage()
+    mCapture.push(0)
+    mDelayControll.push(new AdaptiveDelay({ minDelay: 1000, maxDelay: 2000 }))
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
     if(vpnConfig) {
         console.log('--------------------------------')
+        mProxyLimit = vpnConfig.length
+
         for (let i = 0; i < vpnConfig.length; i++) {
+            mCapture.push(0)
+            mDelayControll.push(new AdaptiveDelay({ minDelay: 500, maxDelay: 1500 }))
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 let proxy = 'http://127.0.0.1:'+result.port
@@ -362,7 +417,7 @@ async function foundLoginNumber() {
             
             try {
                 let target = mConfig.s
-                let worker = mConfig.b+1
+                let worker = Math.min(mConfig.b, mProxyLimit)+1
 
                 mNumberTask = new SharedQueue(target)
                 
@@ -378,7 +433,7 @@ async function foundLoginNumber() {
 
                 mCookiesJar = await getCookiesJar(page)
 
-                let result = await workerStart(worker)                
+                let result = await workerStart(worker, target)                
 
                 process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
             } catch (error) {}
@@ -390,16 +445,17 @@ async function foundLoginNumber() {
     }
 }
 
-async function workerStart(workerSize) {
+async function workerStart(workerSize, target) {
     let workers = []
     let result = {
-        f:0,
-        r:0,
-        c:0,
-        o:0
+        f: 0,
+        r: 0,
+        c: 0,
+        o: 0
     }
 
     let capture = {}
+    let timeoutMs = target * 3000
 
     for (let i = 0; i < workerSize; i++) {
         let workerId = i
@@ -420,20 +476,30 @@ async function workerStart(workerSize) {
                     result.r++
                 } else if (status == 5) {
                     result.c++
+                    mCapture[workerId] = (mCapture[workerId] || 0) + 1
                     let workerKey = workerId.toString()
                     capture[workerKey] = (capture[workerKey] || 0) + 1
                 } else if (status == 3 || status == 0) {
                     result.o++
                 }
 
-                await delay(500)
+                await delay(mDelayControll[workerId].update((mCapture[workerId] || 0)))
             }
         })()
 
         workers.push(workerPromise)
     }
 
-    await Promise.all(workers)
+    let timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(result)
+        }, timeoutMs)
+    })
+
+    await Promise.race([
+        Promise.all(workers),
+        timeoutPromise
+    ])
 
     if (result.c > 0) {
         console.log('Capture:', capture)
