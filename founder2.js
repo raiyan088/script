@@ -331,7 +331,10 @@ async function startBrowser() {
             try {
                 let url = request.url()
                 if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
-                    loginDataProcess(request.postData())
+                    if (!mCookiesJar) {
+                        mCookiesJar = await getCookiesJar(page)
+                    }
+                    loginDataProcess(url, request.headers(), request.postData())
                     
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
@@ -516,7 +519,7 @@ async function setLoginRequest(number) {
     } catch (error) {}
 }
 
-async function loginDataProcess(postData) {
+async function loginDataProcess(url, headers, postData) {
     try {
         let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])
 
@@ -524,7 +527,7 @@ async function loginDataProcess(postData) {
         let token = data[37][2][0][1]
 
         mPendingData++
-        mNumberTask.addData({ number, token })
+        mNumberTask.addData({ number, token, url, headers, postData })
 
         if (pendingResolvers.length > 0) {
             pendingResolvers = pendingResolvers.filter(waiter => {
@@ -554,23 +557,7 @@ async function sendRequest(task, id) {
         }
         
         let headers = {
-            'sec-ch-ua': '"Not:A-Brand";v="8", "Chromium";v="156", "Google Chrome";v="156"',
-            'x-same-domain': '1',
-            'sec-ch-ua-arch': '"x86"',
-            'sec-ch-ua-platform-version': '"19.0.0"',
-            'sec-ch-ua-full-version': '"156.0.0.0"',
-            'sec-ch-ua-full-version-list': '"Not:A-Brand";v="8.0.0.0", "Chromium";v="156.0.8078.80", "Google Chrome";v="156.0.8078.80"',
-            'sec-ch-ua-bitness': '"64"',
-            'sec-ch-ua-model': '""',
-            'sec-ch-ua-wow64': '?0',
-            'sec-ch-ua-platform': '"Android"',
-            'x-goog-ext-278367001-jspb': '["GlifWebSignIn"]',
-            'sec-ch-ua-mobile': '?0',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
-            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-            'sec-ch-ua-full-version': '"112.0.5614.0"',
-            'referer': 'https://accounts.google.com/',
-            'origin': 'https://accounts.google.com',
+            ...task.headers,
             'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             'accept-encoding': 'gzip, deflate, br',
             'host': 'accounts.google.com',
@@ -585,7 +572,7 @@ async function sendRequest(task, id) {
         let options = {
             cookieJar: mCookiesJar,
             method: 'POST',
-            body: params.toString(),
+            body: task.postData,
             headers: headers,
             agent: agent,
             responseType: 'buffer',
@@ -595,13 +582,13 @@ async function sendRequest(task, id) {
             followRedirect: false
         }
 
-        let response = await got('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=V1UmUe', options)
+        let response = await got(task.url, options)
         
         let data = response.body.toString()
 
         let json = extractArrays(data)[0][0]
 
-        if (json[1] == 'V1UmUe') {
+        if (json[1] == 'MI613e') {
             let value = JSON.parse(json[2])
             
             if (value[21]) {
@@ -619,7 +606,9 @@ async function sendRequest(task, id) {
                 return 4
             }
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log('Error:', error.message)
+    }
 
     return 0
 }
@@ -637,7 +626,7 @@ async function loadLoginPage() {
         try {
             await page.goto('https://accounts.google.com/ServiceLogin?service=accountsettings&continue=https://myaccount.google.com', { timeout: 60000 })
             await delay(500)
-                await page.evaluate(() => {
+            await page.evaluate(() => {
                 let root = document.querySelector('div[class="kPY6ve"]')
                 if (root) {
                     root.remove()
@@ -649,8 +638,6 @@ async function loadLoginPage() {
             })
 
             mReqTime = await page.evaluate(() => window.WIZ_global_data.SNlM0e)
-            mCookiesJar = await getCookiesJar(page)
-            
 
             isFirstRequest = true
             break
