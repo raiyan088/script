@@ -406,6 +406,8 @@ async function foundLoginNumber() {
     while (true) {
         if (mConfig) {
             mStart = Date.now()
+
+            console.log(mConfig)
             
             try {
                 for (let i = 0; i < 3; i++) {
