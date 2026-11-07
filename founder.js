@@ -23,6 +23,8 @@ let mProxyLimit = 0
 let mCookiesJar = null
 let mNumberTask = null
 let mStart = Date.now()
+let itFirstCheck = true
+let isTaskRunning = false
 let isFirstRequest = true
 let pendingResolvers = []
 let mProxyList = []
@@ -200,7 +202,7 @@ class Proxy {
 }
 
 class AdaptiveDelay {
-    constructor({minDelay = 1000, maxDelay = 2000, step = 200, incCooldown = 5000} = {}) {
+    constructor({minDelay = 1000, maxDelay = 3000, step = 200, incCooldown = 5000} = {}) {
         this.delay = minDelay
         this.minDelay = minDelay
         this.maxDelay = maxDelay
@@ -315,7 +317,7 @@ startBrowser()
 async function startBrowser() {
     await mProxyManager.buildImage()
     mCapture.push(0)
-    mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
+    mDelayControll.push(new AdaptiveDelay())
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
@@ -324,7 +326,7 @@ async function startBrowser() {
         
         for (let i = 0; i < vpnConfig.length; i++) {
             mCapture.push(0)
-            mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
+            mDelayControll.push(new AdaptiveDelay())
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 mProxyLimit++
@@ -399,31 +401,49 @@ async function startBrowser() {
 }
 
 async function foundLoginNumber() {
+    itFirstCheck = true 
+
     while (true) {
         if (mConfig) {
             mStart = Date.now()
             
             try {
-                let target = mConfig.s
-                let worker = Math.min(mConfig.b, mProxyLimit)+1
+                for (let i = 0; i < 3; i++) {
+                    let target = mConfig.s
+                    let worker = Math.min(mConfig.b, mProxyLimit)+1
 
-                mNumberTask = new SharedQueue(target)
-                
-                mPendingData = 0
+                    mNumberTask = new SharedQueue(target)
+                    
+                    mPendingData = 0
+                    isTaskRunning = true
 
-                for (let i = 0; i < worker; i++) {
-                    let number = mConfig.n+i
-                    await setLoginRequest(number.toString())
+                    for (let i = 0; i < worker; i++) {
+                        let number = mConfig.n+i
+                        await setLoginRequest(number.toString())
+                    }
+
+                    await waitForFirstStepFinish(worker)
+                    seartNextNumberToken(mConfig.n, worker, target)
+
+                    mCookiesJar = await getCookiesJar(page)
+
+                    let result = await workerStart(worker, target, itFirstCheck)
+                    
+                    isTaskRunning = false
+                    await pendingTaskCancel()
+
+                    if (itFirstCheck && result.reload) {
+                        console.log('Request Captcha Found')
+                        await loadLoginPage()
+                        itFirstCheck = true
+                        console.log('Page ReLoad Success')
+                        continue
+                    }
+
+                    process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
+                    itFirstCheck = false
+                    break
                 }
-
-                await waitForFirstStepFinish(worker)
-                seartNextNumberToken(mConfig.n, worker, target)
-
-                mCookiesJar = await getCookiesJar(page)
-
-                let result = await workerStart(worker, target)                
-
-                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
             } catch (error) {}
 
             mConfig = null
@@ -433,9 +453,10 @@ async function foundLoginNumber() {
     }
 }
 
-async function workerStart(workerSize, target) {
+async function workerStart(workerSize, target, firstCheck) {
     let workers = []
     let result = {
+        reload: false,
         f: 0,
         r: 0,
         c: 0,
@@ -445,24 +466,39 @@ async function workerStart(workerSize, target) {
     let capture = {}
     let timeoutMs = target * 3000
 
+    let globalConsecutiveStatus = 0
+    let shouldStop = false
+
     for (let i = 0; i < workerSize; i++) {
         let workerId = i
 
         let workerPromise = (async () => {
             while (true) {
+                if (shouldStop) {
+                    break
+                }
+
                 let task = await mNumberTask.getNumber()
 
-                if (task === null) {
+                if (task === null || shouldStop) {
                     break
                 }
 
                 let status = await sendRequest(task, workerId)
 
+                if (shouldStop) {
+                    break
+                }
+
                 if (status == 1) {
                     result.f++
+                    firstCheck = false
+                    globalConsecutiveStatus = 0
                     if (mConfig) await saveNumber(mConfig.u, mConfig.k, task.number)
                 } else if (status == 2) {
                     result.r++
+                    firstCheck = false
+                    globalConsecutiveStatus = 0
                 } else if (status == 5) {
                     result.c++
                     mCapture[workerId] = (mCapture[workerId] || 0) + 1
@@ -470,6 +506,20 @@ async function workerStart(workerSize, target) {
                     capture[workerKey] = (capture[workerKey] || 0) + 1
                 } else if (status == 3 || status == 0) {
                     result.o++
+                }
+
+                if (firstCheck && (status == 5 || status == 3 || status == 0)) {
+                    globalConsecutiveStatus++
+                    
+                    if (globalConsecutiveStatus >= 10) {
+                        shouldStop = true
+                        result.reload = true
+                        break
+                    }
+                }
+
+                if (shouldStop) {
+                    break
                 }
 
                 await delay(mDelayControll[workerId].update((mCapture[workerId] || 0)))
@@ -481,6 +531,7 @@ async function workerStart(workerSize, target) {
 
     let timeoutPromise = new Promise((resolve) => {
         setTimeout(() => {
+            shouldStop = true
             resolve(result)
         }, timeoutMs)
     })
@@ -517,15 +568,26 @@ async function waitForFirstStepFinish(target) {
     })
 }
 
+async function pendingTaskCancel() {
+    try {
+        if (typeof pendingResolvers !== 'undefined' && pendingResolvers.length > 0) {
+            pendingResolvers.forEach(waiter => {
+                waiter.resolve()
+            })
+            pendingResolvers = []
+        }
+    } catch (error) {}
+}
+
 async function seartNextNumberToken(number, next, target) {
     let currentNextNum = number + next
     let processedCount = next
 
-    while (processedCount < target) {
+    while (processedCount < target && isTaskRunning) {
         mPendingData = 0
 
         for (let i = 0; i < next; i++) {
-            if (processedCount >= target) break
+            if (processedCount >= target || !isTaskRunning) break
             let targetNumber = currentNextNum + i
             await setLoginRequest(targetNumber.toString())
             processedCount++
