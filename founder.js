@@ -527,8 +527,6 @@ async function workerStart(workerSize, target, firstCheck) {
                     break
                 }
 
-                console.log('Get Number: '+workerId)
-
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
@@ -729,7 +727,10 @@ async function sendRequest(task, id) {
             maxRedirects: 15,
             throwHttpErrors: false,
             ignoreInvalidCookies: true,
-            followRedirect: false
+            followRedirect: false,
+            timeout: {
+                request: 10000
+            }
         }
 
         for (let i = 0; i < 2; i++) {
@@ -817,18 +818,21 @@ async function updateVpnIp(user, ip, key, iv) {
 }
 
 async function checkProxyWithAxios(proxyUrl) {
-    try {
-        let agent = new HttpsProxyAgent(proxyUrl)
+    for (let i = 0; i < 3; i++) {
+        try {
+            let agent = new HttpsProxyAgent(proxyUrl)
 
-        let response = await axios.get('https://api.ipify.org?format=json', {
-            httpAgent: agent,
-            httpsAgent: agent,
-            timeout: 10000
-        })
-        
-        console.log('IP Address:', response.data.ip)
-    } catch (error) {
-        console.log('IP Error:', error.message)
+            let response = await axios.get('https://api.ipify.org?format=json', {
+                httpAgent: agent,
+                httpsAgent: agent,
+                timeout: 10000
+            })
+            
+            console.log('IP Address:', response.data.ip)
+            break
+        } catch (error) {
+            console.log('IP Error:', error.message)
+        }
     }
 }
 
