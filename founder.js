@@ -505,12 +505,14 @@ async function workerStart(workerSize, target, firstCheck) {
         let workerPromise = (async () => {
             while (true) {
                 if (shouldStop) {
+                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
+                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
@@ -519,6 +521,7 @@ async function workerStart(workerSize, target, firstCheck) {
                 console.log(status, task.number, mNumberTask.size(), mNumberTask.getCount())
 
                 if (shouldStop) {
+                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
@@ -551,6 +554,7 @@ async function workerStart(workerSize, target, firstCheck) {
                 }
 
                 if (shouldStop) {
+                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
