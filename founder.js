@@ -406,9 +406,9 @@ async function foundLoginNumber() {
     while (true) {
         if (mConfig) {
             mStart = Date.now()
-
-            console.log(mConfig)
             
+            console.log(mConfig)
+
             try {
                 for (let i = 0; i < 3; i++) {
                     let target = mConfig.s
@@ -447,6 +447,8 @@ async function foundLoginNumber() {
                     break
                 }
             } catch (error) {}
+
+            console.log(`Completed Time: ${parseInt((Date.now() - mStart) / 1000)}s`)
 
             mConfig = null
         } else {
