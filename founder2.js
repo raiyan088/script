@@ -200,7 +200,7 @@ class Proxy {
 }
 
 class AdaptiveDelay {
-    constructor({minDelay = 500, maxDelay = 1500, step = 200, incCooldown = 5000, decCooldown = 30000 } = {}) {
+    constructor({minDelay = 1000, maxDelay = 2000, step = 200, incCooldown = 5000, decCooldown = 30000 } = {}) {
         this.delay = minDelay
         this.minDelay = minDelay
         this.maxDelay = maxDelay
@@ -220,7 +220,7 @@ class AdaptiveDelay {
         if (signalCount == 0) {
             return this.delay
         }
-        
+
         let now = Date.now()
 
         if (signalCount > this.lastSignalCount) {
@@ -324,7 +324,7 @@ startBrowser()
 async function startBrowser() {
     await mProxyManager.buildImage()
     mCapture.push(0)
-    mDelayControll.push(new AdaptiveDelay({ minDelay: 1000, maxDelay: 2000 }))
+    mDelayControll.push(new AdaptiveDelay())
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
@@ -334,7 +334,7 @@ async function startBrowser() {
 
         for (let i = 0; i < vpnConfig.length; i++) {
             mCapture.push(0)
-            mDelayControll.push(new AdaptiveDelay({ minDelay: 500, maxDelay: 1500 }))
+            mDelayControll.push(new AdaptiveDelay())
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 let proxy = 'http://127.0.0.1:'+result.port
