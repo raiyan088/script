@@ -330,23 +330,20 @@ async function startBrowser() {
 
     if(vpnConfig) {
         console.log('--------------------------------')
-        mProxyLimit = vpnConfig.length
-
+        
         for (let i = 0; i < vpnConfig.length; i++) {
             mCapture.push(0)
             mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
+                mProxyLimit++
                 let proxy = 'http://127.0.0.1:'+result.port
-                mProxyList.push({ proxy })
+                mProxyList.push(proxy)
                 console.log('Proxy Name: '+result.name)
                 await checkProxyWithAxios(proxy)
                 console.log('Load Time: '+result.time+'s')
                 console.log('--------------------------------')
             } else {
-                mProxyList.push({
-                    proxy: null
-                })
                 console.log('Proxy Name: '+result.name)
                 console.log('Error Msg: '+result.error)
                 console.log('Load Time: '+result.time+'s')
@@ -593,12 +590,12 @@ async function sendRequest(task, id) {
         let agent = undefined
 
         if (id > 0) {
-            let proxyObj = mProxyList[id-1]
+            let proxy = mProxyList[id-1]
 
-            if (proxyObj && proxyObj.proxy) {
+            if (proxy) {
                 agent = {
-                    http: new HttpsProxyAgent(proxyObj.proxy),
-                    https: new HttpsProxyAgent(proxyObj.proxy)
+                    http: new HttpsProxyAgent(proxy),
+                    https: new HttpsProxyAgent(proxy)
                 }
             }
         }
@@ -692,6 +689,20 @@ async function getVpnConfig(user, key, iv) {
             }))
         }
     } catch (error) {}
+
+    return null
+}
+
+async function updateVpnIp(user, ip, key, iv) {
+    try {
+        let response = await axios.post('https://proxy.raiyanbd.com/update-ip', { user, ip, key, iv })
+
+        if (response.data.success) {
+            return response.data.data
+        }
+    } catch (error) {}
+
+    return null
 }
 
 async function checkProxyWithAxios(proxyUrl) {
