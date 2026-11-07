@@ -33,6 +33,15 @@ let mDelayControll = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
+process.on('warning', (warning) => {
+    if (warning.name === 'TimeoutNaNWarning' || warning.message.includes('NaN is not a number')) {
+        console.log('--- Warning Captured ---')
+        console.log('Name:', warning.name)
+        console.log('Message:', warning.message)
+        console.log('Stack Trace:', warning.stack)
+        console.log('------------------------')
+    }
+})
 
 class Proxy {
     static CONFIG = {
