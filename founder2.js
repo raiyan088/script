@@ -324,7 +324,7 @@ startBrowser()
 async function startBrowser() {
     await mProxyManager.buildImage()
     mCapture.push(0)
-    mDelayControll.push(new AdaptiveDelay())
+    mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
@@ -334,7 +334,7 @@ async function startBrowser() {
 
         for (let i = 0; i < vpnConfig.length; i++) {
             mCapture.push(0)
-            mDelayControll.push(new AdaptiveDelay())
+            mDelayControll.push(new AdaptiveDelay({ minDelay:500, maxDelay:1500 }))
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 let proxy = 'http://127.0.0.1:'+result.port
