@@ -481,7 +481,6 @@ async function foundLoginNumber() {
                         console.log('Request Captcha Found')
                         await loadLoginPage()
                         itFirstCheck = true
-                        console.log('Page ReLoad Success')
                         continue
                     }
 
@@ -593,7 +592,7 @@ async function workerStart(workerSize, target, firstCheck) {
 
     mNumberTask.finish()
 
-    if (result.c > 0) {
+    if (result.c > 0 && !result.reload) {
         console.log('Capture:', capture)
     }
 
