@@ -452,8 +452,6 @@ async function foundLoginNumber() {
         if (mConfig) {
             mStart = Date.now()
 
-            console.log(`Task Received: ${mConfig.s} numbers`)
-            
             try {
                 for (let i = 0; i < 3; i++) {
                     let target = mConfig.s
@@ -493,8 +491,6 @@ async function foundLoginNumber() {
                 }
             } catch (error) {}
 
-            console.log(`Task Completed: ${parseInt((Date.now() - mStart) / 1000)} seconds`)
-
             mConfig = null
         } else {
             await delay(1000)
@@ -530,10 +526,13 @@ async function workerStart(workerSize, target, firstCheck) {
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
+                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
                 let status = await sendRequest(task, workerId)
+
+                console.log(status, task.number, mNumberTask.size(), mNumberTask.getCount())
 
                 if (shouldStop) {
                     break
