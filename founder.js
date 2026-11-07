@@ -530,13 +530,10 @@ async function workerStart(workerSize, target, firstCheck) {
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
-                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
                 let status = await sendRequest(task, workerId)
-
-                console.log(status, task.number, mNumberTask.size(), mNumberTask.getCount())
 
                 if (shouldStop) {
                     break
