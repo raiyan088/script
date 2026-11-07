@@ -33,6 +33,21 @@ let mDelayControll = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
+process.on('warning', (warning) => {
+    console.log('--- Warning Captured ---')
+    console.log('Name:', warning.name)
+    console.log('Message:', warning.message)
+    console.log('Stack Trace:', warning.stack)
+    console.log('------------------------')
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection captured:', reason)
+})
+
+process.on('uncaughtException', (error) => {
+    console.log('Uncaught Exception captured:', error.message)
+})
 
 class Proxy {
     static CONFIG = {
@@ -455,7 +470,9 @@ async function foundLoginNumber() {
                     itFirstCheck = false
                     break
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.log(error)
+            }
 
             console.log(`Task Completed: ${parseInt((Date.now() - mStart) / 1000)} seconds`)
 
