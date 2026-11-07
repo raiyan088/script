@@ -200,17 +200,15 @@ class Proxy {
 }
 
 class AdaptiveDelay {
-    constructor({minDelay = 1000, maxDelay = 2000, step = 200, incCooldown = 5000, decCooldown = 30000 } = {}) {
+    constructor({minDelay = 1000, maxDelay = 2000, step = 200, incCooldown = 5000} = {}) {
         this.delay = minDelay
         this.minDelay = minDelay
         this.maxDelay = maxDelay
         this.step = step
 
         this.incCooldown = incCooldown
-        this.decCooldown = decCooldown
 
         this.lastIncTime = 0
-        this.lastDecTime = 0
 
         this.lastSignalCount = 0
         this.lastSignalTime = 0
@@ -230,13 +228,6 @@ class AdaptiveDelay {
 
             this.delay = Math.min(this.delay + this.step, this.maxDelay)
             this.lastIncTime = now
-        } else {
-            if (now - this.lastDecTime < this.decCooldown) {
-                return this.delay
-            }
-
-            this.delay = Math.max(this.delay - this.step, this.minDelay)
-            this.lastDecTime = now
         }
 
         this.lastSignalCount = signalCount
