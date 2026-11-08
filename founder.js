@@ -477,11 +477,15 @@ async function foundLoginNumber() {
                     isTaskRunning = false
                     await pendingTaskCancel()
 
-                    if (itFirstCheck && result.reload) {
+                    if (itFirstCheck && result.b) {
                         console.log('Request Captcha Found')
                         await loadLoginPage()
+                        await clearDelay()
                         itFirstCheck = true
                         continue
+                    } else if (result.c > 20) {
+                        await loadLoginPage()
+                        console.log('Reload Page Success')
                     }
 
                     process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
@@ -500,7 +504,7 @@ async function foundLoginNumber() {
 async function workerStart(workerSize, target, firstCheck) {
     let workers = []
     let result = {
-        reload: false,
+        b: false,
         f: 0,
         r: 0,
         c: 0,
@@ -557,7 +561,7 @@ async function workerStart(workerSize, target, firstCheck) {
                     
                     if (globalConsecutiveStatus >= 10) {
                         shouldStop = true
-                        result.reload = true
+                        result.b = true
                         mNumberTask.finish()
                         break
                     }
@@ -589,7 +593,7 @@ async function workerStart(workerSize, target, firstCheck) {
 
     mNumberTask.finish()
 
-    if (result.c > 0 && !result.reload) {
+    if (result.c > 0 && !result.b) {
         console.log('Capture:', capture)
     }
 
@@ -807,6 +811,13 @@ async function updateVpnIp(user, ip, key, iv) {
     } catch (error) {}
 
     return null
+}
+
+async function clearDelay() {
+    for (let i = 0; i < mDelayControll.length; i++) {
+        mDelayControll[i] = new AdaptiveDelay()
+        mCapture[i] = 0
+    }
 }
 
 async function checkProxyWithAxios(proxyUrl) {
