@@ -12,14 +12,23 @@ async function startProcess() {
 
     mScript = fork('./founder.js', [ 'gmailclect67849', args[0], args[1] ])
 
-
     let number = 8801830000000+getRandom7Digit()
-    let next = 500
+    number = 8801779873000
+    let target = 8801779874000
+    let found = 0
+    let capture = 0
+    let recap = 0
+    let others = 0
+    let next = 50
 
-    mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:10 }))
+    mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:0 }))
 
     mScript.on('message', (data) => {
         try {
+            found += data.d.f
+            recap += data.d.r
+            capture += data.d.c
+            others += data.d.o
             console.log(data.d.f, data.d.r, data.d.c, data.d.o)
         } catch (error) {
             console.log(data)
@@ -28,6 +37,8 @@ async function startProcess() {
 
         number += next
         start = Date.now()
-        mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:10 }))
+        if (number < target) {
+            mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:0 }))
+        }
     })
 }
