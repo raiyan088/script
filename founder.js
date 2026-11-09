@@ -532,7 +532,6 @@ async function workerStart(workerSize, target, firstCheck) {
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
-                    console.log('Task Completed:', mNumberTask.getCount(), mNumberTask.size())
                     break
                 }
 
