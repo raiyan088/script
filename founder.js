@@ -274,10 +274,13 @@ class SharedQueue {
 
         return new Promise((resolve) => {
             let isResolved = false
+            let checkInterval = null
 
             this.waitingResolvers.push((data) => {
                 if (isResolved) return
                 isResolved = true
+
+                if (checkInterval) clearInterval(checkInterval)
 
                 if (this.isFinished || this.count >= this.maxSize) {
                     resolve(null)
@@ -291,7 +294,7 @@ class SharedQueue {
             let intervalTime = 1000
             let elapsedTime = 0
 
-            let checkInterval = setInterval(() => {
+            checkInterval = setInterval(() => {
                 elapsedTime += intervalTime
 
                 if (this.isFinished || this.count >= this.maxSize || elapsedTime >= maxWaitTime) {
@@ -366,7 +369,7 @@ async function startBrowser() {
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
-    if(vpnConfig) {
+    if(vpnConfig && false) {
         console.log('--------------------------------')
         
         for (let i = 0; i < vpnConfig.length; i++) {
@@ -529,6 +532,7 @@ async function workerStart(workerSize, target, firstCheck) {
                 let task = await mNumberTask.getNumber()
 
                 if (task === null || shouldStop) {
+                    console.log('Task Completed:', mNumberTask.getCount(), mNumberTask.size())
                     break
                 }
 
@@ -578,18 +582,24 @@ async function workerStart(workerSize, target, firstCheck) {
         workers.push(workerPromise)
     }
 
+    let timeoutId
+
     let timeoutPromise = new Promise((resolve) => {
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
             shouldStop = true
             mNumberTask.finish()
             resolve(result)
         }, timeoutMs)
     })
 
-    await Promise.race([
-        Promise.all(workers),
-        timeoutPromise
-    ])
+    try {
+        await Promise.race([
+            Promise.all(workers),
+            timeoutPromise
+        ])
+    } finally {
+        if (timeoutId) clearTimeout(timeoutId)
+    }
 
     mNumberTask.finish()
 
@@ -606,17 +616,19 @@ async function waitForFirstStepFinish(target) {
     return new Promise((resolve) => {
         let waiter = {
             target: target,
-            resolve: resolve
+            resolve: resolve,
+            timerId: null
         }
-        pendingResolvers.push(waiter)
 
-        setTimeout(() => {
+        waiter.timerId = setTimeout(() => {
             let index = pendingResolvers.indexOf(waiter)
             if (index !== -1) {
                 pendingResolvers.splice(index, 1)
                 resolve()
             }
         }, Math.max(target * 400, 5000))
+
+        pendingResolvers.push(waiter)
     })
 }
 
@@ -624,6 +636,9 @@ async function pendingTaskCancel() {
     try {
         if (typeof pendingResolvers !== 'undefined' && pendingResolvers.length > 0) {
             pendingResolvers.forEach(waiter => {
+                if (waiter.timerId) {
+                    clearTimeout(waiter.timerId)
+                }
                 waiter.resolve()
             })
             pendingResolvers = []
@@ -681,6 +696,9 @@ async function loginDataProcess(url, headers, postData) {
         if (pendingResolvers.length > 0) {
             pendingResolvers = pendingResolvers.filter(waiter => {
                 if (mPendingData >= waiter.target) {
+                    if (waiter.timerId) {
+                        clearTimeout(waiter.timerId)
+                    }
                     waiter.resolve()
                     return false
                 }
