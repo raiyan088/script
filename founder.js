@@ -369,7 +369,7 @@ async function startBrowser() {
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
-    if(vpnConfig && false) {
+    if(vpnConfig) {
         console.log('--------------------------------')
         
         for (let i = 0; i < vpnConfig.length; i++) {
