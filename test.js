@@ -37,11 +37,6 @@ async function startProcess() {
 
         number += next
         start = Date.now()
-        // if (number < target) {
-        //     mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:10 }))
-        // } else {
-        //     console.log(found, recap, capture, others)
-        //     process.exit(0)
-        // }
+        mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:10 }))
     })
 }
