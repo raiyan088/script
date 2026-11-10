@@ -1,14 +1,12 @@
+const { initTLS, Session, ClientIdentifier } = require("node-tls-client")
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const HttpsProxyAgent = require('https-proxy-agent')
 const puppeteer = require('puppeteer-extra')
-const {CookieJar} = require('tough-cookie')
 const {execFile} = require('child_process')
 const {promisify} = require('util')
 const axios = require('axios')
 const path = require('path')
 const http = require('http')
 const tls = require('tls')
-const got = require('got')
 const fs = require('fs')
 
 
@@ -20,16 +18,15 @@ let mConfig = null
 let page = null
 let mPendingData = 0
 let mProxyLimit = 0
-let mCookiesJar = null
 let mNumberTask = null
 let mStart = Date.now()
 let itFirstCheck = true
 let isTaskRunning = false
 let isFirstRequest = true
 let pendingResolvers = []
-let mProxyList = []
 let mCapture = []
 let mDelayControll = []
+let mSession = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -367,6 +364,11 @@ async function startBrowser() {
     mCapture.push(0)
     mDelayControll.push(new AdaptiveDelay())
 
+    mSession.push(new Session({
+        clientIdentifier: ClientIdentifier.chrome_150, 
+        timeout: 10_000
+    }))
+
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
     if(vpnConfig) {
@@ -379,9 +381,13 @@ async function startBrowser() {
             if (result.status) {
                 mProxyLimit++
                 let proxy = 'http://127.0.0.1:'+result.port
-                mProxyList.push(proxy)
+                mSession.push(new Session({
+                    clientIdentifier: ClientIdentifier.chrome_150, 
+                    timeout: 10_000,
+                    proxy: proxy
+                }))
                 console.log('Proxy Name: '+result.name)
-                await checkProxyWithAxios(proxy)
+                await checkProxyWithAxios(result.port)
                 console.log('Load Time: '+result.time+'s')
                 console.log('--------------------------------')
             } else {
@@ -392,6 +398,8 @@ async function startBrowser() {
             }
         }
     }
+
+    await initTLS()
 
     try {
         let browser = await puppeteer.launch({
@@ -472,8 +480,6 @@ async function foundLoginNumber() {
 
                     await waitForFirstStepFinish(worker)
                     seartNextNumberToken(mConfig.n, worker, target)
-
-                    mCookiesJar = await getCookiesJar(page)
 
                     let result = await workerStart(worker, target, itFirstCheck)
                     
@@ -709,19 +715,6 @@ async function loginDataProcess(url, headers, postData) {
 
 async function sendRequest(task, id) {
     try {
-        let agent = undefined
-
-        if (id > 0) {
-            let proxy = mProxyList[id-1]
-
-            if (proxy) {
-                agent = {
-                    http: new HttpsProxyAgent(proxy),
-                    https: new HttpsProxyAgent(proxy)
-                }
-            }
-        }
-        
         let headers = {
             ...task.headers,
             'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -730,27 +723,21 @@ async function sendRequest(task, id) {
             'sec-fetch-mode': 'no-cors',
         }        
 
-        let options = {
-            cookieJar: mCookiesJar,
-            method: 'POST',
-            body: task.postData,
-            headers: headers,
-            agent: agent,
-            responseType: 'buffer',
-            maxRedirects: 15,
-            throwHttpErrors: false,
-            ignoreInvalidCookies: true,
-            followRedirect: false,
-            timeout: {
-                request: 10000
-            }
-        }
-
         for (let i = 0; i < 2; i++) {
             try {
-                let response = await got(task.url, options)
-        
-                let data = response.body.toString()
+                let session = mSession[id]
+                if (!session) {
+                    await delay(1000)
+                    continue
+                }
+
+                let response = await session.post(task.url, {
+                    headers: headers,
+                    body: task.postData,
+                    timeout: 10000
+                })
+
+                let data = await response.text()
 
                 let json = extractArrays(data)[0][0]
 
@@ -837,14 +824,15 @@ async function clearDelay() {
     }
 }
 
-async function checkProxyWithAxios(proxyUrl) {
+async function checkProxyWithAxios(port) {
     for (let i = 0; i < 3; i++) {
         try {
-            let agent = new HttpsProxyAgent(proxyUrl)
-
             let response = await axios.get('https://api.ipify.org?format=json', {
-                httpAgent: agent,
-                httpsAgent: agent,
+                proxy: {
+                    protocol: 'http',
+                    host: '127.0.0.1',
+                    port: port
+                },
                 timeout: 10000
             })
             
@@ -883,30 +871,6 @@ async function saveNumber(user, key, number) {
             body: ''
         })
     } catch (error) {}
-}
-
-async function getCookiesJar(page) {
-    let puppeteerCookies = await page.cookies()
-
-    let cookies = puppeteerCookies.map(cookie => ({
-        creation: new Date().toISOString(),
-        domain: cookie.domain.replace(/^\./, ''),
-        expires: cookie.expires === -1 ? Infinity : new Date(cookie.expires * 1000).toISOString(),
-        hostOnly: !cookie.domain.startsWith('.'),
-        httpOnly: cookie.httpOnly,
-        key: cookie.name,
-        lastAccessed: new Date().toISOString(),
-        path: cookie.path,
-        secure: cookie.secure,
-        value: cookie.value
-    }))
-
-    return CookieJar.deserializeSync({
-        cookies,
-        rejectPublicSuffixes: true,
-        storeType: 'MemoryCookieStore',
-        version: 'tough-cookie@2.0.0'
-    })
 }
 
 function decode(data) {
