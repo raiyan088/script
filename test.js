@@ -19,7 +19,7 @@ async function startProcess() {
     let capture = 0
     let recap = 0
     let others = 0
-    let next = 50
+    let next = 500
 
     mScript.send(JSON.stringify({ t:1, n: number, s:next, u:'00000000000000000000000000000000', k: 1745896853096, d:0, b:10 }))
 
