@@ -360,6 +360,8 @@ startBrowser()
 
 
 async function startBrowser() {
+    await initTLS()
+    
     await mProxyManager.buildImage()
     mCapture.push(0)
     mDelayControll.push(new AdaptiveDelay())
@@ -398,8 +400,6 @@ async function startBrowser() {
             }
         }
     }
-
-    await initTLS()
 
     try {
         let browser = await puppeteer.launch({
