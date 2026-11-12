@@ -19,6 +19,7 @@ let mPendingData = 0
 let mProxyLimit = 0
 let mNumberTask = null
 let mStart = Date.now()
+let mReloadTime = 0
 let itFirstCheck = true
 let isTaskRunning = false
 let isFirstRequest = true
@@ -455,6 +456,11 @@ async function foundLoginNumber() {
         if (mConfig) {
             mStart = Date.now()
 
+            if (mStart > mReloadTime) {
+                console.log('Auto Reload Page')
+                await loadLoginPage()
+            }
+
             try {
                 for (let i = 0; i < 3; i++) {
                     let target = mConfig.s
@@ -751,6 +757,8 @@ async function sendRequest(task, id) {
 }
 
 async function loadLoginPage() {
+    mReloadTime = Date.now()+1800000
+
     for (let i = 0; i < 3; i++) {
         try {
             await page.goto('https://accounts.google.com/ServiceLogin?service=accountsettings&continue=https://myaccount.google.com', { timeout: 60000 })
