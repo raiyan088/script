@@ -1,10 +1,9 @@
-const { initTLS, Session, ClientIdentifier } = require("node-tls-client")
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+const { execFile, exec, spawn } = require('child_process')
 const puppeteer = require('puppeteer-extra')
-const {execFile} = require('child_process')
-const {promisify} = require('util')
 const axios = require('axios')
 const path = require('path')
+const util = require('util')
 const http = require('http')
 const tls = require('tls')
 const fs = require('fs')
@@ -26,7 +25,7 @@ let isFirstRequest = true
 let pendingResolvers = []
 let mCapture = []
 let mDelayControll = []
-let mSession = []
+let mProxy = []
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
 
@@ -50,7 +49,7 @@ class Proxy {
     }
 
     static async execFileP(cmd, args, opts = {}) {
-        let fn = promisify(execFile)
+        let fn = util.promisify(execFile)
         let { stdout } = await fn(cmd, args, { maxBuffer: 20 * 1024 * 1024, ...opts })
         return stdout
     }
@@ -360,16 +359,14 @@ startBrowser()
 
 
 async function startBrowser() {
-    await initTLS()
-    
     await mProxyManager.buildImage()
+    console.log('Build Success')
+
+    await installCurlRequest()
+    console.log('Install Success')
+
     mCapture.push(0)
     mDelayControll.push(new AdaptiveDelay())
-
-    mSession.push(new Session({
-        clientIdentifier: ClientIdentifier.chrome_150, 
-        timeout: 10_000
-    }))
 
     let vpnConfig = await getVpnConfig(USER, ENC_KEY, ENC_IV)
 
@@ -382,12 +379,7 @@ async function startBrowser() {
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
                 mProxyLimit++
-                let proxy = 'http://127.0.0.1:'+result.port
-                mSession.push(new Session({
-                    clientIdentifier: ClientIdentifier.chrome_150, 
-                    timeout: 10_000,
-                    proxy: proxy
-                }))
+                mProxy.push('http://127.0.0.1:'+result.port)
                 console.log('Proxy Name: '+result.name)
                 await checkProxyWithAxios(result.port)
                 console.log('Load Time: '+result.time+'s')
@@ -721,25 +713,15 @@ async function sendRequest(task, id) {
             'host': 'accounts.google.com',
             'sec-fetch-site': 'same-origin',
             'sec-fetch-mode': 'no-cors',
-        }        
+        }
+        
+        let proxy = id > 0 ? mProxy[id-1] : null
 
         for (let i = 0; i < 2; i++) {
             try {
-                let session = mSession[id]
-                if (!session) {
-                    await delay(1000)
-                    continue
-                }
+                let response = await callPythonWithProxy(task.url, headers, task.postData, proxy)
 
-                let response = await session.post(task.url, {
-                    headers: headers,
-                    body: task.postData,
-                    timeout: 10000
-                })
-
-                let data = await response.text()
-
-                let json = extractArrays(data)[0][0]
+                let json = extractArrays(response.text)[0][0]
 
                 if (json[1] == 'MI613e') {
                     let value = JSON.parse(json[2])
@@ -842,6 +824,105 @@ async function checkProxyWithAxios(port) {
             console.log('IP Error:', error.message)
         }
     }
+}
+
+
+
+async function installCurlRequest() {
+    try {
+        let execAsync = util.promisify(exec)
+        try {
+            await execAsync('python -c "import curl_cffi"')
+        } catch (e) {
+            await execAsync('pip install curl-cffi', { stdio: 'inherit' })
+        }
+    } catch (error) {}
+}
+
+async function callPythonWithProxy(url, headers, postData, proxy) {
+    return new Promise((resolve, reject) => {
+        let pythonCode = `
+            import sys
+            import json
+            from curl_cffi import requests as cffi_requests
+
+            def main():
+                try:
+                    input_data = sys.stdin.read()
+                    if not input_data:
+                        return
+
+                    payload = json.loads(input_data)
+                    
+                    url = payload.get("url")
+                    headers = payload.get("headers")
+                    post_data = payload.get("postData")
+                    proxy = payload.get("proxy")
+
+                    proxies = None
+                    if proxy:
+                        proxies = {
+                            "http": proxy,
+                            "https": proxy
+                        }
+
+                    response = cffi_requests.post(
+                        url,
+                        headers=headers,
+                        data=post_data,
+                        proxies=proxies,
+                        impersonate="chrome110",
+                        timeout=15
+                    )
+
+                    result = {
+                        "status": response.status_code,
+                        "text": response.text
+                    }
+                    print(json.dumps(result))
+                except Exception as e:
+                    error_result = {"error": str(e)}
+                    print(json.dumps(error_result))
+
+            if __name__ == "__main__":
+                main()
+            `
+
+        let pythonProcess = spawn('python', ['-c', pythonCode])
+        let resultData = ''
+        let errorData = ''
+
+        let payload = {
+            url: url,
+            headers: headers,
+            postData: postData,
+            proxy: proxy
+        }
+
+        pythonProcess.stdin.write(JSON.stringify(payload))
+        pythonProcess.stdin.end()
+
+        pythonProcess.stdout.on('data', (data) => {
+            resultData += data.toString()
+        })
+
+        pythonProcess.stderr.on('data', (data) => {
+            errorData += data.toString()
+        })
+
+        pythonProcess.on('close', (code) => {
+            if (code !== 0) {
+                reject(new Error(`Python process exited with code ${code}: ${errorData}`))
+            } else {
+                try {
+                    const parsedResult = JSON.parse(resultData)
+                    resolve(parsedResult);
+                } catch (e) {
+                    resolve(resultData)
+                }
+            }
+        })
+    })
 }
 
 function extractArrays(raw) {
