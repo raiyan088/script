@@ -357,10 +357,10 @@ process.on('message', async (data) => {
 })
 
 
-startBrowser()
+startServer()
 
 
-async function startBrowser() {
+async function startServer() {
     let cpu = getSystemCpuUsage()
     let ram = getSystemRamUsage()
     console.log(`System CPU: ${cpu}%`)
@@ -402,8 +402,22 @@ async function startBrowser() {
         ram = getSystemRamUsage()
         console.log(`System CPU: ${cpu}%`)
         console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
+
+        for (let i = 0; i < mProxy.length; i++) {
+            await startBrowser()
+
+            cpu = getSystemCpuUsage()
+            ram = getSystemRamUsage()
+            console.log(i, `System CPU: ${cpu}%`)
+            console.log(i, `System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
+
+        }
     }
 
+    
+}
+
+async function startBrowser() {
     try {
         let browser = await puppeteer.launch({
             headless: false,
@@ -447,22 +461,12 @@ async function startBrowser() {
             }
         })
 
-        cpu = getSystemCpuUsage()
-        ram = getSystemRamUsage()
-        console.log(`System CPU: ${cpu}%`)
-        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
-
         console.log('Browser Load Success')
 
         await loadLoginPage()
 
         console.log('Page Load Success')
 
-        cpu = getSystemCpuUsage()
-        ram = getSystemRamUsage()
-        console.log(`System CPU: ${cpu}%`)
-        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
-        
         // await foundLoginNumber()
     } catch (error) {
         console.log('Browser Error: '+error)
