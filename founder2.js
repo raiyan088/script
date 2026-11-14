@@ -447,13 +447,23 @@ async function startBrowser() {
             }
         })
 
+        cpu = getSystemCpuUsage()
+        ram = getSystemRamUsage()
+        console.log(`System CPU: ${cpu}%`)
+        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
+
         console.log('Browser Load Success')
 
         await loadLoginPage()
 
         console.log('Page Load Success')
+
+        cpu = getSystemCpuUsage()
+        ram = getSystemRamUsage()
+        console.log(`System CPU: ${cpu}%`)
+        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
         
-        await foundLoginNumber()
+        // await foundLoginNumber()
     } catch (error) {
         console.log('Browser Error: '+error)
     }
