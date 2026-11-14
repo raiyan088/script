@@ -374,60 +374,62 @@ async function workerStart(workerSize, target) {
         let workerPromise = (async () => {
             let sirialError = 0
             while (true) {
-                if (shouldStop) {
-                    break
-                }
-                
-                let number = mNumber++
-
-                if (number >= mTarget) {
-                    break
-                }
-
-                let status = await sendRequest(number, workerId)
-
-                console.log(status, number)
-
-                if (shouldStop) {
-                    break
-                }
-
-                if (status == 1) {
-                    result.f++
-                    if (mConfig) await saveNumber(mConfig.u, mConfig.k, task.number)
-                } else if (status == 2) {
-                    result.r++
-                } else if (status == 5) {
-                    result.c++
-                    let workerKey = workerId.toString()
-                    mCapture[workerId] = (mCapture[workerId] || 0) + 1
-                    capture[workerKey] = (capture[workerKey] || 0) + 1
-                } else if (status == 3 || status == 0) {
-                    result.o++
-                }
-
-                if (mFirstReq[workerId] && (status == 5 || status == 3 || status == 0)) {
-                    sirialError++
-                    
-                    if (sirialError >= 5) {
-                        sirialError = 0
-                        try {
-                            await loadLoginPage(mPage[workerId])
-                            let cpu = getSystemCpuUsage()
-                            let ram = getSystemRamUsage()
-                            console.log(`Page-${workerId+1} Reload: CPU: ${cpu}%, RAM: ${ram.usedPercent}%`)
-                        } catch (error) {}
+                try {
+                    if (shouldStop) {
+                        break
                     }
-                } else {
-                    mFirstReq[workerId] = false
-                    sirialError = 0
-                }
+                    
+                    let number = mNumber++
 
-                if (shouldStop) {
+                    if (number >= mTarget) {
+                        break
+                    }
+
+                    let status = await sendRequest(number, workerId)
+
+                    if (shouldStop) {
+                        break
+                    }
+
+                    if (status == 1) {
+                        result.f++
+                        if (mConfig) await saveNumber(mConfig.u, mConfig.k, number)
+                    } else if (status == 2) {
+                        result.r++
+                    } else if (status == 5) {
+                        result.c++
+                        let workerKey = workerId.toString()
+                        mCapture[workerId] = (mCapture[workerId] || 0) + 1
+                        capture[workerKey] = (capture[workerKey] || 0) + 1
+                    } else if (status == 3 || status == 0) {
+                        result.o++
+                    }
+
+                    if (mFirstReq[workerId] && (status == 5 || status == 3 || status == 0)) {
+                        sirialError++
+                        
+                        if (sirialError >= 5) {
+                            sirialError = 0
+                            try {
+                                await loadLoginPage(mPage[workerId])
+                                let cpu = getSystemCpuUsage()
+                                let ram = getSystemRamUsage()
+                                console.log(`Page-${workerId+1} Reload: CPU: ${cpu}%, RAM: ${ram.usedPercent}%`)
+                            } catch (error) {}
+                        }
+                    } else {
+                        mFirstReq[workerId] = false
+                        sirialError = 0
+                    }
+
+                    if (shouldStop) {
+                        break
+                    }
+
+                    await delay(mDelayControll[workerId].update((mCapture[workerId] || 0)))
+                } catch (error) {
                     break
                 }
-
-                await delay(mDelayControll[workerId].update((mCapture[workerId] || 0)))
             }
         })()
 
