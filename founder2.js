@@ -247,7 +247,6 @@ async function startServer() {
             mDelayControll.push(new AdaptiveDelay())
             let result = await mProxyManager.connect(vpnConfig[i].config, 8888+i, i+1)
             if (result.status) {
-                mProxyLimit++
                 mProxy.push('http://127.0.0.1:'+result.port)
                 console.log('Proxy Name: '+result.name)
                 console.log('IP Address:', result.ip)
