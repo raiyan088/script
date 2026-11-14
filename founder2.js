@@ -262,26 +262,34 @@ async function startServer() {
         }
     }
 
-    for (let i = 0; i <= mProxy.length; i++) {
-        await startBrowser()
+    await startBrowser(null)
+
+    for (let i = 0; i < mProxy.length; i++) {
+        await startBrowser(mProxy[i])
     }
 
     await foundLoginNumber()
 }
 
-async function startBrowser() {
+async function startBrowser(proxy) {
     try {
+        let args = [
+            '--no-sandbox',
+            '--disable-notifications',
+            '--disable-setuid-sandbox',
+            '--ignore-certificate-errors',
+            '--ignore-certificate-errors-skip-list',
+            '--disable-dev-shm-usage'
+        ]
+
+        if (proxy) {
+            args.push('--proxy-server=' + proxy)
+        }
+
         let browser = await puppeteer.launch({
             headless: false,
             headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-notifications',
-                '--disable-setuid-sandbox',
-                '--ignore-certificate-errors',
-                '--ignore-certificate-errors-skip-list',
-                '--disable-dev-shm-usage'
-            ]
+            args: args
         })
 
         let page = (await browser.pages())[0]
