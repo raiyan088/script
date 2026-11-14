@@ -26,6 +26,7 @@ let STORAGE = decode('aHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi
 
 puppeteer.use(StealthPlugin())
 
+process.setMaxListeners(20)
 
 process.on('message', async (data) => {
     try {
