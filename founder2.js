@@ -7,6 +7,7 @@ const util = require('util')
 const http = require('http')
 const tls = require('tls')
 const fs = require('fs')
+const os = require('os')
 
 
 let USER = process.argv.slice(2)[0]
@@ -360,6 +361,10 @@ startBrowser()
 
 
 async function startBrowser() {
+    let cpu = getSystemCpuUsage()
+    let ram = getSystemRamUsage()
+    console.log(`System CPU: ${cpu}%`)
+    console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
     await mProxyManager.buildImage()
     console.log('Build Success')
 
@@ -392,6 +397,11 @@ async function startBrowser() {
                 console.log('--------------------------------')
             }
         }
+
+        cpu = getSystemCpuUsage()
+        ram = getSystemRamUsage()
+        console.log(`System CPU: ${cpu}%`)
+        console.log(`System RAM: ${ram.usedPercent}% (${ram.usedMB} MB / ${ram.totalMB} MB)`)
     }
 
     try {
@@ -933,6 +943,15 @@ async function callPythonWithProxy(url, headers, postData, proxy) {
     })
 }
 
+async function saveNumber(user, key, number) {
+    try {
+        await fetch(STORAGE+encodeURIComponent('number/'+user+'/'+key+'/'+number), {
+            method: 'POST',
+            body: ''
+        })
+    } catch (error) {}
+}
+
 function extractArrays(raw) {
     raw = raw.replace(/^\)\]\}'\s*/g, '')
 
@@ -953,13 +972,30 @@ function extractArrays(raw) {
     return arrays
 }
 
-async function saveNumber(user, key, number) {
-    try {
-        await fetch(STORAGE+encodeURIComponent('number/'+user+'/'+key+'/'+number), {
-            method: 'POST',
-            body: ''
-        })
-    } catch (error) {}
+function cpuSnapshot() {
+    let cpus = os.cpus()
+    let idle = 0, total = 0
+    for (const cpu of cpus) {
+        for (const type in cpu.times) total += cpu.times[type]
+        idle += cpu.times.idle
+    }
+    return { idle, total }
+}
+
+function getSystemCpuUsage() {
+    let { idle, total } = cpuSnapshot();
+    return +(100 - (idle / total) * 100).toFixed(2)
+}
+
+function getSystemRamUsage() {
+    let total = os.totalmem()
+    let free = os.freemem()
+    let used = total - free
+    return {
+        usedPercent: +((used / total) * 100).toFixed(2),
+        usedMB: +(used / 1024 / 1024).toFixed(2),
+        totalMB: +(total / 1024 / 1024).toFixed(2),
+    }
 }
 
 function decode(data) {
