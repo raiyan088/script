@@ -530,13 +530,13 @@ async function sendRequest(number, id) {
                     console.log(id, 'MI613e Not Found')
                 }
             } catch (error) {
-                console.log(id, 'Error: '+data)
+                console.log(id, number, 'Error: '+data)
             }
         } else {
             console.log(id, 'Data Not Found')
         }
     } catch (error) {
-        console.log(id, error)
+        console.log(id, number, error)
     }
 
     return 0
