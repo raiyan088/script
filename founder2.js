@@ -530,7 +530,7 @@ async function sendRequest(number, id) {
                     console.log(id, 'MI613e Not Found')
                 }
             } catch (error) {
-                console.log(id, number, 'Error: '+data)
+                console.log(id, number, 'Error: ', Buffer.from(data).toString('base64'))
             }
         } else {
             console.log(id, 'Data Not Found')
