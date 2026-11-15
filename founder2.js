@@ -506,27 +506,31 @@ async function sendRequest(number, id) {
                 return await res.text()
             }, url + (url.endsWith('&') ? '' : '&') + 'request=manually', capturedData.headers, capturedData.postData)
 
-            let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
-            temp = temp.substring(0, temp.lastIndexOf(']]')+2)
+            try {
+                let temp = data.substring(data.indexOf('[['), data.lastIndexOf(']]')-2)
+                temp = temp.substring(0, temp.lastIndexOf(']]')+2)
 
-            let json = JSON.parse(temp)[0]
-            if (json[1] == 'MI613e') {
-                let value = JSON.parse(json[2])
-                if (value[21]) {
-                    let values = JSON.stringify(value[21])
-                    if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
-                        return 1
-                    } else if (values.includes('/v3/signin/challenge/recaptcha')) {
-                        return 2
+                let json = JSON.parse(temp)[0]
+                if (json[1] == 'MI613e') {
+                    let value = JSON.parse(json[2])
+                    if (value[21]) {
+                        let values = JSON.stringify(value[21])
+                        if (values.includes('/v3/signin/challenge/pwd') || values.includes('/v3/signin/rejected')) {
+                            return 1
+                        } else if (values.includes('/v3/signin/challenge/recaptcha')) {
+                            return 2
+                        }
+                        return 3
+                    } else if (value[18] && value[18][0]) {
+                        return 5
+                    } else {
+                        return 4
                     }
-                    return 3
-                } else if (value[18] && value[18][0]) {
-                    return 5
                 } else {
-                    return 4
+                    console.log(id, 'MI613e Not Found')
                 }
-            } else {
-                console.log(id, 'MI613e Not Found')
+            } catch (error) {
+                console.log(id, 'Error: '+data)
             }
         } else {
             console.log(id, 'Data Not Found')
