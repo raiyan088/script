@@ -40,6 +40,11 @@ process.on('message', async (data) => {
     } catch (error) {}
 })
 
+process.on('warning', (warning) => {
+    console.warn('Warning Name:', warning.name)
+    console.warn('Warning Message:', warning.message)
+    console.warn('Stack Trace:\n', warning.stack)
+})
 
 class Proxy {
     static CONFIG = {
@@ -184,7 +189,7 @@ class Proxy {
 }
 
 class AdaptiveDelay {
-    constructor({minDelay = 1000, maxDelay = 3000, step = 200, incCooldown = 5000} = {}) {
+    constructor({minDelay = 500, maxDelay = 3000, step = 200, incCooldown = 5000} = {}) {
         this.delay = minDelay
         this.minDelay = minDelay
         this.maxDelay = maxDelay
