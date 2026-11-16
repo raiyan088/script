@@ -32,18 +32,21 @@ process.on('message', async (data) => {
     try {
         let json = (typeof data === 'string') ? JSON.parse(data) : data
         if (json.t == 1) {
-            mConfig = json
+            if (json.d) {
+                if (json.d.t == 1) {
+                    mConfig = json.d
+                } else if (json.d.t == 2) {
+                    let running = mConfig != null
+                    process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
+                }
+            } else {
+                mConfig = json
+            }
         } else if (json.t == 2) {
             let running = mConfig != null
             process.send({ t: 3, s: 'controller_status', d: { t:2, r:running, u:json.u, s:USER, a:parseInt((Date.now()-mStart)/1000) } })
         }
     } catch (error) {}
-})
-
-process.on('warning', (warning) => {
-    console.warn('Warning Name:', warning.name)
-    console.warn('Warning Message:', warning.message)
-    console.warn('Stack Trace:\n', warning.stack)
 })
 
 class Proxy {
@@ -189,7 +192,7 @@ class Proxy {
 }
 
 class AdaptiveDelay {
-    constructor({minDelay = 800, maxDelay = 3000, step = 200, incCooldown = 5000} = {}) {
+    constructor({minDelay = 500, maxDelay = 3000, step = 200, incCooldown = 5000} = {}) {
         this.delay = minDelay
         this.minDelay = minDelay
         this.maxDelay = maxDelay
