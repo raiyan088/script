@@ -531,9 +531,15 @@ async function sendRequest(number, id) {
                 } else {
                     return 4
                 }
+            } else {
+                console.log(id, 'MI613e Not Found')
             }
+        } else {
+            console.log(id, 'CapturedData Not Found')
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log(id, 'Error:'+error)
+    }
 
     return 0
 }
